@@ -1,6 +1,5 @@
-import { useDocumentTitle } from '@/hooks';
+import { useDocumentTitle, useLibrary } from '@/hooks';
 import { PageWrapper } from '@/components/ui';
-import { MOCK_BOOKS } from '@/mocks/books';
 import { MOCK_LIBRARY_STATS } from '@/mocks/libraryStats';
 import {
   SectionHeader,
@@ -14,13 +13,14 @@ import './LibraryPage.css';
 
 /**
  * Library page composing the domain components.
- * UI only - uses mock data and placeholder callbacks.
+ * Integrates the useLibrary hook for IndexedDB persistence and PDF import.
  */
 export function LibraryPage() {
   useDocumentTitle('Library');
 
-  // In Phase 3, MOCK_BOOKS will be replaced by a hook, e.g. useLibrary()
-  const books = MOCK_BOOKS;
+  const { books, isLoading, isImporting, importBook } = useLibrary();
+
+  // For Phase 3, we still use mock stats until reading stats logic is built in Phase 4.
   const stats = MOCK_LIBRARY_STATS;
 
   return (
@@ -41,7 +41,10 @@ export function LibraryPage() {
 
       {/* 2. Main Library Area */}
       <section className="library-page__main">
-        <SectionHeader title="All Books" />
+        <SectionHeader 
+          title="All Books" 
+          subtitle={isLoading ? 'Loading library...' : `${books.length} book${books.length !== 1 ? 's' : ''}`}
+        />
 
         <div className="library-page__toolbar">
           <LibraryToolbar
@@ -53,20 +56,20 @@ export function LibraryPage() {
 
         <BookGrid
           books={books}
-          onOpenBook={(book) => console.log('Opening book:', book.id)}
+          onOpenBook={(book) => console.log('Opening book:', book.title)}
           emptyState={
             <EmptyLibrary
               title="Your library is empty"
-              description="Book management and PDF upload will be available in a future phase. Your entire collection will appear here."
-              buttonText="Import PDF"
-              onAction={() => console.log('Import PDF coming in Phase 3')}
+              description="Click the import button below to add your first PDF."
+              buttonText={isImporting ? 'Importing...' : 'Import PDF'}
+              onAction={importBook}
             />
           }
         />
       </section>
 
       {/* 3. Global Actions */}
-      <ImportButton onImport={() => console.log('Import PDF coming in Phase 3')} />
+      <ImportButton onImport={importBook} />
     </PageWrapper>
   );
 }
