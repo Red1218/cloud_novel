@@ -1,0 +1,55 @@
+/* ==============================================================
+   APP LAYOUT SHELL
+   Desktop: CSS Grid with sidebar column + main column.
+   Tablet/Mobile: Single column (sidebar becomes fixed overlay).
+   ============================================================== */
+
+.app-layout {
+  display: grid;
+  /* Desktop: sidebar column + flexible main column */
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- Main column (header + scrollable content) ------------ */
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0; /* Prevent grid blowout */
+  background-color: var(--color-bg-app);
+}
+
+/* ---- Scrollable content area ------------------------------ */
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-content__inner {
+  padding: var(--space-8) var(--space-6);
+  min-height: 100%;
+}
+
+/* ==============================================================
+   RESPONSIVE
+   ============================================================== */
+
+/* Tablet/Mobile: collapse sidebar column from grid */
+@media (max-width: 1023px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile: tighter content padding */
+@media (max-width: 767px) {
+  .app-content__inner {
+    padding: var(--space-5) var(--space-4);
+  }
+}

@@ -1,0 +1,127 @@
+/* ============================================================
+   CLOUD NOVEL — DESIGN TOKENS
+   Single source of truth for all design decisions.
+   Dark theme only (Phase 1).
+   ============================================================ */
+
+:root {
+  /* ----------------------------------------------------------
+     COLOR PALETTE
+     ---------------------------------------------------------- */
+
+  /* Background layers (darkest → lightest) */
+  --color-bg-app:           #0d0f14;
+  --color-bg-sidebar:       #111318;
+  --color-bg-header:        #111318;
+  --color-bg-surface:       #181b24;
+  --color-bg-surface-hover: #1e2230;
+  --color-bg-elevated:      #222636;
+
+  /* Text */
+  --color-text-primary:     #e2e6f0;
+  --color-text-secondary:   #9ba3bb;
+  --color-text-muted:       #5c6480;
+  --color-text-disabled:    #3a3f57;
+
+  /* Accent — indigo-blue */
+  --color-accent:           #6c8ef5;
+  --color-accent-hover:     #8ba4f7;
+  --color-accent-subtle:    rgba(108, 142, 245, 0.12);
+  --color-accent-border:    rgba(108, 142, 245, 0.3);
+
+  /* Borders */
+  --color-border:           rgba(255, 255, 255, 0.06);
+  --color-border-strong:    rgba(255, 255, 255, 0.11);
+
+  /* Semantic */
+  --color-danger:           #f56565;
+  --color-danger-subtle:    rgba(245, 101, 101, 0.12);
+  --color-success:          #68d391;
+  --color-warning:          #f6ad55;
+  --color-info:             #63b3ed;
+
+  /* ----------------------------------------------------------
+     SPACING SCALE (4px base unit)
+     ---------------------------------------------------------- */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY
+     ---------------------------------------------------------- */
+  --font-family-base:  'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-family-mono:  'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  --font-size-xs:   0.6875rem;  /* 11px */
+  --font-size-sm:   0.8125rem;  /* 13px */
+  --font-size-base: 0.9375rem;  /* 15px */
+  --font-size-lg:   1.0625rem;  /* 17px */
+  --font-size-xl:   1.25rem;    /* 20px */
+  --font-size-2xl:  1.5rem;     /* 24px */
+  --font-size-3xl:  1.875rem;   /* 30px */
+  --font-size-4xl:  2.25rem;    /* 36px */
+
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --line-height-tight:   1.2;
+  --line-height-snug:    1.375;
+  --line-height-base:    1.6;
+  --line-height-relaxed: 1.8;
+
+  /* ----------------------------------------------------------
+     LAYOUT DIMENSIONS
+     ---------------------------------------------------------- */
+  --sidebar-width:  240px;
+  --header-height:  58px;
+  --content-max-w:  1200px;
+
+  /* ----------------------------------------------------------
+     BORDER RADIUS
+     ---------------------------------------------------------- */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* ----------------------------------------------------------
+     SHADOWS
+     ---------------------------------------------------------- */
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm:  0 1px 4px rgba(0, 0, 0, 0.45);
+  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.55);
+  --shadow-lg:  0 8px 28px rgba(0, 0, 0, 0.65);
+  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.72);
+
+  /* ----------------------------------------------------------
+     TRANSITIONS (tokens only — components opt in)
+     ---------------------------------------------------------- */
+  --transition-fast:   100ms ease;
+  --transition-base:   200ms ease;
+  --transition-slow:   350ms ease;
+  --transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ----------------------------------------------------------
+     Z-INDEX SCALE
+     ---------------------------------------------------------- */
+  --z-base:     1;
+  --z-raised:   10;
+  --z-backdrop: 80;
+  --z-sidebar:  100;
+  --z-header:   90;
+  --z-modal:    200;
+  --z-toast:    300;
+}
