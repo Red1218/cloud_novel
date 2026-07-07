@@ -4,12 +4,15 @@ import { BookRepository } from '@/repositories/BookRepository';
 import { extractPdfData } from '@/services/pdfService';
 import { computeSHA256 } from '@/utils/hash';
 import { selectPdfFile } from '@/utils/filePicker';
+import { useToast } from '@/hooks/useToast';
 
 export function useLibrary() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const { showToast } = useToast();
 
   const fetchBooks = useCallback(async () => {
     try {
@@ -21,10 +24,11 @@ export function useLibrary() {
     } catch (err) {
       console.error('Failed to fetch books from library:', err);
       setError('Failed to load library.');
+      showToast({ type: 'error', title: 'Error', message: 'Failed to load library.' });
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   // Fetch initially
   useEffect(() => {
@@ -47,7 +51,12 @@ export function useLibrary() {
       // 4. Duplicate Check
       const existingBook = await BookRepository.getByHash(hash);
       if (existingBook) {
-        throw new Error(`The book "${existingBook.title}" is already in your library.`);
+        showToast({
+          type: 'warning',
+          title: 'Duplicate Book',
+          message: `The book "${existingBook.title}" is already in your library.`
+        });
+        return;
       }
 
       // 5. Extract Metadata and Thumbnail
@@ -74,18 +83,27 @@ export function useLibrary() {
       // 8. Refresh Library
       await fetchBooks();
 
+      // Success
+      showToast({
+        type: 'success',
+        title: 'Import Successful',
+        message: `Added "${newBook.title}" to your library.`
+      });
+
     } catch (err: any) {
       if (err.message !== 'File selection cancelled') {
         console.error('Import failed:', err);
         setError(err.message || 'Failed to import book.');
-        // If we had a toast system, we could dispatch here. 
-        // For now, we use a simple browser alert to meet "friendly error handling" without over-engineering Phase 3 UI.
-        alert(err.message || 'Failed to import book.');
+        showToast({
+          type: 'error',
+          title: 'Import Error',
+          message: err.message || 'Failed to import book. The PDF might be corrupted or unsupported.'
+        });
       }
     } finally {
       setIsImporting(false);
     }
-  }, [fetchBooks]);
+  }, [fetchBooks, showToast]);
 
   return {
     books,
