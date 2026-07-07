@@ -1,0 +1,45 @@
+.page-wrapper {
+  max-width: var(--content-max-w);
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Page header row */
+.page-wrapper__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-wrapper__heading-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.page-wrapper__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.page-wrapper__description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+.page-wrapper__action {
+  flex-shrink: 0;
+}
+
+/* Page body */
+.page-wrapper__body {
+  /* Body takes natural height; scrolling handled by .app-content parent. */
+}
