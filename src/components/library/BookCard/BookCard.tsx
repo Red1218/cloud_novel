@@ -25,7 +25,7 @@ export function BookCard({ book, onOpen }: BookCardProps) {
   return (
     <article className="book-card">
       <div className="book-card__cover-wrapper" onClick={handleOpen} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleOpen()}>
-        <BookCover src={book.cover} title={book.title} />
+        <BookCover src={book.thumbnail} title={book.title} />
         <div className="book-card__overlay">
           <button type="button" className="book-card__open-btn" tabIndex={-1}>
             Open
