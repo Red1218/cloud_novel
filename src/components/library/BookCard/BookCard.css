@@ -1,0 +1,121 @@
+.book-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+/* -- Cover Area -- */
+
+.book-card__cover-wrapper {
+  position: relative;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.book-card__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.book-card__cover-wrapper:hover .book-card__overlay,
+.book-card__cover-wrapper:focus-visible .book-card__overlay {
+  opacity: 1;
+}
+
+.book-card__open-btn {
+  background-color: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transform: translateY(10px);
+  transition: transform var(--transition-bounce), background-color var(--transition-fast);
+}
+
+.book-card__cover-wrapper:hover .book-card__open-btn,
+.book-card__cover-wrapper:focus-visible .book-card__open-btn {
+  transform: translateY(0);
+}
+
+.book-card__open-btn:hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* -- Info Area -- */
+
+.book-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.book-card__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card__author {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -- Meta Area (Progress & Last Opened) -- */
+
+.book-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.book-card__progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.book-card__progress-bar {
+  flex-grow: 1;
+  height: 4px;
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.book-card__progress-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+.book-card__progress-text {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  min-width: 3ch;
+  text-align: right;
+}
+
+.book-card__last-opened {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
