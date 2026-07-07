@@ -1,0 +1,47 @@
+.import-button {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-3) var(--space-6);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-bounce);
+}
+
+.import-button:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-2px);
+}
+
+.import-button:active {
+  transform: translateY(0);
+}
+
+.import-button__icon {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.import-button__text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* On larger screens, it might make more sense to place it within the page flow 
+   or keep it fixed but adjust positioning based on the sidebar.
+   For now, we keep it fixed bottom-right, but adjust for the sidebar width. */
+@media (min-width: 1024px) {
+  .import-button {
+    bottom: var(--space-8);
+    right: var(--space-8);
+  }
+}

@@ -1,0 +1,26 @@
+.library-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.library-toolbar__main {
+  flex-grow: 1;
+  display: flex;
+}
+
+.library-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Tablet and up: Row layout */
+@media (min-width: 768px) {
+  .library-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
