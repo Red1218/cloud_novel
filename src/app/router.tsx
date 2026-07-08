@@ -30,7 +30,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardPage /> },
       { path: ROUTES.LIBRARY.slice(1), element: <LibraryPage /> },
-      { path: ROUTES.READER.slice(1), element: <ReaderPage /> },
+      { path: ROUTES.READER.slice(1) + '/:bookId', element: <ReaderPage /> },
       { path: ROUTES.SETTINGS.slice(1), element: <SettingsPage /> },
     ],
   },
