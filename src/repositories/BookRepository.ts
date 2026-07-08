@@ -35,7 +35,15 @@ export const BookRepository = {
   },
 
   /**
-   * Retrieves the full StoredBook (including the PDF blob) for reading.
+   * Retrieves the full StoredBook (including the PDF blob) for reading by UUID.
+   */
+  async getStoredBookById(id: string): Promise<StoredBook | undefined> {
+    const db = await getDB();
+    return db.get('books', id);
+  },
+
+  /**
+   * Retrieves the full StoredBook (including the PDF blob) for reading by hash.
    */
   async getStoredBookByHash(hash: string): Promise<StoredBook | undefined> {
     const db = await getDB();

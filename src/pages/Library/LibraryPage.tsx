@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 import { useDocumentTitle, useLibrary } from '@/hooks';
 import { PageWrapper } from '@/components/ui';
+import { ROUTES } from '@/constants';
 import { MOCK_LIBRARY_STATS } from '@/mocks/libraryStats';
 import {
   SectionHeader,
@@ -18,6 +20,7 @@ import './LibraryPage.css';
 export function LibraryPage() {
   useDocumentTitle('Library');
 
+  const navigate = useNavigate();
   const { books, isLoading, isImporting, importBook } = useLibrary();
 
   // For Phase 3, we still use mock stats until reading stats logic is built in Phase 4.
@@ -56,7 +59,7 @@ export function LibraryPage() {
 
         <BookGrid
           books={books}
-          onOpenBook={(book) => console.log('Opening book:', book.title)}
+          onOpenBook={(book) => navigate(`${ROUTES.READER}/${book.id}`)}
           emptyState={
             <EmptyLibrary
               title="Your library is empty"
