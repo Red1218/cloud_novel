@@ -1,31 +1,28 @@
 import { forwardRef } from 'react';
-import type { RefObject } from 'react';
 import './PdfCanvas.css';
 
 interface PdfCanvasProps {
-  isLoading:    boolean;
-  error:        string | null;
-  /** Ref forwarded to the scroll container for viewport fit measurements. */
-  containerRef: RefObject<HTMLDivElement | null>;
+  isLoading: boolean;
+  error:     string | null;
 }
 
 /**
  * Purely presentational component that renders the canvas element.
- * The actual rendering logic is handled by usePdfRenderer which receives canvasRef.
- * containerRef is attached to the scroll container so useReader can measure
- * available dimensions for fit-width and fit-page calculations.
+ *
+ * The scroll container and stacking context previously owned by this component
+ * have moved to ReaderViewport, which composes PdfCanvas and PdfTextLayer
+ * as siblings inside a shared positioning context.
+ *
+ * The actual rendering logic is handled by usePdfRenderer which receives
+ * canvasRef from ReaderPage.
  */
 export const PdfCanvas = forwardRef<HTMLCanvasElement, PdfCanvasProps>(
-  ({ isLoading, error, containerRef }, ref) => {
+  ({ isLoading, error }, ref) => {
     return (
-      <div className="pdf-canvas-container" ref={containerRef}>
-        <div className="pdf-canvas-wrapper">
-          <canvas
-            ref={ref}
-            className={`pdf-canvas ${isLoading || error ? 'pdf-canvas--hidden' : ''}`}
-          />
-        </div>
-      </div>
+      <canvas
+        ref={ref}
+        className={`pdf-canvas ${isLoading || error ? 'pdf-canvas--hidden' : ''}`}
+      />
     );
   },
 );

@@ -1,27 +1,17 @@
-  .pdf-canvas-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: var(--space-6);
-    box-sizing: border-box;
-  }
+/*
+ * .pdf-canvas-container and .pdf-canvas-wrapper have been removed.
+ * Those styles now live in ReaderViewport.css as:
+ *   .reader-viewport-scroll   (the scroll container)
+ *   .reader-viewport-page     (the stacking context)
+ */
 
-  .pdf-canvas-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
+.pdf-canvas {
+  max-width: 100%;
+  box-shadow: var(--shadow-lg);
+  background-color: white; /* PDF pages are usually white */
+  display: block;           /* Remove inline baseline gap */
+}
 
-  .pdf-canvas {
-    max-width: 100%;
-    box-shadow: var(--shadow-lg);
-    background-color: white; /* PDF pages are usually white */
-  }
-
-  .pdf-canvas--hidden {
-    display: none;
-  }
+.pdf-canvas--hidden {
+  display: none;
+}

@@ -1,0 +1,186 @@
+/*
+ * PDF.js Text Layer — official styles
+ *
+ * The .textLayer block below is taken verbatim from:
+ *   pdfjs-dist@6.1.200/web/pdf_viewer.css (lines 615–762)
+ *
+ * Only this block is included. The full pdf_viewer.css (163 kB) is NOT
+ * imported — it contains unrelated viewer chrome that would conflict with
+ * the project's own design system.
+ *
+ * Project-specific positioning overrides follow the official block.
+ */
+
+/* ─── Official PDF.js text layer styles ────────────────────────────────────── */
+
+.textLayer {
+  color-scheme: only light;
+
+  position: absolute;
+  text-align: initial;
+  inset: 0;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  letter-spacing: normal;
+  word-spacing: normal;
+  -webkit-text-size-adjust: none;
+     -moz-text-size-adjust: none;
+          text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  caret-color: CanvasText;
+  z-index: 0;
+}
+
+.textLayer.highlighting {
+  touch-action: none;
+}
+
+.textLayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  -webkit-user-select: text;
+     -moz-user-select: text;
+          user-select: text;
+}
+
+.textLayer {
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+.textLayer > :not(.markedContent),
+.textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.textLayer .markedContent {
+  display: contents;
+}
+
+.textLayer span[role="img"] {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  cursor: default;
+}
+
+.textLayer .highlight {
+  --highlight-bg-color: rgb(180 0 170 / 0.25);
+  --highlight-selected-bg-color: rgb(0 100 0 / 0.25);
+  --highlight-backdrop-filter: none;
+  --highlight-selected-backdrop-filter: none;
+
+  margin: -1px;
+  padding: 1px;
+  background-color: var(--highlight-bg-color);
+  backdrop-filter: var(--highlight-backdrop-filter);
+  border-radius: 4px;
+}
+
+@media screen and (forced-colors: active) {
+  .textLayer .highlight {
+    --highlight-bg-color: transparent;
+    --highlight-selected-bg-color: transparent;
+    --highlight-backdrop-filter: var(--hcm-highlight-filter);
+    --highlight-selected-backdrop-filter: var(--hcm-highlight-selected-filter);
+  }
+}
+
+.textLayer .highlight.appended {
+  position: initial;
+}
+
+.textLayer .highlight.begin {
+  border-radius: 4px 0 0 4px;
+}
+
+.textLayer .highlight.end {
+  border-radius: 0 4px 4px 0;
+}
+
+.textLayer .highlight.middle {
+  border-radius: 0;
+}
+
+.textLayer .highlight.selected {
+  background-color: var(--highlight-selected-bg-color);
+  backdrop-filter: var(--highlight-selected-backdrop-filter);
+  scroll-margin-top: 50px;
+}
+
+.textLayer ::-moz-selection {
+  background: rgba(0 0 255 / 0.25);
+  background: color-mix(in srgb, AccentColor, transparent 50%);
+  color: transparent;
+}
+
+.textLayer ::selection {
+  background: rgba(0 0 255 / 0.25);
+  background: color-mix(in srgb, AccentColor, transparent 50%);
+  color: transparent;
+}
+
+.textLayer.selectionRendering ::-moz-selection {
+  background: transparent;
+  color: transparent;
+}
+
+.textLayer.selectionRendering ::selection {
+  background: transparent;
+  color: transparent;
+}
+
+.textLayer br::-moz-selection {
+  background: transparent;
+}
+
+.textLayer br::selection {
+  background: transparent;
+}
+
+.textLayer .endOfContent {
+  display: block;
+  position: absolute;
+  inset: 100% 0 0;
+  z-index: 0;
+  cursor: default;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+.textLayer.selecting .endOfContent {
+  top: 0;
+}
+
+/* ─── Project-specific positioning ─────────────────────────────────────────── */
+
+/*
+ * The text layer sits above the canvas (z-index: 2) inside ReaderViewport's
+ * stacking context (position: relative on .reader-viewport-page).
+ *
+ * pointer-events are disabled on the container so mouse events pass through
+ * to the canvas. They are re-enabled on the individual text spans so that
+ * native browser text selection still works.
+ */
+.textLayer {
+  z-index: 2;
+  pointer-events: none;
+}
+
+.textLayer :is(span, br) {
+  pointer-events: auto;
+}

@@ -1,26 +1,30 @@
 import { useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { TextLayer } from 'pdfjs-dist';
 import { useDocumentTitle } from '@/hooks';
 import {
   ReaderHeader,
   LoadingState,
   ErrorState,
-  PdfCanvas,
+  ReaderViewport,
   usePdfDocument,
   usePdfRenderer,
+  usePdfTextLayer,
   useReader,
 } from '@/features/reader';
 import './ReaderPage.css';
 
 /**
- * Reader page — composition only.
+ * Reader page — composition and orchestration only.
  *
- * Wires together:
- *  - usePdfDocument  (loads StoredBook + PDFDocumentProxy)
- *  - useReader       (all Reader state: page, zoom, viewport, shortcuts)
- *  - usePdfRenderer  (pure canvas rendering)
+ * Wires together all hooks and passes results to presentational components:
+ *  - usePdfDocument   loads StoredBook + PDFDocumentProxy from IndexedDB
+ *  - useReader        all Reader state: page, viewport, zoom, shortcuts
+ *  - usePdfRenderer   pure canvas rendering (unchanged)
+ *  - usePdfTextLayer  fetches TextContent per page for the text layer
  *
  * Contains no Reader business logic.
+ * ReaderViewport receives all data as props and handles all layer composition.
  */
 export function ReaderPage() {
   const { bookId } = useParams<{ bookId: string }>();
@@ -32,9 +36,29 @@ export function ReaderPage() {
 
   const reader = useReader(pdfDocument, containerRef);
 
+  // Fetch text content for the current page.
+  // Re-fetches only when `reader.page` changes — not on zoom or resize.
+  const { textContent } = usePdfTextLayer(reader.page);
+
   useDocumentTitle(
     book?.title ? `${book.title} — Page ${reader.currentPage}` : 'Reader',
   );
+
+  // Call TextLayer.cleanup() once when the document unloads.
+  //
+  // TextLayer.cleanup() releases global static state held by the TextLayer
+  // class (font metrics caches, canvas contexts). It must be called only
+  // during document teardown — NOT on page navigation, zoom, or resize.
+  //
+  // The effect runs whenever pdfDocument changes. The cleanup function fires
+  // when pdfDocument transitions away from a value (i.e. becomes null on
+  // unload), which is the correct and only moment to call this.
+  useEffect(() => {
+    if (!pdfDocument) return;
+    return () => {
+      TextLayer.cleanup();
+    };
+  }, [pdfDocument]);
 
   // Ensure the header is visible when the reader opens.
   useEffect(() => {
@@ -68,11 +92,14 @@ export function ReaderPage() {
 
         {error && !isLoading && <ErrorState message={error} />}
 
-        <PdfCanvas
-          ref={canvasRef}
-          containerRef={containerRef}
+        <ReaderViewport
+          page={reader.page}
+          viewport={reader.viewport}
+          textContent={textContent}
           isLoading={isLoading}
           error={error}
+          canvasRef={canvasRef}
+          containerRef={containerRef}
         />
       </main>
     </div>
