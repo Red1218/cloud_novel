@@ -1,27 +1,27 @@
-.pdf-canvas-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--space-6);
-  box-sizing: border-box;
-}
+  .pdf-canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-6);
+    box-sizing: border-box;
+  }
 
-.pdf-canvas-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
+  .pdf-canvas-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
-.pdf-canvas {
-  max-width: 100%;
-  box-shadow: var(--shadow-lg);
-  background-color: white; /* PDF pages are usually white */
-}
+  .pdf-canvas {
+    max-width: 100%;
+    box-shadow: var(--shadow-lg);
+    background-color: white; /* PDF pages are usually white */
+  }
 
-.pdf-canvas--hidden {
-  display: none;
-}
+  .pdf-canvas--hidden {
+    display: none;
+  }
