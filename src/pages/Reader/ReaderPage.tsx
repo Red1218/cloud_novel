@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks';
 import {
@@ -8,89 +8,71 @@ import {
   PdfCanvas,
   usePdfDocument,
   usePdfRenderer,
+  useReader,
 } from '@/features/reader';
 import './ReaderPage.css';
 
+/**
+ * Reader page — composition only.
+ *
+ * Wires together:
+ *  - usePdfDocument  (loads StoredBook + PDFDocumentProxy)
+ *  - useReader       (all Reader state: page, zoom, viewport, shortcuts)
+ *  - usePdfRenderer  (pure canvas rendering)
+ *
+ * Contains no Reader business logic.
+ */
 export function ReaderPage() {
   const { bookId } = useParams<{ bookId: string }>();
-  
-  const { pdfDocument, book, isLoading: isDocumentLoading, error } = usePdfDocument(bookId);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = pdfDocument?.numPages || 0;
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Reset scroll position immediately on mount to ensure header is visible
+  const { pdfDocument, book, isLoading, error } = usePdfDocument(bookId);
+
+  const reader = useReader(pdfDocument, containerRef);
+
+  useDocumentTitle(
+    book?.title ? `${book.title} — Page ${reader.currentPage}` : 'Reader',
+  );
+
+  // Ensure the header is visible when the reader opens.
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
 
-  // Reset to page 1 when a new document loads
-  useEffect(() => {
-    if (pdfDocument) {
-      setCurrentPage(1);
-    }
-  }, [pdfDocument]);
-
-  // Update document title dynamically
-  const title = book?.title ? `${book.title} — Page ${currentPage}` : 'Reader';
-  useDocumentTitle(title);
-
-  const handlePrevPage = useCallback(() => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  }, []);
-
-  const handleNextPage = useCallback(() => {
-    if (totalPages > 0) {
-      setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-    }
-  }, [totalPages]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore key presses while typing inside input or textarea elements
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' || 
-        target.tagName === 'TEXTAREA' || 
-        target.isContentEditable
-      ) {
-        return;
-      }
-
-      if (e.key === 'ArrowLeft') {
-        handlePrevPage();
-      } else if (e.key === 'ArrowRight') {
-        handleNextPage();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePrevPage, handleNextPage]);
-
-  usePdfRenderer({ pdfDocument, canvasRef, currentPage });
+  usePdfRenderer({
+    page:     reader.page,
+    viewport: reader.viewport,
+    canvasRef,
+  });
 
   return (
     <div className="reader-page">
-      <ReaderHeader 
-        title={book?.title} 
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPrevPage={handlePrevPage}
-        onNextPage={handleNextPage}
+      <ReaderHeader
+        title={book?.title}
+        currentPage={reader.currentPage}
+        totalPages={reader.totalPages}
+        zoom={reader.effectiveZoom}
+        onPrevPage={reader.previousPage}
+        onNextPage={reader.nextPage}
+        onZoomIn={reader.zoomIn}
+        onZoomOut={reader.zoomOut}
+        onResetZoom={reader.resetZoom}
+        onFitWidth={reader.fitWidth}
+        onFitPage={reader.fitPage}
       />
-      
+
       <main className="reader-page__content">
-        {isDocumentLoading && <LoadingState />}
-        
-        {error && !isDocumentLoading && <ErrorState message={error} />}
-        
-        <PdfCanvas 
-          ref={canvasRef} 
-          isLoading={isDocumentLoading} 
-          error={error} 
+        {isLoading && <LoadingState />}
+
+        {error && !isLoading && <ErrorState message={error} />}
+
+        <PdfCanvas
+          ref={canvasRef}
+          containerRef={containerRef}
+          isLoading={isLoading}
+          error={error}
         />
       </main>
     </div>
