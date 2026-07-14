@@ -108,18 +108,21 @@ export const BookRepository = {
       return;
     }
 
+    // Protect against corrupted pageCount (must be at least 1)
+    const safePageCount = Math.max(1, book.pageCount);
+
     let changed = false;
 
     // Apply updates with change detection
     if (update.currentPage !== undefined) {
-      // Clamp currentPage to valid range: 1 <= currentPage <= pageCount
-      const clampedPage = Math.min(Math.max(1, update.currentPage), Math.max(1, book.pageCount));
+      // Clamp currentPage to valid range: 1 <= currentPage <= safePageCount
+      const clampedPage = Math.min(Math.max(1, update.currentPage), safePageCount);
 
       if (book.currentPage !== clampedPage) {
         book.currentPage = clampedPage;
-        // Derive progress from currentPage / pageCount
+        // Derive progress from currentPage / safePageCount
         // Ensure progress is between 0 and 100
-        const rawProgress = (clampedPage / book.pageCount) * 100;
+        const rawProgress = (clampedPage / safePageCount) * 100;
         book.progress = Math.min(100, Math.max(0, rawProgress));
         changed = true;
       }

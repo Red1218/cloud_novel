@@ -96,8 +96,11 @@ export function useReadingState(bookId: string | undefined): UseReadingStateResu
       isFlushingRef.current = false;
 
       // If new updates arrived during the flush, schedule another flush
+      // Use queueMicrotask to avoid recursive call stack
       if (pendingUpdateRef.current !== null) {
-        void flush();
+        queueMicrotask(() => {
+          void flush();
+        });
       }
     }
   }, [persistUpdate]);
