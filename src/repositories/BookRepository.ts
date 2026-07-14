@@ -1,5 +1,17 @@
 import { getDB } from '@/services/db';
 import type { Book, StoredBook } from '@/types';
+import type { ScaleMode } from '@/features/reader/types';
+
+/**
+ * Update payload for reading state persistence.
+ * All fields are optional — only provided fields will be updated.
+ */
+export interface ReadingStateUpdate {
+  currentPage?: number;
+  zoom?: number;
+  scaleMode?: ScaleMode;
+  lastOpened?: number;
+}
 
 /**
  * Repository for interacting with the books collection in IndexedDB.
@@ -13,7 +25,7 @@ export const BookRepository = {
   async getAll(): Promise<Book[]> {
     const db = await getDB();
     const storedBooks = await db.getAll('books');
-    
+
     // Map StoredBook -> Book (omitting the pdf blob)
     return storedBooks.map((stored) => {
       const { pdf, ...domainBook } = stored;
@@ -29,7 +41,7 @@ export const BookRepository = {
     const db = await getDB();
     const storedBook = await db.getFromIndex('books', 'by-hash', hash);
     if (!storedBook) return undefined;
-    
+
     const { pdf, ...domainBook } = storedBook;
     return domainBook;
   },
@@ -68,6 +80,69 @@ export const BookRepository = {
     const key = await db.getKeyFromIndex('books', 'by-hash', hash);
     if (key) {
       await db.delete('books', key);
+    }
+  },
+
+  /**
+   * Partially updates the reading state fields of a book.
+   * Only updates the fields provided in the update object.
+   *
+   * IMPORTANT: progress is ALWAYS derived from currentPage / pageCount.
+   * It must NEVER be written independently. When currentPage changes,
+   * progress is automatically recalculated.
+   *
+   * currentPage is clamped to valid range: 1 <= currentPage <= pageCount.
+   *
+   * Only writes to IndexedDB if at least one field actually changed.
+   *
+   * @param id - The UUID of the book to update
+   * @param update - Partial reading state to persist
+   */
+  async updateReadingState(id: string, update: ReadingStateUpdate): Promise<void> {
+    const db = await getDB();
+
+    // Get the existing book
+    const book = await db.get('books', id);
+    if (!book) {
+      // Book no longer exists — not an exceptional condition for persistence
+      return;
+    }
+
+    let changed = false;
+
+    // Apply updates with change detection
+    if (update.currentPage !== undefined) {
+      // Clamp currentPage to valid range: 1 <= currentPage <= pageCount
+      const clampedPage = Math.min(Math.max(1, update.currentPage), Math.max(1, book.pageCount));
+
+      if (book.currentPage !== clampedPage) {
+        book.currentPage = clampedPage;
+        // Derive progress from currentPage / pageCount
+        // Ensure progress is between 0 and 100
+        const rawProgress = (clampedPage / book.pageCount) * 100;
+        book.progress = Math.min(100, Math.max(0, rawProgress));
+        changed = true;
+      }
+    }
+
+    if (update.zoom !== undefined && book.zoom !== update.zoom) {
+      book.zoom = update.zoom;
+      changed = true;
+    }
+
+    if (update.scaleMode !== undefined && book.scaleMode !== update.scaleMode) {
+      book.scaleMode = update.scaleMode;
+      changed = true;
+    }
+
+    if (update.lastOpened !== undefined && book.lastOpened !== update.lastOpened) {
+      book.lastOpened = update.lastOpened;
+      changed = true;
+    }
+
+    // Only write to IndexedDB if something actually changed
+    if (changed) {
+      await db.put('books', book);
     }
   },
 };

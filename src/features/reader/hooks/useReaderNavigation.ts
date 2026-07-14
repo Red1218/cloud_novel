@@ -1,32 +1,48 @@
-﻿import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
+export interface UseReaderNavigationOptions {
+  /** Initial page number from persisted state (1-based). Defaults to 1. */
+  initialPage?: number;
+  /** Callback invoked whenever currentPage changes (for persistence). */
+  onPageChange?: (page: number) => void;
+}
+
 export interface UseReaderNavigationResult {
-  currentPage:  number;
-  nextPage:     () => void;
+  currentPage: number;
+  nextPage: () => void;
   previousPage: () => void;
-  goToPage:     (targetPage: number) => void;
+  goToPage: (targetPage: number) => void;
 }
 
 /**
  * Manages page navigation state for the Reader.
  *
- * Owns currentPage and resets to page 1 whenever the document changes.
+ * Accepts initialPage from persisted state and reports changes via onPageChange.
+ * Resets to initialPage (or 1) whenever the document changes.
  * All action callbacks are stable (useCallback with empty or constant deps).
  */
 export function useReaderNavigation(
   pdfDocument: PDFDocumentProxy | null,
+  options: UseReaderNavigationOptions = {},
 ): UseReaderNavigationResult {
-  const [currentPage, setCurrentPage] = useState(1);
+  const { initialPage = 1, onPageChange } = options;
+
+  const [currentPage, setCurrentPage] = useState(initialPage);
 
   // Stable ref to total pages so callbacks never need it in their dep arrays.
   const totalPagesRef = useRef(0);
   totalPagesRef.current = pdfDocument?.numPages ?? 0;
 
-  // Reset to page 1 when the document changes.
+  // Report page changes to parent for persistence
   useEffect(() => {
-    setCurrentPage(1);
-  }, [pdfDocument]);
+    onPageChange?.(currentPage);
+  }, [currentPage, onPageChange]);
+
+  // Reset to initialPage when the document changes.
+  useEffect(() => {
+    setCurrentPage(initialPage);
+  }, [pdfDocument, initialPage]);
 
   const previousPage = useCallback(() => {
     setCurrentPage(prev => Math.max(1, prev - 1));

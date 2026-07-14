@@ -1,3 +1,5 @@
+import type { ScaleMode } from '@/features/reader/types';
+
 /**
  * Represents a book in the Cloud Novel library (Domain Model).
  * This interface is used by the UI components.
@@ -23,10 +25,18 @@ export interface Book {
   lastOpened?: number;
   /** Base64 PNG string of the first page */
   thumbnail?: string;
-  /** Current reading progress (0-100) */
+  /**
+   * Current reading progress (0-100).
+   * This is ALWAYS derived from currentPage / pageCount.
+   * Do not set directly — use updateReadingState instead.
+   */
   progress: number;
-  /** Current page number */
+  /** Current page number (1-based) */
   currentPage?: number;
+  /** Last zoom level used (for persistence) */
+  zoom?: number;
+  /** Last scale mode used (for persistence) */
+  scaleMode?: ScaleMode;
 }
 
 /**

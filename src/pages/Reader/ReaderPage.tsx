@@ -19,7 +19,7 @@ import './ReaderPage.css';
  *
  * Wires together all hooks and passes results to presentational components:
  *  - usePdfDocument   loads StoredBook + PDFDocumentProxy from IndexedDB
- *  - useReader        all Reader state: page, viewport, zoom, shortcuts
+ *  - useReader        all Reader state: page, viewport, zoom, shortcuts, persistence
  *  - usePdfRenderer   pure canvas rendering (unchanged)
  *  - usePdfTextLayer  fetches TextContent per page for the text layer
  *
@@ -29,12 +29,26 @@ import './ReaderPage.css';
 export function ReaderPage() {
   const { bookId } = useParams<{ bookId: string }>();
 
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { pdfDocument, book, isLoading, error } = usePdfDocument(bookId);
 
-  const reader = useReader(pdfDocument, containerRef);
+  // useReader is the single owner of reading state persistence.
+  // It exposes touchLastOpened() and flushPersistence() for external control.
+  const reader = useReader(pdfDocument, containerRef, bookId, {
+    initialPage: book?.currentPage ?? 1,
+    initialZoom: book?.zoom,
+    initialScaleMode: book?.scaleMode,
+  });
+
+  // Touch lastOpened immediately when book is first loaded.
+  // This is called only once per book load.
+  useEffect(() => {
+    if (book) {
+      void reader.touchLastOpened();
+    }
+  }, [book, reader]);
 
   // Fetch text content for the current page.
   // Re-fetches only when `reader.page` changes — not on zoom or resize.
@@ -66,7 +80,7 @@ export function ReaderPage() {
   }, []);
 
   usePdfRenderer({
-    page:     reader.page,
+    page: reader.page,
     viewport: reader.viewport,
     canvasRef,
   });

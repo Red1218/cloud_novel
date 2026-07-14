@@ -1,12 +1,22 @@
-﻿import type { RefObject } from 'react';
+import { useCallback, type RefObject } from 'react';
 import type { PDFDocumentProxy, PDFPageProxy, PageViewport } from 'pdfjs-dist';
 import type { ScaleMode } from '../types';
 import { useReaderNavigation } from './useReaderNavigation';
 import { useReaderZoom } from './useReaderZoom';
 import { useReaderViewport } from './useReaderViewport';
 import { useReaderKeyboard } from './useReaderKeyboard';
+import { useReadingState } from './useReadingState';
 
 // ─── Public interface ─────────────────────────────────────────────────────────
+
+export interface UseReaderOptions {
+  /** Initial page from persisted state. */
+  initialPage?: number;
+  /** Initial zoom from persisted state. */
+  initialZoom?: number;
+  /** Initial scale mode from persisted state. */
+  initialScaleMode?: ScaleMode;
+}
 
 export interface UseReaderResult {
   // State
@@ -30,6 +40,12 @@ export interface UseReaderResult {
   readonly resetZoom: () => void;
   readonly fitWidth: () => void;
   readonly fitPage: () => void;
+
+  // Persistence control
+  /** Immediately persist lastOpened timestamp. Call when book is opened. */
+  readonly touchLastOpened: () => Promise<void>;
+  /** Flush any pending persistence updates immediately. */
+  readonly flushPersistence: () => Promise<void>;
 }
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
@@ -42,21 +58,60 @@ export interface UseReaderResult {
  *  useReaderZoom        zoom level, scaleMode, zoom actions
  *  useReaderViewport    page loading, viewport derivation, resize handling
  *  useReaderKeyboard    global keyboard shortcuts
+ *  useReadingState      persistence of reading state to IndexedDB
  *
  * The public API (UseReaderResult) is unchanged from the monolithic version.
  * Callers and tests are unaffected by this internal restructuring.
  *
  * @param pdfDocument  - The loaded PDF document, or null while loading.
  * @param containerRef - Ref to the scroll container used for fit measurements.
+ * @param bookId       - The UUID of the book for persistence. If undefined, persistence is disabled.
+ * @param options      - Optional configuration including initial persisted state.
  */
 export function useReader(
   pdfDocument: PDFDocumentProxy | null,
   containerRef: RefObject<HTMLDivElement | null>,
+  bookId: string | undefined,
+  options: UseReaderOptions = {},
 ): UseReaderResult {
+  const { initialPage = 1, initialZoom, initialScaleMode } = options;
   const totalPages = pdfDocument?.numPages ?? 0;
 
-  const nav = useReaderNavigation(pdfDocument);
-  const zoom = useReaderZoom();
+  // Persistence hook — owns all IndexedDB interactions for reading state
+  // Destructure callbacks for stable dependencies
+  const {
+    queueUpdate,
+    flush,
+    touchLastOpened,
+  } = useReadingState(bookId);
+
+  // Wrap queueUpdate for specific fields to match expected callback signatures
+  const handlePageChange = useCallback((page: number): void => {
+    queueUpdate({ currentPage: page });
+  }, [queueUpdate]);
+
+  const handleZoomChange = useCallback((zoom: number): void => {
+    queueUpdate({ zoom });
+  }, [queueUpdate]);
+
+  const handleScaleModeChange = useCallback((scaleMode: ScaleMode): void => {
+    queueUpdate({ scaleMode });
+  }, [queueUpdate]);
+
+  // Navigation with persistence callbacks
+  const nav = useReaderNavigation(pdfDocument, {
+    initialPage,
+    onPageChange: handlePageChange,
+  });
+
+  // Zoom with persistence callbacks
+  const zoom = useReaderZoom({
+    initialZoom,
+    initialScaleMode,
+    onZoomChange: handleZoomChange,
+    onScaleModeChange: handleScaleModeChange,
+  });
+
   const vp = useReaderViewport(
     pdfDocument,
     nav.currentPage,
@@ -89,5 +144,7 @@ export function useReader(
     resetZoom: zoom.resetZoom,
     fitWidth: zoom.fitWidth,
     fitPage: zoom.fitPage,
+    touchLastOpened,
+    flushPersistence: flush,
   };
 }

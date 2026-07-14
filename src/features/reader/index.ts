@@ -1,6 +1,7 @@
 export * from './types';
 export * from './constants';
 export * from './hooks/useReader';
+export * from './hooks/useReadingState';
 export * from './hooks/usePdfDocument';
 export * from './hooks/usePdfRenderer';
 export * from './hooks/usePdfTextLayer';
