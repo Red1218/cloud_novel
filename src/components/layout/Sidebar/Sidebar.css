@@ -1,0 +1,128 @@
+/* ==============================================================
+   SIDEBAR — Desktop layout
+   On desktop (≥1024px): sidebar is a permanent grid column.
+   ============================================================== */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  height: 100%;
+  background-color: var(--color-bg-sidebar);
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+}
+
+/* ---- Brand -------------------------------------------------- */
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4);
+  height: var(--header-height);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.sidebar__logo {
+  font-size: 1.375rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sidebar__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ---- Navigation --------------------------------------------- */
+
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-3) var(--space-2);
+  overflow-y: auto;
+}
+
+.sidebar__nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ---- Footer ------------------------------------------------- */
+
+.sidebar__footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.sidebar__version {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+/* ==============================================================
+   BACKDROP — hidden on desktop, shown on tablet/mobile
+   ============================================================== */
+
+.sidebar-backdrop {
+  display: none;
+}
+
+/* ==============================================================
+   TABLET / MOBILE  (<1024px)
+   Sidebar becomes a fixed drawer overlay.
+   No animation in Phase 1 — instant show/hide.
+   ============================================================== */
+
+@media (max-width: 1023px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: var(--z-sidebar);
+    /* Drawer is off-screen by default (no transition = no animation). */
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* When open: bring drawer on-screen instantly */
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  /* Backdrop: hidden by default */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    z-index: var(--z-backdrop);
+    /* Hidden until sidebar opens */
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sidebar-backdrop--visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Mobile (<768px): drawer takes 80% of screen width */
+@media (max-width: 767px) {
+  .sidebar {
+    width: 80%;
+  }
+}

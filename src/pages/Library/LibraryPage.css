@@ -1,0 +1,35 @@
+/* The page wrapper provides basic spacing. We just need to layout the stats row. */
+
+.library-page__stats {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  width: 100%;
+}
+
+.library-page__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.library-page__toolbar {
+  margin-bottom: var(--space-4);
+}
+
+/* Tablet Layout */
+@media (min-width: 768px) {
+  .library-page__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop Layout */
+@media (min-width: 1024px) {
+  .library-page__stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+  }
+}

@@ -1,0 +1,17 @@
+/*
+ * .pdf-canvas-container and .pdf-canvas-wrapper have been removed.
+ * Those styles now live in ReaderViewport.css as:
+ *   .reader-viewport-scroll   (the scroll container)
+ *   .reader-viewport-page     (the stacking context)
+ */
+
+.pdf-canvas {
+  max-width: 100%;
+  box-shadow: var(--shadow-lg);
+  background-color: white; /* PDF pages are usually white */
+  display: block;           /* Remove inline baseline gap */
+}
+
+.pdf-canvas--hidden {
+  display: none;
+}

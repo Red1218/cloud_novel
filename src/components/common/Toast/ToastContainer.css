@@ -1,0 +1,10 @@
+.toast-container {
+  position: fixed;
+  top: var(--space-6);
+  right: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  z-index: var(--z-toast);
+  pointer-events: none; /* Let clicks pass through the container gaps */
+}
