@@ -3,6 +3,7 @@
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: var(--space-6) var(--space-4);
   width: 100%;
+  padding: var(--space-2) 0;
 }
 
 /* Tablet */
@@ -10,6 +11,7 @@
   .book-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: var(--space-8) var(--space-6);
+    padding: var(--space-4) 0;
   }
 }
 
@@ -18,5 +20,20 @@
   .book-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: var(--space-10) var(--space-8);
+    padding: var(--space-4) 0;
   }
+}
+
+/* Large Desktop */
+@media (min-width: 1440px) {
+  .book-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-10) var(--space-8);
+  }
+}
+
+/* Loading state */
+.book-grid--loading {
+  opacity: 0.7;
+  pointer-events: none;
 }
