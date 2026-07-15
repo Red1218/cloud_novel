@@ -8,16 +8,18 @@ export interface SectionHeaderProps {
   subtitle?: string;
   /** Optional actions (e.g., buttons, links) to display on the right */
   actions?: ReactNode;
+  /** Optional ID for the heading element (for aria-labelledby) */
+  id?: string;
 }
 
 /**
  * Reusable header for grouping sections within the library or other pages.
  */
-export function SectionHeader({ title, subtitle, actions }: SectionHeaderProps) {
+export function SectionHeader({ title, subtitle, actions, id }: SectionHeaderProps) {
   return (
     <div className="section-header">
       <div className="section-header__text">
-        <h2 className="section-header__title">{title}</h2>
+        <h2 id={id} className="section-header__title">{title}</h2>
         {subtitle && <p className="section-header__subtitle">{subtitle}</p>}
       </div>
       {actions && <div className="section-header__actions">{actions}</div>}

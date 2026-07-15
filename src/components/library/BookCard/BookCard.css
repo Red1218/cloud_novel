@@ -14,6 +14,11 @@
   overflow: hidden;
 }
 
+.book-card__cover-wrapper:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .book-card__overlay {
   position: absolute;
   inset: 0;
@@ -22,12 +27,32 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
+  /* Transition only when hover is supported */
   transition: opacity var(--transition-fast);
 }
 
-.book-card__cover-wrapper:hover .book-card__overlay,
+/* Hover animation only when @media (hover: hover) */
+@media (hover: hover) {
+  .book-card__cover-wrapper:hover .book-card__overlay {
+    opacity: 1;
+  }
+
+  .book-card__cover-wrapper:hover .book-card__open-btn {
+    transform: translateY(0);
+  }
+
+  .book-card__open-btn:hover {
+    background-color: var(--color-accent-hover);
+  }
+}
+
+/* Always show overlay on focus (keyboard navigation) */
 .book-card__cover-wrapper:focus-visible .book-card__overlay {
   opacity: 1;
+}
+
+.book-card__cover-wrapper:focus-visible .book-card__open-btn {
+  transform: translateY(0);
 }
 
 .book-card__open-btn {
@@ -41,15 +66,9 @@
   cursor: pointer;
   transform: translateY(10px);
   transition: transform var(--transition-bounce), background-color var(--transition-fast);
-}
-
-.book-card__cover-wrapper:hover .book-card__open-btn,
-.book-card__cover-wrapper:focus-visible .book-card__open-btn {
-  transform: translateY(0);
-}
-
-.book-card__open-btn:hover {
-  background-color: var(--color-accent-hover);
+  /* Ensure it's not a button element (we use span for no nested buttons) */
+  display: inline-block;
+  user-select: none;
 }
 
 /* -- Info Area -- */
@@ -107,6 +126,22 @@
   transition: width var(--transition-base);
 }
 
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .book-card__progress-fill {
+    transition: none;
+  }
+
+  .book-card__overlay {
+    transition: none;
+  }
+
+  .book-card__open-btn {
+    transition: none;
+    transform: translateY(0);
+  }
+}
+
 .book-card__progress-text {
   font-size: 0.65rem;
   font-weight: var(--font-weight-medium);
@@ -116,6 +151,62 @@
 }
 
 .book-card__last-opened {
-  font-size: 0.7rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+}
+
+/* -- Skeleton Loading State -- */
+
+.book-card--skeleton .book-cover--skeleton {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-elevated) 25%,
+    var(--color-bg-surface-hover) 50%,
+    var(--color-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+.book-card__skeleton-text {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-elevated) 25%,
+    var(--color-bg-surface-hover) 50%,
+    var(--color-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+  height: 0.875rem;
+}
+
+.book-card__skeleton-text--title {
+  width: 80%;
+  margin-bottom: var(--space-2);
+}
+
+.book-card__skeleton-text--author {
+  width: 60%;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Respect prefers-reduced-motion for skeleton */
+@media (prefers-reduced-motion: reduce) {
+  .book-card--skeleton .book-cover--skeleton,
+  .book-card__skeleton-text {
+    animation: none;
+    background: var(--color-bg-elevated);
+  }
 }
