@@ -10,5 +10,6 @@ export * from './components/PdfCanvas/PdfCanvas';
 export * from './components/PdfTextLayer/PdfTextLayer';
 export * from './components/ReaderViewport/ReaderViewport';
 export * from './components/ReaderHeader/ReaderHeader';
+export * from './components/ReaderToolbar/ReaderToolbar';
 export * from './components/LoadingState/LoadingState';
 export * from './components/ErrorState/ErrorState';

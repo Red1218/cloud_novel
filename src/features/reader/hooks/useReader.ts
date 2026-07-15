@@ -1,4 +1,4 @@
-import { useCallback, type RefObject } from 'react';
+import { useCallback, useRef, type RefObject } from 'react';
 import type { PDFDocumentProxy, PDFPageProxy, PageViewport } from 'pdfjs-dist';
 import type { ScaleMode } from '../types';
 import { useReaderNavigation } from './useReaderNavigation';
@@ -104,12 +104,18 @@ export function useReader(
     onPageChange: handlePageChange,
   });
 
+  // Ref kept current every render so zoomIn/zoomOut can read the actual
+  // rendered scale when transitioning from a fit mode to custom zoom.
+  // Using a ref avoids any extra state or dep-array entries.
+  const effectiveZoomRef = useRef<number>(initialZoom ?? 1.0);
+
   // Zoom with persistence callbacks
   const zoom = useReaderZoom({
     initialZoom,
     initialScaleMode,
     onZoomChange: handleZoomChange,
     onScaleModeChange: handleScaleModeChange,
+    effectiveZoomRef,
   });
 
   const vp = useReaderViewport(
@@ -119,6 +125,10 @@ export function useReader(
     zoom.scaleMode,
     containerRef,
   );
+
+  // Keep the ref current with the actual rendered scale every render.
+  // This must happen after vp is computed, before any callbacks fire.
+  effectiveZoomRef.current = vp.effectiveZoom;
 
   useReaderKeyboard({
     previousPage: nav.previousPage,

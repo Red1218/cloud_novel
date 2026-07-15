@@ -34,31 +34,42 @@ export function useReaderNavigation(
   const totalPagesRef = useRef(0);
   totalPagesRef.current = pdfDocument?.numPages ?? 0;
 
-  // Report page changes to parent for persistence
-  useEffect(() => {
-    onPageChange?.(currentPage);
-  }, [currentPage, onPageChange]);
-
   // Reset to initialPage when the document changes.
   useEffect(() => {
     setCurrentPage(initialPage);
   }, [pdfDocument, initialPage]);
 
   const previousPage = useCallback(() => {
-    setCurrentPage(prev => Math.max(1, prev - 1));
-  }, []);
+    setCurrentPage(prev => {
+      const next = Math.max(1, prev - 1);
+      if (next !== prev) {
+        onPageChange?.(next);
+      }
+      return next;
+    });
+  }, [onPageChange]);
 
   const nextPage = useCallback(() => {
     setCurrentPage(prev => {
       const total = totalPagesRef.current;
-      return total > 0 ? Math.min(total, prev + 1) : prev;
+      const next = total > 0 ? Math.min(total, prev + 1) : prev;
+      if (next !== prev) {
+        onPageChange?.(next);
+      }
+      return next;
     });
-  }, []);
+  }, [onPageChange]);
 
   const goToPage = useCallback((targetPage: number) => {
     const total = totalPagesRef.current;
-    setCurrentPage(Math.min(Math.max(1, targetPage), Math.max(1, total)));
-  }, []);
+    setCurrentPage(prev => {
+      const next = Math.min(Math.max(1, targetPage), Math.max(1, total));
+      if (next !== prev) {
+        onPageChange?.(next);
+      }
+      return next;
+    });
+  }, [onPageChange]);
 
   return { currentPage, nextPage, previousPage, goToPage };
 }
