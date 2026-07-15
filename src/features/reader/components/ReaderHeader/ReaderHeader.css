@@ -1,10 +1,22 @@
-﻿/* ── Container ──────────────────────────────────────────────────────────── */
+/* ── Container ──────────────────────────────────────────────────────────── */
 
+/*
+ * padding via max() keeps desktop layout pixel-identical (env values are 0px
+ * on desktop).  On notched mobile the larger env() value wins, pushing
+ * content away from the system chrome.
+ *
+ * flex-wrap: nowrap is explicit — the toolbar must never reflow to a second
+ * line regardless of content width.
+ */
 .reader-header {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   height: var(--header-height);
-  padding: 0 var(--space-4);
+  padding-top:    0;
+  padding-bottom: 0;
+  padding-left:   max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-left)));
+  padding-right:  max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-right)));
   background-color: var(--color-bg-header);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
@@ -48,6 +60,9 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
+  /* 44px touch target (WCAG 2.5.5) */
+  min-width: 44px;
+  min-height: 44px;
   padding: var(--space-2) var(--space-3);
   margin-left: calc(-1 * var(--space-3));
   border-radius: var(--radius-sm);
@@ -93,6 +108,9 @@
   border: none;
   color: var(--color-text-primary);
   cursor: pointer;
+  /* 44px touch target (WCAG 2.5.5) */
+  min-width: 44px;
+  min-height: 44px;
   padding: var(--space-1);
   border-radius: var(--radius-sm);
   transition: background-color var(--transition-fast);
@@ -140,6 +158,9 @@
   border: none;
   color: var(--color-text-primary);
   cursor: pointer;
+  /* 44px touch target (WCAG 2.5.5) */
+  min-width: 44px;
+  min-height: 44px;
   padding: var(--space-1);
   border-radius: var(--radius-sm);
   transition: background-color var(--transition-fast);
@@ -209,5 +230,25 @@
   /* Fit and reset presets are too wide for narrow viewports */
   .reader-header__zoom-presets {
     display: none;
+  }
+}
+
+/* ── Narrow phones (≤ 480px) ────────────────────────────────────────────── */
+
+/*
+ * Further tightens spacing so all controls remain reachable on portrait
+ * phones.  The 44px touch-target min dimensions are preserved on all buttons.
+ * padding-left/right use max() so safe-area insets are honoured even at the
+ * reduced base spacing.
+ */
+@media (max-width: 480px) {
+  .reader-header {
+    gap: var(--space-1);
+    padding-left:  max(var(--space-2), calc(var(--space-2) + env(safe-area-inset-left)));
+    padding-right: max(var(--space-2), calc(var(--space-2) + env(safe-area-inset-right)));
+  }
+
+  .reader-header__zoom-display {
+    min-width: 36px;
   }
 }
