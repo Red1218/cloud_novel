@@ -5,9 +5,9 @@ import './BookGrid.css';
 
 export interface BookGridProps {
   /** The books to display in the grid */
-  books: Book[];
+  books: readonly Book[];
   /** Optional callback fired when a book is opened */
-  onOpenBook?: (book: Book) => void;
+  onOpenBook?: (bookId: string) => void;
   /** Content to display when the books array is empty */
   emptyState?: ReactNode;
 }
