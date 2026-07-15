@@ -1,8 +1,27 @@
 /* ─── Scroll container ──────────────────────────────────────────────────────── */
 
 /*
- * Replaces .pdf-canvas-container from PdfCanvas.css.
  * Owns the scroll behaviour for the entire reading area.
+ *
+ * overflow-x: auto    — horizontal scrollbar appears only when the canvas is
+ *                       wider than the container (custom zoom beyond fit-width).
+ *                       Suppressed in fit-width/fit-page because calculateScale
+ *                       sizes the canvas to the available width.
+ *
+ * scrollbar-gutter: stable — reserves the vertical scrollbar gutter at all
+ *                       times so the canvas never shifts left when the bar
+ *                       appears or disappears during page loads.
+ *
+ * padding via max()   — safe-area-inset-* values are 0px on desktop, so
+ *                       max() collapses to the base token and the layout is
+ *                       pixel-identical to the previous version.  On notched
+ *                       mobile the larger env() value wins.
+ *
+ * user-select: none   — prevents accidental text selection on the scroll
+ *                       track, background, and page gaps.
+ *                       PdfTextLayer explicitly sets user-select: text on its
+ *                       own root element, restoring selection inside the PDF.
+ *                       This pairing is intentional — do not remove either half.
  */
 .reader-viewport-scroll {
   display: flex;
@@ -11,9 +30,16 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--space-6);
+  overflow-x: auto;
+  scrollbar-gutter: stable;
+  padding-top:    max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-top)));
+  padding-bottom: max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-bottom)));
+  padding-left:   max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-left)));
+  padding-right:  max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-right)));
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
+  user-select: none;
+  cursor: default;
 }
 
 /* ─── Page stacking context ─────────────────────────────────────────────────── */
@@ -27,9 +53,15 @@
  *
  * inline-block so the element sizes to its content (the canvas dimensions).
  * flex-shrink: 0 prevents the scroll container from compressing it.
+ *
+ * Note: max-width: 100% has been intentionally removed from .pdf-canvas.
+ * usePdfRenderer sets canvas.style.width to an explicit pixel value; keeping
+ * max-width: 100% would override that value and suppress the horizontal
+ * scrollbar on wide custom-zoom pages.
  */
 .reader-viewport-page {
   position: relative;
   display: inline-block;
   flex-shrink: 0;
+  box-shadow: var(--shadow-md);
 }

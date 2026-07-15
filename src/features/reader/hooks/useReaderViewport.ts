@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
 import type { PDFDocumentProxy, PDFPageProxy, PageViewport } from 'pdfjs-dist';
 import type { ScaleMode } from '../types';
@@ -74,25 +74,69 @@ export function useReaderViewport(
   // ── Resize handling ──────────────────────────────────────────────────────
 
   // Custom zoom is deliberately preserved across resize events.
-  // Only fit-width and fit-page modes need to recalculate on window resize.
+  // Only fit-width and fit-page modes need to recalculate on resize.
+  //
+  // A ResizeObserver on containerRef.current is used instead of a window
+  // listener so that sidebar-width changes and orientation changes are all
+  // captured through a single, precise observer on the exact element whose
+  // clientWidth/clientHeight calculateScale() reads.
+  //
+  // Dimension cache (plain refs, not state) — avoids scheduling rAF + debounce
+  // when the observer fires but both dimensions are unchanged (e.g. a vertical-
+  // only resize while in fit-width mode, or a spurious browser notification).
+  // The cache lives entirely inside this effect and has no public API surface.
+  const cachedWidthRef  = useRef<number>(-1);
+  const cachedHeightRef = useRef<number>(-1);
+
   useEffect(() => {
     if (scaleMode === 'custom') return;
 
-    let timeoutId: ReturnType<typeof setTimeout>;
+    // Snapshot the element at effect-run time.
+    // If the ref is not yet attached (rare but possible during fast
+    // unmount/remount), exit cleanly — no polling, no retry.
+    const el = containerRef.current;
+    if (!el) return;
 
-    const handleResize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setContainerVersion(v => v + 1);
-      }, 100);
-    };
+    // Reset the dimension cache whenever the effect re-runs (scaleMode changed).
+    cachedWidthRef.current  = -1;
+    cachedHeightRef.current = -1;
 
-    window.addEventListener('resize', handleResize);
+    let rafId:     ReturnType<typeof requestAnimationFrame> | null      = null;
+    let timeoutId: ReturnType<typeof setTimeout>             | undefined = undefined;
+
+    const observer = new ResizeObserver(() => {
+      // Read dimensions synchronously inside the callback is safe here because
+      // we are only reading, not writing, layout properties.
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+
+      // Skip scheduling if neither dimension actually changed.
+      if (w === cachedWidthRef.current && h === cachedHeightRef.current) return;
+
+      // Accept the new dimensions before scheduling so that rapid successive
+      // callbacks with the same size are also deduplicated.
+      cachedWidthRef.current  = w;
+      cachedHeightRef.current = h;
+
+      // rAF defers the debounce scheduling out of the ResizeObserver
+      // notification microtask, preventing synchronous forced layout.
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setContainerVersion(v => v + 1);
+        }, 100);
+      });
+    });
+
+    observer.observe(el);
+
     return () => {
-      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
+      if (rafId !== null) cancelAnimationFrame(rafId);
       clearTimeout(timeoutId);
     };
-  }, [scaleMode]);
+  }, [scaleMode, containerRef]);
 
   // ── Viewport (derived data, not state) ───────────────────────────────────
 

@@ -6,7 +6,6 @@
  */
 
 .pdf-canvas {
-  max-width: 100%;
   box-shadow: var(--shadow-lg);
   background-color: white; /* PDF pages are usually white */
   display: block;           /* Remove inline baseline gap */
