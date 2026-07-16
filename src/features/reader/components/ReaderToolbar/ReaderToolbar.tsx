@@ -9,6 +9,7 @@ interface ReaderToolbarProps {
   onResetZoom:  () => void;
   onFitWidth:   () => void;
   onFitPage:    () => void;
+  onOpenReadingEnvironment: () => void;
 }
 
 export function ReaderToolbar({
@@ -18,6 +19,7 @@ export function ReaderToolbar({
   onResetZoom,
   onFitWidth,
   onFitPage,
+  onOpenReadingEnvironment,
 }: ReaderToolbarProps) {
   const zoomPct = useMemo(() => Math.round(zoom * 100), [zoom]);
 
@@ -28,7 +30,7 @@ export function ReaderToolbar({
         className="reader-toolbar__button"
         aria-label="Theme settings"
         title="Theme"
-        disabled
+        onClick={onOpenReadingEnvironment}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="2"
@@ -42,7 +44,7 @@ export function ReaderToolbar({
         className="reader-toolbar__button"
         aria-label="Brightness settings"
         title="Brightness"
-        disabled
+        onClick={onOpenReadingEnvironment}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="2"
@@ -144,9 +146,9 @@ export function ReaderToolbar({
       <button
         type="button"
         className="reader-toolbar__button"
-        aria-label="Reader settings"
-        title="Settings"
-        disabled
+        aria-label="Reading environment"
+        title="Reading environment"
+        onClick={onOpenReadingEnvironment}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="2"

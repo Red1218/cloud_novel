@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type PointerEvent,
 } from 'react';
 import { useParams } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { useDocumentTitle } from '@/hooks';
 import {
   ReaderHeader,
   ReaderToolbar,
+  ReadingEnvironmentPanel,
   LoadingState,
   ErrorState,
   ReaderViewport,
@@ -18,6 +20,10 @@ import {
   usePdfRenderer,
   usePdfTextLayer,
   useReader,
+  useReaderEnvironment,
+  type ReaderOpeningMode,
+  type ReaderTheme,
+  type ReadingPreset,
 } from '@/features/reader';
 import './ReaderPage.css';
 
@@ -44,9 +50,11 @@ export function ReaderPage() {
   );
 
   const [isChromeVisible, setIsChromeVisible] = useState(false);
+  const [isEnvironmentOpen, setIsEnvironmentOpen] = useState(false);
   const [zoomFeedback, setZoomFeedback] = useState<string | null>(null);
 
   const { pdfDocument, book, isLoading, error } = usePdfDocument(bookId);
+  const readerEnvironment = useReaderEnvironment(bookId);
 
   const reader = useReader(pdfDocument, containerRef, bookId, {
     initialPage: book?.currentPage ?? 1,
@@ -93,13 +101,22 @@ export function ReaderPage() {
   }, []);
 
   const scheduleChromeHide = useCallback((): void => {
+    if (!readerEnvironment.settings.autoHideControls || isEnvironmentOpen) {
+      clearChromeTimer();
+      return;
+    }
+
     clearChromeTimer();
     chromeTimerRef.current = setTimeout(() => {
       isChromeVisibleRef.current = false;
       setIsChromeVisible(false);
       chromeTimerRef.current = null;
     }, CHROME_HIDE_DELAY_MS);
-  }, [clearChromeTimer]);
+  }, [
+    clearChromeTimer,
+    isEnvironmentOpen,
+    readerEnvironment.settings.autoHideControls,
+  ]);
 
   const revealChrome = useCallback((): void => {
     if (isChromeVisibleRef.current) {
@@ -142,6 +159,68 @@ export function ReaderPage() {
     revealChrome();
   }, [revealChrome]);
 
+  const openReadingEnvironment = useCallback((): void => {
+    clearChromeTimer();
+    isChromeVisibleRef.current = true;
+    setIsChromeVisible(true);
+    setIsEnvironmentOpen(true);
+  }, [clearChromeTimer]);
+
+  const closeReadingEnvironment = useCallback((): void => {
+    setIsEnvironmentOpen(false);
+    if (readerEnvironment.settings.autoHideControls) {
+      scheduleChromeHide();
+    }
+  }, [readerEnvironment.settings.autoHideControls, scheduleChromeHide]);
+
+  const applyReadingPreset = useCallback((preset: ReadingPreset): void => {
+    readerEnvironment.updateSettings({
+      theme: preset.theme,
+      brightness: preset.brightness,
+    });
+
+    if (preset.openingMode === 'fit-page') {
+      reader.fitPage();
+      return;
+    }
+
+    reader.fitWidth();
+  }, [reader, readerEnvironment]);
+
+  const handleThemeChange = useCallback((theme: ReaderTheme): void => {
+    readerEnvironment.updateSettings({ theme });
+  }, [readerEnvironment]);
+
+  const handleBrightnessChange = useCallback((brightness: number): void => {
+    readerEnvironment.updateSettings({ brightness });
+  }, [readerEnvironment]);
+
+  const handleOpeningModeChange = useCallback((openingMode: ReaderOpeningMode): void => {
+    if (openingMode === 'fit-page') {
+      reader.fitPage();
+      return;
+    }
+
+    reader.fitWidth();
+  }, [reader]);
+
+  const handleAutoHideControlsChange = useCallback((autoHideControls: boolean): void => {
+    readerEnvironment.updateSettings({ autoHideControls });
+
+    if (!autoHideControls) {
+      clearChromeTimer();
+      return;
+    }
+
+    if (!isEnvironmentOpen && isChromeVisibleRef.current) {
+      scheduleChromeHide();
+    }
+  }, [clearChromeTimer, isEnvironmentOpen, readerEnvironment, scheduleChromeHide]);
+
+  const readerEnvironmentStyle = {
+    '--reader-environment-dim-opacity': readerEnvironment.dimOpacity.toString(),
+  } as CSSProperties;
+
   useEffect(() => {
     return () => {
       clearChromeTimer();
@@ -150,6 +229,33 @@ export function ReaderPage() {
       }
     };
   }, [clearChromeTimer]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape' && isEnvironmentOpen) {
+        closeReadingEnvironment();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [closeReadingEnvironment, isEnvironmentOpen]);
+
+  useEffect(() => {
+    if (
+      !isEnvironmentOpen
+      && isChromeVisibleRef.current
+      && readerEnvironment.settings.autoHideControls
+    ) {
+      scheduleChromeHide();
+    }
+  }, [
+    isEnvironmentOpen,
+    readerEnvironment.settings.autoHideControls,
+    scheduleChromeHide,
+  ]);
 
   useEffect(() => {
     if (!reader.viewport) return;
@@ -177,10 +283,13 @@ export function ReaderPage() {
 
   return (
     <div
-      className={`reader-page ${isChromeVisible ? 'reader-page--chrome-visible' : ''}`}
+      className={`reader-page reader-page--theme-${readerEnvironment.settings.theme} ${isChromeVisible ? 'reader-page--chrome-visible' : ''}`}
+      style={readerEnvironmentStyle}
       onPointerMove={handlePointerMove}
       onClick={handleReaderClick}
     >
+      <div className="reader-page__environment-dim" aria-hidden="true" />
+
       <div
         className="reader-page__top-chrome reader-page__chrome"
         onPointerDown={handleChromePointerDown}
@@ -223,8 +332,37 @@ export function ReaderPage() {
           onResetZoom={reader.resetZoom}
           onFitWidth={reader.fitWidth}
           onFitPage={reader.fitPage}
+          onOpenReadingEnvironment={openReadingEnvironment}
         />
       </div>
+
+      {isEnvironmentOpen && (
+        <>
+          <button
+            type="button"
+            className="reader-page__environment-scrim"
+            onClick={closeReadingEnvironment}
+            aria-label="Close reading environment"
+          />
+          <div
+            className="reader-page__environment-panel"
+            onPointerDown={handleChromePointerDown}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <ReadingEnvironmentPanel
+              settings={readerEnvironment.settings}
+              scaleMode={reader.scaleMode}
+              onApplyPreset={applyReadingPreset}
+              onThemeChange={handleThemeChange}
+              onBrightnessChange={handleBrightnessChange}
+              onOpeningModeChange={handleOpeningModeChange}
+              onAutoHideControlsChange={handleAutoHideControlsChange}
+              onReset={readerEnvironment.resetSettings}
+              onClose={closeReadingEnvironment}
+            />
+          </div>
+        </>
+      )}
 
       <div
         className={`reader-page__zoom-feedback ${zoomFeedback ? 'reader-page__zoom-feedback--visible' : ''}`}
