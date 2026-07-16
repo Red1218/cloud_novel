@@ -1,8 +1,37 @@
 .reader-page {
+  --reader-environment-bg: var(--reader-bg-dark);
+  --reader-environment-dim-opacity: 0;
   --reader-chrome-bg: rgba(17, 19, 24, 0.78);
   --reader-chrome-border: rgba(255, 255, 255, 0.1);
   --reader-chrome-blur: blur(18px);
   --reader-chrome-hover-bg: rgba(255, 255, 255, 0.09);
+  --reader-chrome-text: var(--reader-chrome-text-dark);
+  --reader-chrome-text-muted: var(--reader-chrome-muted-dark);
+  --reader-chrome-text-disabled: var(--reader-chrome-disabled-dark);
+  --reader-panel-bg: linear-gradient(135deg, rgba(42, 42, 42, 0.95), rgba(17, 17, 17, 0.96));
+  --reader-panel-border: rgba(255, 255, 255, 0.12);
+  --reader-panel-border-strong: rgba(255, 255, 255, 0.34);
+  --reader-panel-text: var(--reader-chrome-text-dark);
+  --reader-panel-muted: rgba(238, 241, 247, 0.66);
+  --reader-panel-accent: var(--reader-panel-accent-dark);
+  --reader-panel-tile-bg: rgba(255, 255, 255, 0.07);
+  --reader-panel-tile-hover-bg: rgba(255, 255, 255, 0.11);
+  --reader-panel-control-bg: rgba(255, 255, 255, 0.08);
+  --reader-panel-control-hover-bg: rgba(255, 255, 255, 0.13);
+  --reader-panel-active-bg: rgba(238, 241, 247, 0.94);
+  --reader-panel-active-text: #151821;
+  --reader-panel-selected-border: rgba(238, 241, 247, 0.92);
+  --reader-panel-slider-accent: #f0f2f5;
+  --reader-panel-check-bg: rgba(238, 241, 247, 0.96);
+  --reader-panel-check-text: #151821;
+  --reader-panel-handle-bg: rgba(238, 241, 247, 0.18);
+  --reader-panel-shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
+  --reader-theme-preview-dark: #171717;
+  --reader-theme-preview-light: #f6f7f9;
+  --reader-theme-preview-sepia: #ead9b9;
+  --reader-theme-preview-contrast: #000000;
+  --reader-theme-preview-line-dark: #eceff5;
+  --reader-theme-preview-line-light: #2b303a;
 
   /*
    * Chrome insets — how much vertical space to reserve inside the scroll
@@ -29,10 +58,37 @@
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  background:
-    radial-gradient(circle at 50% 38%, rgba(108, 142, 245, 0.08), transparent 42%),
-    linear-gradient(180deg, #090b10 0%, #0d0f14 58%, #08090d 100%);
+  background: var(--reader-environment-bg);
   overflow: hidden;
+}
+
+.reader-page--theme-light {
+  --reader-environment-bg: var(--reader-bg-light);
+  --reader-chrome-bg: rgba(255, 255, 255, 0.78);
+  --reader-chrome-border: rgba(21, 24, 33, 0.12);
+  --reader-chrome-hover-bg: rgba(21, 24, 33, 0.08);
+  --reader-chrome-text: var(--reader-chrome-text-light);
+  --reader-chrome-text-muted: var(--reader-chrome-muted-light);
+  --reader-chrome-text-disabled: var(--reader-chrome-disabled-light);
+}
+
+.reader-page--theme-sepia {
+  --reader-environment-bg: var(--reader-bg-sepia);
+  --reader-chrome-bg: rgba(49, 39, 25, 0.72);
+  --reader-chrome-border: rgba(255, 248, 229, 0.16);
+  --reader-chrome-hover-bg: rgba(255, 248, 229, 0.12);
+}
+
+.reader-page--theme-contrast {
+  --reader-environment-bg: var(--reader-bg-contrast);
+  --reader-chrome-bg: rgba(0, 0, 0, 0.88);
+  --reader-chrome-border: rgba(255, 255, 255, 0.24);
+  --reader-chrome-hover-bg: rgba(255, 255, 255, 0.16);
+  --reader-panel-bg: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(0, 0, 0, 0.98));
+  --reader-panel-border: rgba(255, 255, 255, 0.22);
+  --reader-panel-border-strong: rgba(255, 255, 255, 0.5);
+  --reader-panel-tile-bg: rgba(255, 255, 255, 0.1);
+  --reader-panel-tile-hover-bg: rgba(255, 255, 255, 0.15);
 }
 
 .reader-page--chrome-visible {
@@ -43,10 +99,20 @@
 .reader-page__content {
   flex-grow: 1;
   position: relative;
+  z-index: var(--z-base);
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.reader-page__environment-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000000;
+  opacity: var(--reader-environment-dim-opacity);
+  pointer-events: none;
 }
 
 .reader-page__chrome {
@@ -118,6 +184,24 @@
 
 .reader-page__zoom-feedback--visible {
   opacity: 1;
+}
+
+.reader-page__environment-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  background: transparent;
+}
+
+.reader-page__environment-panel {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-modal);
+  pointer-events: none;
+}
+
+.reader-page__environment-panel .reading-environment {
+  pointer-events: auto;
 }
 
 @media (max-width: 767px) {

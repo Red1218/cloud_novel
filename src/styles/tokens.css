@@ -40,6 +40,21 @@
   --color-warning:          #f6ad55;
   --color-info:             #63b3ed;
 
+  /* Reader environment */
+  --reader-bg-dark:          radial-gradient(circle at 50% 38%, rgba(108, 142, 245, 0.08), transparent 42%),
+                             linear-gradient(180deg, #090b10 0%, #0d0f14 58%, #08090d 100%);
+  --reader-bg-light:         linear-gradient(180deg, #f1f2f4 0%, #dfe3e8 100%);
+  --reader-bg-sepia:         linear-gradient(180deg, #e1cfad 0%, #c7ad82 100%);
+  --reader-bg-contrast:      linear-gradient(180deg, #000000 0%, #050505 100%);
+  --reader-chrome-text-dark: #eef1f7;
+  --reader-chrome-muted-dark: rgba(238, 241, 247, 0.68);
+  --reader-chrome-disabled-dark: rgba(238, 241, 247, 0.34);
+  --reader-chrome-text-light: #151821;
+  --reader-chrome-muted-light: rgba(21, 24, 33, 0.66);
+  --reader-chrome-disabled-light: rgba(21, 24, 33, 0.32);
+  --reader-panel-accent-dark: #d8b75c;
+  --reader-panel-accent-light: #6c8ef5;
+
   /* ----------------------------------------------------------
      SPACING SCALE (4px base unit)
      ---------------------------------------------------------- */

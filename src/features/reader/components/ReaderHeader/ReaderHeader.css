@@ -39,7 +39,7 @@
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  color: var(--color-text-primary);
+  color: var(--reader-chrome-text);
   border-radius: var(--radius-full);
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
@@ -50,7 +50,7 @@
 }
 
 .reader-header__page-btn:disabled {
-  color: rgba(226, 230, 240, 0.32);
+  color: var(--reader-chrome-text-disabled);
   cursor: default;
 }
 
@@ -58,7 +58,7 @@
   max-width: 100%;
   margin: 0;
   overflow: hidden;
-  color: var(--color-text-primary);
+  color: var(--reader-chrome-text);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
@@ -75,7 +75,7 @@
 
 .reader-header__page-info {
   min-width: 78px;
-  color: var(--color-text-secondary);
+  color: var(--reader-chrome-text-muted);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;

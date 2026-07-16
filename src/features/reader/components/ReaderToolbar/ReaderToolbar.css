@@ -18,7 +18,7 @@
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  color: var(--color-text-primary);
+  color: var(--reader-chrome-text);
   border-radius: var(--radius-full);
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
@@ -29,7 +29,7 @@
 }
 
 .reader-toolbar__button:disabled {
-  color: rgba(226, 230, 240, 0.42);
+  color: var(--reader-chrome-text-disabled);
   cursor: default;
 }
 
@@ -42,7 +42,7 @@
 .reader-toolbar__zoom-value {
   min-width: 58px;
   padding: 0 var(--space-2);
-  color: var(--color-text-secondary);
+  color: var(--reader-chrome-text-muted);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
