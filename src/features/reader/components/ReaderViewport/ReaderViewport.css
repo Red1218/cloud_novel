@@ -22,6 +22,15 @@
  *                       PdfTextLayer explicitly sets user-select: text on its
  *                       own root element, restoring selection inside the PDF.
  *                       This pairing is intentional — do not remove either half.
+ *
+ * Chrome inset padding — When the floating header/toolbar are visible, the
+ *                       scroll container grows its top/bottom padding by the
+ *                       chrome inset CSS variables (--reader-chrome-top-inset
+ *                       and --reader-chrome-bottom-inset) propagated from the
+ *                       parent .reader-page element.  This ensures the PDF is
+ *                       never obscured behind chrome elements regardless of
+ *                       zoom level.  When chrome is hidden both insets are 0px
+ *                       and the full viewport height is available for reading.
  */
 .reader-viewport-scroll {
   display: flex;
@@ -32,10 +41,10 @@
   overflow-y: auto;
   overflow-x: auto;
   scrollbar-gutter: stable;
-  padding-top:    max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-top)));
-  padding-bottom: max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-bottom)));
-  padding-left:   max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-left)));
-  padding-right:  max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-right)));
+  padding-top:    calc(max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-top))) + var(--reader-chrome-top-inset, 0px));
+  padding-bottom: calc(max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-bottom))) + var(--reader-chrome-bottom-inset, 0px));
+  padding-left:   max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-left)));
+  padding-right:  max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-right)));
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
   user-select: none;
@@ -54,6 +63,12 @@
  * inline-block so the element sizes to its content (the canvas dimensions).
  * flex-shrink: 0 prevents the scroll container from compressing it.
  *
+ * margin-top/bottom: auto — Issue 1 fix: vertically centres the page within the
+ * padded flex column when the canvas is shorter than the available scroll area
+ * (e.g. fit-width on a short mobile viewport).  When the page is taller than the
+ * container (zoomed in) the auto margins collapse to 0 and normal scroll
+ * behaviour applies — zoom math and PDF rendering are not affected.
+ *
  * Note: max-width: 100% has been intentionally removed from .pdf-canvas.
  * usePdfRenderer sets canvas.style.width to an explicit pixel value; keeping
  * max-width: 100% would override that value and suppress the horizontal
@@ -63,5 +78,31 @@
   position: relative;
   display: inline-block;
   flex-shrink: 0;
-  box-shadow: var(--shadow-md);
+  margin-top:    auto;
+  margin-bottom: auto;
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.38),
+    0 18px 52px rgba(0, 0, 0, 0.62);
+}
+
+/* ─── Mobile horizontal scrollbar clearance ─────────────────────────────────── */
+
+/*
+ * When the page is zoomed beyond fit-width on a narrow viewport, a horizontal
+ * scrollbar appears at the bottom of the scroll container. Without extra
+ * clearance the scrollbar track sits flush against the system gesture /
+ * navigation bar, making it hard to grab and visually cramped.
+ *
+ * Adding var(--space-2) (8px) to padding-bottom gives the track a comfortable
+ * buffer. The value is small enough to have no perceptible effect on normal
+ * fit-width or fit-page reading where no horizontal scrollbar appears.
+ */
+@media (max-width: 767px) {
+  .reader-viewport-scroll {
+    padding-bottom: calc(
+      max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-bottom)))
+      + var(--reader-chrome-bottom-inset, 0px)
+      + var(--space-2)
+    );
+  }
 }

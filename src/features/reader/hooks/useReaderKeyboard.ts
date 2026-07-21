@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 
 interface UseReaderKeyboardOptions {
   previousPage: () => void;
@@ -20,6 +20,11 @@ interface UseReaderKeyboardOptions {
  *
  * All shortcuts are suppressed when focus is inside an editable element
  * (input, textarea, or contenteditable).
+ *
+ * Arrow keys always call preventDefault() to prevent the browser from
+ * scrolling the viewport horizontally when the page is zoomed in and the
+ * scroll container has horizontal overflow. Without this, the native scroll
+ * and page navigation fire simultaneously, causing visible jitter.
  */
 export function useReaderKeyboard({
   previousPage,
@@ -40,11 +45,15 @@ export function useReaderKeyboard({
       }
 
       if (e.key === 'ArrowLeft') {
+        // preventDefault stops the browser from scrolling the scroll container
+        // horizontally when the page is wider than the viewport (zoomed in).
+        e.preventDefault();
         previousPage();
         return;
       }
 
       if (e.key === 'ArrowRight') {
+        e.preventDefault();
         nextPage();
         return;
       }

@@ -1,254 +1,116 @@
-/* ── Container ──────────────────────────────────────────────────────────── */
-
-/*
- * padding via max() keeps desktop layout pixel-identical (env values are 0px
- * on desktop).  On notched mobile the larger env() value wins, pushing
- * content away from the system chrome.
- *
- * flex-wrap: nowrap is explicit — the toolbar must never reflow to a second
- * line regardless of content width.
- */
 .reader-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(44px, auto) minmax(0, 1fr) minmax(44px, auto);
   align-items: center;
-  flex-wrap: nowrap;
-  height: var(--header-height);
-  padding-top:    0;
-  padding-bottom: 0;
-  padding-left:   max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-left)));
-  padding-right:  max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-right)));
-  background-color: var(--color-bg-header);
-  border-bottom: 1px solid var(--color-border);
-  flex-shrink: 0;
-  z-index: var(--z-header);
-  gap: var(--space-3);
-  overflow: hidden;
+  width: min(760px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  min-height: 58px;
+  padding: 6px;
+  border: 1px solid var(--reader-chrome-border);
+  border-radius: var(--radius-full);
+  background: var(--reader-chrome-bg);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.42);
+  backdrop-filter: var(--reader-chrome-blur);
 }
 
-/* ── Column layout ──────────────────────────────────────────────────────── */
-
-.reader-header__left {
+.reader-header__left,
+.reader-header__right,
+.reader-header__center {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+}
+
+.reader-header__left {
+  justify-content: flex-start;
 }
 
 .reader-header__center {
-  flex: 1;
-  min-width: 0; /* enables text truncation */
-  display: flex;
-  align-items: center;
+  min-width: 0;
   justify-content: center;
 }
 
 .reader-header__right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
+  justify-content: flex-end;
 }
 
-/* ── Back button ────────────────────────────────────────────────────────── */
-
-.reader-header__back-btn {
-  display: flex;
+.reader-header__back-btn,
+.reader-header__page-btn {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  /* 44px touch target (WCAG 2.5.5) */
+  justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  padding: var(--space-2) var(--space-3);
-  margin-left: calc(-1 * var(--space-3));
-  border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background-color var(--transition-fast);
-  white-space: nowrap;
+  color: var(--reader-chrome-text);
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.reader-header__back-btn:hover {
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-surface-hover);
+.reader-header__back-btn:hover,
+.reader-header__page-btn:hover:not(:disabled) {
+  background-color: var(--reader-chrome-hover-bg);
 }
 
-/* ── Title ──────────────────────────────────────────────────────────────── */
+.reader-header__page-btn:disabled {
+  color: var(--reader-chrome-text-disabled);
+  cursor: default;
+}
 
 .reader-header__title {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--reader-chrome-text);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: var(--line-height-tight);
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-/* ── Pagination pill ────────────────────────────────────────────────────── */
 
 .reader-header__pagination {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 2px var(--space-2);
-}
-
-.reader-header__page-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  /* 44px touch target (WCAG 2.5.5) */
-  min-width: 44px;
-  min-height: 44px;
-  padding: var(--space-1);
-  border-radius: var(--radius-sm);
-  transition: background-color var(--transition-fast);
-}
-
-.reader-header__page-btn:hover:not(:disabled) {
-  background-color: var(--color-bg-surface-hover);
-}
-
-.reader-header__page-btn:disabled {
-  color: var(--color-text-muted);
-  cursor: not-allowed;
+  gap: 2px;
 }
 
 .reader-header__page-info {
+  min-width: 78px;
+  color: var(--reader-chrome-text-muted);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-  min-width: 44px;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
   text-align: center;
   user-select: none;
 }
 
-.reader-header__page-slash {
-  display: none;
-}
-
-/* ── Zoom pill ──────────────────────────────────────────────────────────── */
-
-.reader-header__zoom-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 2px var(--space-2);
-}
-
-.reader-header__zoom-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  /* 44px touch target (WCAG 2.5.5) */
-  min-width: 44px;
-  min-height: 44px;
-  padding: var(--space-1);
-  border-radius: var(--radius-sm);
-  transition: background-color var(--transition-fast);
-  flex-shrink: 0;
-}
-
-.reader-header__zoom-btn:hover {
-  background-color: var(--color-bg-surface-hover);
-}
-
-.reader-header__zoom-display {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-  min-width: 40px;
-  text-align: center;
-  user-select: none;
-}
-
-/* Preset buttons (Fit W / Fit P / 100%) separated by a divider */
-.reader-header__zoom-presets {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding-left: var(--space-2);
-  margin-left: var(--space-1);
-  border-left: 1px solid var(--color-border-strong);
-}
-
-.reader-header__zoom-preset-btn {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background-color var(--transition-fast);
-  white-space: nowrap;
-}
-
-.reader-header__zoom-preset-btn:hover {
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-surface-hover);
-}
-
-/* ── Mobile (≤ 768px) ───────────────────────────────────────────────────── */
-
-@media (max-width: 768px) {
-  .reader-header__back-text {
-    display: none;
-  }
-
-  .reader-header__center {
-    display: none;
-  }
-
-  .reader-header__page-label {
-    display: none;
-  }
-
-  .reader-header__page-slash {
-    display: inline;
-  }
-
-  /* Fit and reset presets are too wide for narrow viewports */
-  .reader-header__zoom-presets {
-    display: none;
-  }
-}
-
-/* ── Narrow phones (≤ 480px) ────────────────────────────────────────────── */
-
-/*
- * Further tightens spacing so all controls remain reachable on portrait
- * phones.  The 44px touch-target min dimensions are preserved on all buttons.
- * padding-left/right use max() so safe-area insets are honoured even at the
- * reduced base spacing.
- */
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .reader-header {
-    gap: var(--space-1);
-    padding-left:  max(var(--space-2), calc(var(--space-2) + env(safe-area-inset-left)));
-    padding-right: max(var(--space-2), calc(var(--space-2) + env(safe-area-inset-right)));
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
   }
 
-  .reader-header__zoom-display {
-    min-width: 36px;
+  .reader-header__title {
+    font-size: var(--font-size-sm);
+  }
+
+  .reader-header__page-info {
+    min-width: 58px;
+  }
+}
+
+@media (max-width: 430px) {
+  .reader-header {
+    gap: 2px;
+  }
+
+  .reader-header__page-btn {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-header__back-btn,
+  .reader-header__page-btn {
+    transition: none;
   }
 }
