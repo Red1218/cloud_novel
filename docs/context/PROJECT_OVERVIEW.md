@@ -20,10 +20,11 @@ Cloud Novel is a modern, scalable web platform designed to allow users to read, 
 - Content delivery and caching.
 
 ## Technology Stack
-- **Frontend:** [To be defined based on architecture]
-- **Backend:** [To be defined based on architecture]
-- **Database:** [To be defined based on architecture]
-- **Infrastructure:** [To be defined based on architecture]
+- **Frontend:** React 19, TypeScript, Vite
+- **Backend:** None (Local-first architecture)
+- **Database:** IndexedDB (via `idb` library)
+- **Infrastructure:** Client-side web application
+- **PDF Engine:** pdf.js (`pdfjs-dist`)
 
 ## Architecture Philosophy
 - **Modularity:** Separation of concerns across frontend, backend, and data layers.

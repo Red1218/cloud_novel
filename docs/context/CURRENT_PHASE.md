@@ -1,25 +1,24 @@
 # Current Phase
 
 ## Current Phase Name
-- [e.g., Phase 1: Core Foundation & MVP]
+- Phase 5.3: Reading Environment
 
 ## Objectives
-- Establish the baseline architecture and documentation.
-- Implement core data models and API endpoints.
-- Setup CI/CD and testing environments.
+- Build the core reading environment and implement the PDF rendering pipeline.
+- Adhere to the "Published Page is Sacred" philosophy.
+- Ensure performant loading and rendering of pages.
 
 ## Out of Scope Items
-- Advanced features (e.g., machine learning recommendations, complex analytics).
-- Third-party integrations not essential for MVP.
-- Premature optimization of non-bottleneck systems.
+- Search inside PDF (Phase 5.5).
+- Cloud Sync (Phase 5.7).
+- Advanced Reading Insights (Phase 5.6).
 
 ## Expected Deliverables
-- Fully functional CI/CD pipeline.
-- Core API with authentication.
-- Basic frontend scaffolding.
-- Comprehensive AI context system (Completed).
+- Functional PDF reader view.
+- Isolated rendering engine decoupled from UI.
+- Paging and basic navigation within the document.
 
 ## Success Criteria
-- All tests pass in the CI pipeline.
-- API endpoints are reachable and documented.
-- AI assistants can ingest the context system successfully.
+- User can open and read a PDF novel seamlessly.
+- Application performance remains high during rapid paging.
+- AI assistants correctly identify Phase 5.3 context.
