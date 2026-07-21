@@ -156,3 +156,59 @@
 1. Document the proposed architectural change.
 2. Wait for explicit approval from the lead architect (Human or ChatGPT).
 3. **Do not continue implementation until the architecture is re-approved.**
+
+### Architecture Change Requests
+
+```text
+Architecture Improvement Discovered
+        ↓
+STOP
+        ↓
+Document Proposal
+        ↓
+Architecture Review
+        ↓
+Approval?
+      ├── Yes → Implement
+      └── No  → Record in TECH_DEBT.md, ROADMAP.md or DECISION_LOG.md
+```
+
+Implementation resumes only after explicit approval.
+
+If implementation reveals an architectural improvement:
+
+STOP.
+
+Document:
+
+Current Architecture
+
+Proposed Improvement
+
+Reasoning
+
+Alternatives
+
+Benefits
+
+Trade-offs
+
+Files Affected
+
+Architectural Risks
+
+Classify the proposal as:
+
+- Immediate Blocker
+- Recommended Improvement
+- Future Enhancement
+
+Only Immediate Blockers should halt implementation automatically.
+
+Future Enhancements should be recorded in:
+
+- TECH_DEBT.md
+- DECISION_LOG.md
+- Future roadmap or phase documentation
+
+Do not implement architectural changes without approval.

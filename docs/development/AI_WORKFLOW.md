@@ -10,9 +10,9 @@ This document details the roles, responsibilities, and handoff points for each A
 
 | Agent | Core Responsibility | Specialization |
 | :--- | :--- | :--- |
-| **ChatGPT** | Product Management & Final Review | Ideation, UX specifications, requirement gathering, and final acceptance testing. |
+| **ChatGPT** | Product Management & Final Review | Ideation, UX specifications, requirement gathering, and final acceptance testing. ChatGPT reviews and approves architectural changes before implementation proceeds. |
 | **Stitch** | Prototyping & Scaffolding | Translating requirements into initial component structures, types, and boilerplate. |
-| **Codex** | Deep Implementation | Writing complex domain logic, algorithms, and core feature behavior. |
+| **Codex** | Deep Implementation | Writing complex domain logic, algorithms, and core feature behavior. Codex is responsible for implementation within the approved architecture. Codex must never silently introduce architectural changes. If improvements are discovered, Codex should stop, document the proposal, and wait for approval. |
 | **Kimi** | Specialized Code Review | Performance profiling, accessibility audits, and defensive programming checks. |
 | **Claude** | Refinement & Polish | UI/UX polish, bug fixing, refactoring, and removing technical debt. |
 | **Gemini** | Knowledge & Context Orchestration | Generating and maintaining documentation, system analysis, and managing global coding standards. |

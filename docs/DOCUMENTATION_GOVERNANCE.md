@@ -68,18 +68,26 @@ Documentation must be updated immediately upon the occurrence of:
 
 ## Documentation Freeze
 
-Documentation Freeze is required before implementation begins. 
+Documentation Freeze establishes the official engineering baseline for Cloud Novel.
 
-Only the following changes are allowed after freeze:
-- Bug fixes in documentation
-- Broken links resolution
-- Typographical corrections
-- Clarifications
+Once documentation is frozen:
 
-The following are strictly prohibited post-freeze without restarting the planning phase:
-- No architectural rewrites.
-- No UX rewrites.
 - No workflow redesign.
+- No architecture rewrites.
+- No terminology changes.
+- No restructuring of engineering standards.
+
+Allowed updates after freeze:
+
+- Typographical corrections.
+- Broken links.
+- Cross-reference updates.
+- Newly approved ADRs.
+- New completed phase documentation.
+- Changelog entries.
+- Documentation required by approved features.
+
+Breaking Documentation Freeze requires an Architecture Review and explicit approval.
 
 ## Review Process
 
@@ -149,6 +157,19 @@ Before entering the 'Approved' state, documentation should pass:
 - Always update the Decision Log when appropriate.
 - Always update ADRs when architecture changes.
 
+Architecture changes require explicit approval.
+
+No implementation may silently modify project architecture.
+
+Architecture proposals must be documented before implementation.
+
+Approved architecture changes should update:
+
+- ADRs
+- Decision Log
+- Engineering Handbook (if applicable)
+- Architecture documentation (if applicable)
+
 ## Documentation Audit
 
 We recommend periodic audits to ensure the integrity of the documentation repository:
@@ -159,3 +180,5 @@ We recommend periodic audits to ensure the integrity of the documentation reposi
 ## Version History
 
 - **Version 1.0**: Initial Documentation Governance.
+- **Version 1.1**: Adopted Architecture Change Policy rules.
+- **Version 1.3**: Adopted Documentation Freeze Policy.

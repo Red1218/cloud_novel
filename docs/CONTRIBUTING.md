@@ -62,6 +62,28 @@ We follow a rigorous, phase-based development workflow. Implementation must **ne
 12. **Merge into `develop`:** Integrate the feature.
 13. **Release:** Deploy to `main`.
 
+If you identify an architectural improvement during implementation:
+
+Stop.
+
+Do not implement it immediately.
+
+Document the proposal.
+
+Wait for approval.
+
+Continue implementation only within the approved architecture.
+
+### Documentation Freeze
+
+Before beginning implementation:
+
+- Ensure the relevant documentation has been approved.
+- Verify the documentation version.
+- Implement only against the latest frozen documentation.
+- Do not silently reinterpret documentation.
+- Raise documentation inconsistencies before coding.
+
 ---
 
 ## 4. AI Workflow
@@ -225,3 +247,5 @@ Use this index to navigate the repository's guidelines:
 | Version | Date | Description |
 | :--- | :--- | :--- |
 | **1.0** | 2026-07-16 | Initial Contributor Guide. |
+| **1.1** | 2026-07-16 | Added Architecture Change Policy. |
+| **1.3** | 2026-07-16 | Added Documentation Freeze Policy. |

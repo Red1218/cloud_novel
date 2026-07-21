@@ -48,6 +48,43 @@ Documentation versions follow semantic versioning conventions, adapted for engin
 
 ---
 
+## Documentation v1.1
+
+**Date**: 2026-07-16
+
+**Added**
+- Formally adopted the Architecture Change Policy across all core guidelines.
+
+**Changed**
+- Updated `ENGINEERING_HANDBOOK.md` with strict policy to prevent silent architectural changes.
+- Expanded `IMPLEMENTATION_CHARTER_TEMPLATE.md` to classify architectural change requests.
+- Updated `AI_WORKFLOW.md` to define ChatGPT and Codex responsibilities regarding architecture changes.
+- Updated `DOCUMENTATION_GOVERNANCE.md` with new rules for architecture modification approvals.
+- Updated `CONTRIBUTING.md` workflow to stop implementation upon finding architectural improvements.
+
+---
+
+## Documentation v1.2
+
+**Date**: 2026-07-16
+
+**Added**
+- Standardized Architecture Change approval workflow diagram to `ENGINEERING_HANDBOOK.md` and `IMPLEMENTATION_CHARTER_TEMPLATE.md`.
+
+---
+
+## Documentation v1.3
+
+**Date**: 2026-07-16
+
+**Added**
+- Added Documentation Freeze Policy.
+- Defined frozen engineering baseline.
+- Clarified implementation against frozen documentation.
+- Added contributor responsibilities regarding documentation consistency.
+
+---
+
 ## Future Entries
 
 *Use the following template for future updates to this document:*

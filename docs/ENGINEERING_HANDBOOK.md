@@ -16,13 +16,13 @@ The reader is always more important than the interface.
 
 ---
 
-Documentation Version: 1.0
+Documentation Version: 1.3
 
 Status: Frozen
 
 Last Updated:
 
-YYYY-MM-DD
+2026-07-16
 
 Maintained By:
 
@@ -51,6 +51,20 @@ Engineering
 - **Maximum cohesion.** Code that changes together should live together.
 - **Accessibility first.** Accessibility is a core requirement, not an afterthought.
 - **Performance first.** Optimize for rapid load times, smooth scrolling, and minimal memory footprint.
+
+### Documentation Freeze
+
+Implementation must always target the latest frozen documentation version.
+
+If implementation discovers documentation inconsistencies:
+
+STOP.
+
+Resolve the documentation first.
+
+Resume implementation only after documentation has been updated and approved.
+
+Documentation is the engineering source of truth.
 
 ---
 
@@ -149,6 +163,60 @@ To maintain a scalable and maintainable codebase, we strictly enforce boundary i
 - **UI independent:** Presentation components consume data but do not dictate business rules.
 - **Business logic independent:** Core domain rules do not depend on UI or databases.
 - **Persistence independent:** The choice of database (e.g., IndexedDB) can be swapped without affecting the domain.
+
+---
+
+## Architecture Change Policy
+
+The approved architecture is the implementation target.
+
+If an architectural improvement is discovered during implementation:
+
+STOP.
+
+Do NOT implement the architectural change.
+
+Instead provide:
+
+- Current Architecture
+- Proposed Improvement
+- Reasoning
+- Alternatives Considered
+- Benefits
+- Trade-offs
+- Expected Files to Modify
+- Architectural Risks
+
+Wait for explicit approval before making architectural changes.
+
+Until approval is granted:
+
+- Do not refactor architecture.
+- Do not introduce new architectural patterns.
+- Do not change state management.
+- Do not change persistence strategy.
+- Do not move responsibilities between layers.
+- Do not silently restructure the project.
+
+Architecture evolves intentionally, never implicitly.
+
+### Approval Workflow
+
+This workflow is mandatory for all architectural changes:
+
+```text
+Architecture Improvement Discovered
+        ↓
+STOP
+        ↓
+Document Proposal
+        ↓
+Architecture Review
+        ↓
+Approval?
+      ├── Yes → Implement
+      └── No  → Record in TECH_DEBT.md, ROADMAP.md or DECISION_LOG.md
+```
 
 ---
 
