@@ -1,5 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type { StoredBook } from '@/types';
+import type { Bookmark } from '@/features/reader/bookmarks/types';
 
 interface CloudNovelDBSchema extends DBSchema {
   books: {
@@ -12,6 +13,13 @@ interface CloudNovelDBSchema extends DBSchema {
       'by-lastOpened': number;
     };
   };
+  bookmarks: {
+    key: string; // The UUID (id)
+    value: Bookmark;
+    indexes: {
+      'by-bookId': string;
+    };
+  };
   // Future phases will use this
   settings: {
     key: string;
@@ -20,7 +28,7 @@ interface CloudNovelDBSchema extends DBSchema {
 }
 
 const DB_NAME = 'CloudNovelDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<CloudNovelDBSchema>> | null = null;
 
@@ -31,19 +39,26 @@ let dbPromise: Promise<IDBPDatabase<CloudNovelDBSchema>> | null = null;
 export function getDB(): Promise<IDBPDatabase<CloudNovelDBSchema>> {
   if (!dbPromise) {
     dbPromise = openDB<CloudNovelDBSchema>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        // Destructive migration for Phase 3.1
-        if (db.objectStoreNames.contains('books')) {
-          db.deleteObjectStore('books');
+      upgrade(db, oldVersion) {
+        if (oldVersion < 2) {
+          // Destructive migration for Phase 3.1
+          if (db.objectStoreNames.contains('books')) {
+            db.deleteObjectStore('books');
+          }
+          
+          const bookStore = db.createObjectStore('books', { keyPath: 'id' });
+          
+          // Create indexes
+          bookStore.createIndex('by-hash', 'hash', { unique: true });
+          bookStore.createIndex('by-title', 'title');
+          bookStore.createIndex('by-importedAt', 'importedAt');
+          bookStore.createIndex('by-lastOpened', 'lastOpened');
         }
-        
-        const bookStore = db.createObjectStore('books', { keyPath: 'id' });
-        
-        // Create indexes
-        bookStore.createIndex('by-hash', 'hash', { unique: true });
-        bookStore.createIndex('by-title', 'title');
-        bookStore.createIndex('by-importedAt', 'importedAt');
-        bookStore.createIndex('by-lastOpened', 'lastOpened');
+
+        if (oldVersion < 3 && !db.objectStoreNames.contains('bookmarks')) {
+          const bookmarkStore = db.createObjectStore('bookmarks', { keyPath: 'id' });
+          bookmarkStore.createIndex('by-bookId', 'bookId');
+        }
 
         if (!db.objectStoreNames.contains('settings')) {
           db.createObjectStore('settings');
