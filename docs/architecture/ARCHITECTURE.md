@@ -77,14 +77,21 @@ State is localized as much as possible.
 
 ### Persistence (IndexedDB)
 Persistence logic is decoupled from UI logic.
-- **Repositories:** Classes like `BookRepository.ts` abstract IndexedDB operations.
-- **Feature Hooks:** Custom hooks (e.g., `useReadingState.ts`) consume repositories to persist domain state. The UI simply calls generic functions like `queueUpdate` or `touchLastOpened`.
+- **Services & Repositories:** Classes like `BookRepository.ts` and `bookmarkService.ts` abstract IndexedDB operations.
+- **Feature Hooks:** Custom hooks (e.g., `useReadingState.ts`, `useReaderBookmarks.ts`) consume services to persist domain state. The UI simply calls generic functions like `queueUpdate` or `toggleBookmark`.
+- **Database Schema:** The `CloudNovelDB` schema strictly defines object stores. Migrations are managed via the `DB_VERSION` constant (e.g., v3 added the `bookmarks` store).
 
 ### PDF Rendering Isolation
 The PDF.js dependency is strictly isolated to prevent performance bottlenecks and maintain flexibility.
 - **Service Layer:** `pdfService.ts` handles worker initialization and document fetching.
 - **Feature Layer:** `usePdfDocument.ts` and `usePdfRenderer.ts` manage the async loading state and canvas painting.
 - **Presentation Layer:** The UI (e.g., `ReaderViewport.tsx`) only provides an HTML canvas element and receives dimensions. It does not handle PDF byte parsing.
+
+### Bookmark Engine
+The Bookmark Engine (`src/features/reader/bookmarks`) follows a strict vertical slice architecture:
+- **Persistence:** `bookmarkService.ts` directly interfaces with IndexedDB to save page positions, keeping persistence separate from React.
+- **State Management:** `useReaderBookmarks.ts` exposes headless hooks (`toggleBookmark`, `addBookmark`, `removeBookmark`) for UI interaction.
+- **Presentation:** The Bookmark Engine is designed to support dedicated UI components through the `useReaderBookmarks` headless hook, ensuring the presentation layer remains decoupled from persistence.
 
 ---
 

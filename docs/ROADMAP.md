@@ -20,9 +20,12 @@ Implementation details are explicitly omitted here. Technical breakdowns belong 
 ### Completed
 - [x] **Phase 5.1 — Library UX Polish**
 - [x] **Phase 5.2 — Immersive Reading Experience**
+- [x] **Phase 5.3 — Reading Environment**
+- [x] **Phase 5.4 — Bookmarks & Reading Navigation** (Completed: 2026-07-22)
+  - Delivered the Bookmark Engine with IndexedDB persistence, headless React hooks, and supporting infrastructure. Bookmark UI is scheduled for a later phase.
 
 ### Current
-- [▶] **Phase 5.3 — Reading Environment**
+- [▶] **Phase 5.5 — Search Inside PDF**
 
 ---
 
@@ -32,8 +35,7 @@ The following features represent the approved strategic direction for Cloud Nove
 
 | Phase | Goal | Priority | Status | Dependencies | Estimated Complexity |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Phase 5.4** | Bookmarks & Reading Navigation | High | Planned | Phase 5.3 | Medium |
-| **Phase 5.5** | Search Inside PDF | Medium | Planned | Phase 5.4 | High |
+| **Phase 5.5** | Search Inside PDF | Medium | In Progress | Phase 5.4 | High |
 | **Phase 5.6** | Reading Insights | Low | Planned | Phase 5.1 | Low |
 | **Phase 5.7** | Cloud Sync | High | Planned | Phase 5.4 | Very High |
 | **Phase 6.0** | Cross-device Reading | High | Planned | Phase 5.7 | Very High |
