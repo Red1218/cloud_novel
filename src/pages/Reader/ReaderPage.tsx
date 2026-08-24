@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type MouseEvent,
   type PointerEvent,
 } from 'react';
 import { useParams } from 'react-router-dom';
@@ -29,6 +30,7 @@ import './ReaderPage.css';
 
 const CHROME_HIDE_DELAY_MS = 10_000;
 const ZOOM_FEEDBACK_DELAY_MS = 1_000;
+const CLICK_TOGGLE_DRAG_THRESHOLD_PX = 6;
 
 /**
  * Reader page - composition and orchestration only.
@@ -44,12 +46,13 @@ export function ReaderPage() {
   const chromeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const zoomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousZoomPctRef = useRef<number | null>(null);
-  const isChromeVisibleRef = useRef(false);
+  const clickStartRef = useRef<{ x: number; y: number } | null>(null);
+  const isChromeVisibleRef = useRef(true);
   const isCoarsePointerRef = useRef(
     window.matchMedia('(hover: none), (pointer: coarse)').matches,
   );
 
-  const [isChromeVisible, setIsChromeVisible] = useState(false);
+  const [isChromeVisible, setIsChromeVisible] = useState(true);
   const [isEnvironmentOpen, setIsEnvironmentOpen] = useState(false);
   const [zoomFeedback, setZoomFeedback] = useState<string | null>(null);
 
@@ -142,22 +145,64 @@ export function ReaderPage() {
     });
   }, [clearChromeTimer, scheduleChromeHide]);
 
+  const handleReaderPointerDown = useCallback((event: PointerEvent): void => {
+    clickStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+  }, []);
+
   const handlePointerMove = useCallback((): void => {
     if (!isCoarsePointerRef.current) {
       revealChrome();
     }
   }, [revealChrome]);
 
-  const handleReaderClick = useCallback((): void => {
-    if (isCoarsePointerRef.current) {
-      toggleChrome();
+  const handleReaderClick = useCallback((event: MouseEvent): void => {
+    if (event.defaultPrevented) return;
+
+    const target = event.target;
+    if (
+      target instanceof Element
+      && target.closest('a, button, input, select, textarea, [role="button"]')
+    ) {
+      return;
     }
+
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed && selection.toString().trim() !== '') {
+      return;
+    }
+
+    const clickStart = clickStartRef.current;
+    clickStartRef.current = null;
+
+    if (clickStart) {
+      const deltaX = Math.abs(event.clientX - clickStart.x);
+      const deltaY = Math.abs(event.clientY - clickStart.y);
+      if (
+        deltaX > CLICK_TOGGLE_DRAG_THRESHOLD_PX
+        || deltaY > CLICK_TOGGLE_DRAG_THRESHOLD_PX
+      ) {
+        return;
+      }
+    }
+
+    toggleChrome();
   }, [toggleChrome]);
 
   const handleChromePointerDown = useCallback((event: PointerEvent): void => {
     event.stopPropagation();
     revealChrome();
   }, [revealChrome]);
+
+  useEffect(() => {
+    if (!loadedBookId) return;
+
+    isChromeVisibleRef.current = true;
+    setIsChromeVisible(true);
+    scheduleChromeHide();
+  }, [loadedBookId, scheduleChromeHide]);
 
   const openReadingEnvironment = useCallback((): void => {
     clearChromeTimer();
@@ -285,6 +330,7 @@ export function ReaderPage() {
     <div
       className={`reader-page reader-page--theme-${readerEnvironment.settings.theme} ${isChromeVisible ? 'reader-page--chrome-visible' : ''}`}
       style={readerEnvironmentStyle}
+      onPointerDown={handleReaderPointerDown}
       onPointerMove={handlePointerMove}
       onClick={handleReaderClick}
     >
