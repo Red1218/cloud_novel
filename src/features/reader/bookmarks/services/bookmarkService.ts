@@ -54,6 +54,25 @@ export const bookmarkService = {
   },
 
   /**
+   * Sets or clears a bookmark's label. The label is trimmed; an empty
+   * label removes it. Returns the updated bookmark, or undefined when the
+   * bookmark does not exist.
+   */
+  async updateBookmarkLabel(bookmarkId: string, label: string): Promise<Bookmark | undefined> {
+    const db = await getDB();
+    const bookmark = await db.get('bookmarks', bookmarkId);
+    if (!bookmark) return undefined;
+
+    const trimmed = label.trim();
+    const updated: Bookmark = { ...bookmark };
+    if (trimmed) updated.label = trimmed;
+    else delete updated.label;
+
+    await db.put('bookmarks', updated);
+    return updated;
+  },
+
+  /**
    * Removes a bookmark by ID. No-op when the bookmark does not exist.
    */
   async removeBookmark(bookmarkId: string): Promise<void> {

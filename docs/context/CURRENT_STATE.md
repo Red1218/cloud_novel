@@ -1,7 +1,7 @@
 # Current State
 
 ## Current Documentation Version
-- Version: 1.4 (Frozen Engineering Baseline)
+- Version: 1.4.1 (Frozen Engineering Baseline)
 
 ## Completed Phases
 - (See `docs/phases/` for detailed historical phase completions)
@@ -18,6 +18,7 @@
 ## Recent Milestones
 - Completed Phase 5.3 (Reading Environment) and Phase 5.4 (Bookmarks & Reading Navigation).
 - Established isolated bookmark engine with IndexedDB persistence.
+- Added Bookmark UI (top-bar toggle and Bookmarks panel, including bookmark naming) on top of the bookmark engine.
 - Standardized documentation governance (see `docs/DOCUMENTATION_GOVERNANCE.md`).
 
 ## Known Technical Debt
