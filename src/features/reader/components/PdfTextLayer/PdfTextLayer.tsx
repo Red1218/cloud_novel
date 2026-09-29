@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { PDFPageProxy, PageViewport } from 'pdfjs-dist';
 import { TextLayer } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextContent } from '../../services/textLayerService';
+import { TextLayerHighlighter } from '../../search/services/textLayerHighlighter';
+import type { TextLayerHighlight } from '../../search/types';
 import './PdfTextLayer.css';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -14,6 +16,22 @@ interface PdfTextLayerProps {
   textContent: TextContent | null;
   /** The viewport shared with the canvas — never recalculated independently. */
   viewport:    PageViewport | null;
+  /** Search matches on this page; the selected one is scrolled into view. */
+  highlights?: TextLayerHighlight[];
+}
+
+const NO_HIGHLIGHTS: TextLayerHighlight[] = [];
+
+/**
+ * PDF.js 6 sizes the text layer and its spans with `--total-scale-factor`,
+ * which its own viewer sets on each page. Without it the layer falls back
+ * to a default size and drifts from the canvas (misplaced selection and
+ * search highlights), so derive it from the viewport the canvas uses.
+ */
+function setTextLayerScale(container: HTMLElement, viewport: PageViewport): void {
+  const { pageWidth } = viewport.rawDims as { pageWidth: number };
+  const renderedWidth = viewport.rotation % 180 === 0 ? viewport.width : viewport.height;
+  container.style.setProperty('--total-scale-factor', String(renderedWidth / pageWidth));
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -45,10 +63,14 @@ interface PdfTextLayerProps {
  * PdfTextLayer.css applies the correct selection, span positioning, and
  * visibility rules from the pdfjs-dist stylesheet.
  */
-export function PdfTextLayer({ page, textContent, viewport }: PdfTextLayerProps) {
+export function PdfTextLayer({ page, textContent, viewport, highlights = NO_HIGHLIGHTS }: PdfTextLayerProps) {
   const containerRef  = useRef<HTMLDivElement>(null);
   const textLayerRef  = useRef<TextLayer | null>(null);
   const renderedPageRef = useRef<PDFPageProxy | null>(null);
+  const highlighterRef = useRef<TextLayerHighlighter | null>(null);
+  // Bumped when a text layer finishes rendering, so highlights are applied
+  // to the new spans.
+  const [renderedVersion, setRenderedVersion] = useState(0);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -59,6 +81,7 @@ export function PdfTextLayer({ page, textContent, viewport }: PdfTextLayerProps)
         textLayerRef.current = null;
         renderedPageRef.current = null;
       }
+      highlighterRef.current = null;
       return;
     }
 
@@ -78,6 +101,7 @@ export function PdfTextLayer({ page, textContent, viewport }: PdfTextLayerProps)
       }
 
       renderedPageRef.current = page;
+      setTextLayerScale(container, viewport);
 
       const layer = new TextLayer({
         textContentSource: textContent,
@@ -86,11 +110,16 @@ export function PdfTextLayer({ page, textContent, viewport }: PdfTextLayerProps)
       });
 
       textLayerRef.current = layer;
+      highlighterRef.current = null;
 
       // Fire-and-forget: void suppresses the floating-promise lint warning.
       // RenderingCancelledException is expected during rapid page navigation
       // and is silently ignored. All other errors are logged.
-      void layer.render().catch((err: unknown) => {
+      void layer.render().then(() => {
+        if (textLayerRef.current !== layer) return; // superseded
+        highlighterRef.current = new TextLayerHighlighter(layer.textDivs, layer.textContentItemsStr);
+        setRenderedVersion(v => v + 1);
+      }).catch((err: unknown) => {
         if (err instanceof Error && err.name === 'RenderingCancelledException') {
           return;
         }
@@ -99,9 +128,18 @@ export function PdfTextLayer({ page, textContent, viewport }: PdfTextLayerProps)
 
     } else {
       // ── Same page, viewport changed (zoom / resize): update positioning ──
+      setTextLayerScale(container, viewport);
       textLayerRef.current?.update({ viewport });
     }
   }, [page, textContent, viewport]);
+
+  // Apply search highlights once the layer is rendered, and whenever they change.
+  useEffect(() => {
+    const highlighter = highlighterRef.current;
+    if (!highlighter) return;
+    const selected = highlighter.apply(highlights);
+    selected?.scrollIntoView({ block: 'center', inline: 'center' });
+  }, [highlights, renderedVersion]);
 
   // Full cleanup on unmount.
   // Reset every internal tracking ref so the component is left in a
@@ -113,6 +151,7 @@ export function PdfTextLayer({ page, textContent, viewport }: PdfTextLayerProps)
         textLayerRef.current = null;
       }
       renderedPageRef.current = null;
+      highlighterRef.current = null;
     };
   }, []);
 
