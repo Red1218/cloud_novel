@@ -44,8 +44,6 @@ export interface UseReaderResult {
   // Persistence control
   /** Immediately persist lastOpened timestamp. Call when book is opened. */
   readonly touchLastOpened: () => Promise<void>;
-  /** Flush any pending persistence updates immediately. */
-  readonly flushPersistence: () => Promise<void>;
 }
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
@@ -81,7 +79,6 @@ export function useReader(
   // Destructure callbacks for stable dependencies
   const {
     queueUpdate,
-    flush,
     touchLastOpened,
   } = useReadingState(bookId);
 
@@ -155,6 +152,5 @@ export function useReader(
     fitWidth: zoom.fitWidth,
     fitPage: zoom.fitPage,
     touchLastOpened,
-    flushPersistence: flush,
   };
 }

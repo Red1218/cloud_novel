@@ -15,3 +15,5 @@ export * from './components/ReaderToolbar/ReaderToolbar';
 export * from './components/ReadingEnvironmentPanel/ReadingEnvironmentPanel';
 export * from './components/LoadingState/LoadingState';
 export * from './components/ErrorState/ErrorState';
+export * from './bookmarks';
+export * from './search';

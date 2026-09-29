@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
+import { BookmarkButton } from '../../bookmarks/components';
 import './ReaderHeader.css';
 
 interface ReaderHeaderProps {
@@ -9,6 +10,13 @@ interface ReaderHeaderProps {
   totalPages?:  number;
   onPrevPage?:  () => void;
   onNextPage?:  () => void;
+  /** Whether the current page is bookmarked. */
+  isBookmarked?:     boolean;
+  /** Bookmark controls render only when both handlers are provided. */
+  onToggleBookmark?: () => void;
+  onOpenBookmarks?:  () => void;
+  /** Search button renders only when provided. */
+  onOpenSearch?:     () => void;
 }
 
 export function ReaderHeader({
@@ -17,6 +25,10 @@ export function ReaderHeader({
   totalPages  = 0,
   onPrevPage,
   onNextPage,
+  isBookmarked = false,
+  onToggleBookmark,
+  onOpenBookmarks,
+  onOpenSearch,
 }: ReaderHeaderProps) {
   const navigate = useNavigate();
   const hasPages = totalPages > 0;
@@ -51,6 +63,45 @@ export function ReaderHeader({
       </div>
 
       <div className="reader-header__right">
+        {hasPages && onOpenSearch && (
+          <button
+            type="button"
+            className="reader-header__icon-btn"
+            onClick={onOpenSearch}
+            aria-label="Search in book"
+            title="Search (Ctrl/⌘+F)"
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2"
+              strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+          </button>
+        )}
+        {hasPages && onToggleBookmark && onOpenBookmarks && (
+          <div className="reader-header__bookmarks">
+            <BookmarkButton isBookmarked={isBookmarked} onToggle={onToggleBookmark} />
+            <button
+              type="button"
+              className="reader-header__icon-btn"
+              onClick={onOpenBookmarks}
+              aria-label="Show bookmarks"
+              title="Bookmarks"
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M8 6h13" />
+                <path d="M8 12h13" />
+                <path d="M8 18h13" />
+                <path d="M3 6h.01" />
+                <path d="M3 12h.01" />
+                <path d="M3 18h.01" />
+              </svg>
+            </button>
+          </div>
+        )}
         {hasPages && (
           <div className="reader-header__pagination" aria-label="Page navigation">
             <button

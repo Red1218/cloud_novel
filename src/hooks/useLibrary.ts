@@ -10,8 +10,7 @@ export function useLibrary() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
+
   const { showToast } = useToast();
 
   const fetchBooks = useCallback(async () => {
@@ -23,7 +22,6 @@ export function useLibrary() {
       setBooks(allBooks);
     } catch (err) {
       console.error('Failed to fetch books from library:', err);
-      setError('Failed to load library.');
       showToast({ type: 'error', title: 'Error', message: 'Failed to load library.' });
     } finally {
       setIsLoading(false);
@@ -36,7 +34,6 @@ export function useLibrary() {
   }, [fetchBooks]);
 
   const importBook = useCallback(async () => {
-    setError(null);
     try {
       // 1. File Picker
       const file = await selectPdfFile();
@@ -93,7 +90,6 @@ export function useLibrary() {
     } catch (err: any) {
       if (err.message !== 'File selection cancelled') {
         console.error('Import failed:', err);
-        setError(err.message || 'Failed to import book.');
         showToast({
           type: 'error',
           title: 'Import Error',
@@ -109,8 +105,6 @@ export function useLibrary() {
     books,
     isLoading,
     isImporting,
-    error,
     importBook,
-    refresh: fetchBooks,
   };
 }

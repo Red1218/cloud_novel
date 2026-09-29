@@ -22,6 +22,8 @@ export interface UsePdfTextLayerResult {
  *    so stale responses from old pages are discarded during rapid navigation.
  *  - Reset state when `page` becomes null (document unloaded / navigate away).
  *  - Never re-fetch when only the viewport changes — text content is per-page.
+ *  - Only return text content that belongs to `page`: while a new page's
+ *    text is loading, `textContent` is null rather than the previous page's.
  *
  * Does NOT:
  *  - Touch the DOM.
@@ -33,7 +35,9 @@ export interface UsePdfTextLayerResult {
 export function usePdfTextLayer(
   page: PDFPageProxy | null,
 ): UsePdfTextLayerResult {
-  const [textContent, setTextContent] = useState<TextContent | null>(null);
+  // The loaded content is stored with the page it belongs to, so a page
+  // change never exposes the previous page's text (derived during render).
+  const [loaded, setLoaded] = useState<{ page: PDFPageProxy; content: TextContent } | null>(null);
   const [isLoading, setIsLoading]     = useState(false);
   const [error, setError]             = useState<string | null>(null);
 
@@ -43,7 +47,7 @@ export function usePdfTextLayer(
 
   useEffect(() => {
     if (!page) {
-      setTextContent(null);
+      setLoaded(null);
       setIsLoading(false);
       setError(null);
       return;
@@ -59,7 +63,7 @@ export function usePdfTextLayer(
     getTextContent(page)
       .then((content) => {
         if (thisRequest !== requestIdRef.current) return; // stale — discard
-        setTextContent(content);
+        setLoaded({ page, content });
         setIsLoading(false);
       })
       .catch((err: unknown) => {
@@ -75,6 +79,8 @@ export function usePdfTextLayer(
       requestIdRef.current += 1;
     };
   }, [page]); // viewport is intentionally excluded — text is per-page, not per-zoom.
+
+  const textContent = loaded && loaded.page === page ? loaded.content : null;
 
   return { textContent, isLoading, error };
 }

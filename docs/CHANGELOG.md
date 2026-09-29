@@ -85,6 +85,48 @@ Documentation versions follow semantic versioning conventions, adapted for engin
 
 ---
 
+## Documentation v1.4
+
+**Date:** 2026-07-22
+
+**Added**
+- Updated architectural documentation to reflect the Bookmark Engine vertical slice pattern.
+- Marked Phase 5.3 (Reading Environment) and Phase 5.4 (Bookmarks & Reading Navigation) as completed in the Roadmap and Context files.
+- Transitioned Current Phase to Phase 5.5 (Search Inside PDF).
+
+**Breaking Changes**
+- None.
+
+---
+
+## Documentation v1.4.1
+
+**Date:** 2026-09-29
+
+**Changed**
+- Recorded the Bookmark UI (top-bar toggle and Bookmarks panel, including bookmark naming) in the Roadmap, Architecture (Bookmark Engine presentation layer and the new `renameBookmark` hook action), and Current State.
+
+**Breaking Changes**
+- None.
+
+---
+
+## Documentation v1.5
+
+**Date:** 2026-09-29
+
+**Added**
+- ADR-015 — Search Inside PDF (accepted), and its entry in the ADR index.
+- Architecture: Search Engine section.
+
+**Changed**
+- Current State: Search Inside PDF implementation recorded (pending review).
+
+**Breaking Changes**
+- None.
+
+---
+
 ## Future Entries
 
 *Use the following template for future updates to this document:*

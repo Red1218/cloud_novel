@@ -1,0 +1,92 @@
+/* Visual language mirrors .reader-header so the bar reads as part of the reader chrome. */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  min-height: 52px;
+  padding: 4px 6px 4px var(--space-4);
+  border: 1px solid var(--reader-chrome-border);
+  border-radius: var(--radius-full);
+  background: var(--reader-chrome-bg);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.42);
+  backdrop-filter: var(--reader-chrome-blur);
+}
+
+.search-bar__icon {
+  flex: 0 0 auto;
+  margin-right: var(--space-2);
+  color: var(--reader-chrome-text-muted);
+}
+
+.search-bar__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 40px;
+  color: var(--reader-chrome-text);
+  font-size: var(--font-size-sm);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.search-bar__input::placeholder {
+  color: var(--reader-chrome-text-muted);
+}
+
+/* Hide the browser's own clear button; the bar has a close button. */
+.search-bar__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search-bar__status {
+  flex: 0 0 auto;
+  padding: 0 var(--space-2);
+  color: var(--reader-chrome-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.search-bar__status:empty {
+  display: none;
+}
+
+.search-bar__button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  color: var(--reader-chrome-text);
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.search-bar__button:hover:not(:disabled) {
+  background-color: var(--reader-chrome-hover-bg);
+}
+
+.search-bar__button:disabled {
+  color: var(--reader-chrome-text-disabled);
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .search-bar {
+    width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    padding-left: var(--space-3);
+  }
+
+  .search-bar__button {
+    min-width: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-bar__button {
+    transition: none;
+  }
+}

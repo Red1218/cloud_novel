@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import type { ScaleMode } from '../types';
 import { ZOOM_MIN, ZOOM_MAX, ZOOM_STEP, ZOOM_DEFAULT } from '../constants';
@@ -64,6 +64,11 @@ export function useReaderZoom(options: UseReaderZoomOptions = {}): UseReaderZoom
 
   const [zoom, setZoom] = useState(initialZoom);
   const [scaleMode, setScaleMode] = useState<ScaleMode>(initialScaleMode);
+
+  useEffect(() => {
+    setZoom(initialZoom);
+    setScaleMode(initialScaleMode);
+  }, [initialZoom, initialScaleMode]);
 
   // Captures the current scaleMode so zoomIn/zoomOut can read it without
   // adding scaleMode to their dependency arrays (which would cause churn).

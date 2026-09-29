@@ -1,0 +1,116 @@
+/* Layout mirrors .reading-environment so both reader panels feel like one system. */
+.bookmark-panel {
+  position: absolute;
+  top: 50%;
+  right: max(var(--space-6), calc(var(--space-6) + env(safe-area-inset-right)));
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(332px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: var(--space-5);
+  overflow-y: auto;
+  color: var(--reader-panel-text);
+  border: 1px solid var(--reader-panel-border);
+  border-radius: var(--radius-2xl);
+  background: var(--reader-panel-bg);
+  box-shadow: var(--reader-panel-shadow);
+  transform: translateY(-50%);
+  backdrop-filter: var(--reader-chrome-blur);
+  pointer-events: auto;
+}
+
+.bookmark-panel__handle {
+  display: none;
+}
+
+.bookmark-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.bookmark-panel__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--reader-panel-text);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.bookmark-panel__count {
+  color: var(--reader-panel-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.bookmark-panel__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--reader-panel-muted);
+  border-radius: var(--radius-full);
+  background: var(--reader-panel-control-bg);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.bookmark-panel__close:hover {
+  color: var(--reader-panel-text);
+  background: var(--reader-panel-control-hover-bg);
+}
+
+.bookmark-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bookmark-panel__empty {
+  margin: 0;
+  color: var(--reader-panel-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+}
+
+@media (max-width: 767px) {
+  .bookmark-panel {
+    top: auto;
+    right: max(var(--space-3), calc(var(--space-3) + env(safe-area-inset-right)));
+    bottom: max(var(--space-3), calc(var(--space-3) + env(safe-area-inset-bottom)));
+    left: max(var(--space-3), calc(var(--space-3) + env(safe-area-inset-left)));
+    width: auto;
+    max-height: min(72dvh, 680px);
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-2xl) var(--radius-2xl) var(--radius-lg) var(--radius-lg);
+    transform: none;
+  }
+
+  .bookmark-panel__handle {
+    display: block;
+    width: 40px;
+    height: 5px;
+    margin: calc(var(--space-2) * -1) auto 0;
+    border-radius: var(--radius-full);
+    background: var(--reader-panel-handle-bg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bookmark-panel__close {
+    transition: none;
+  }
+}
