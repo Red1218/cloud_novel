@@ -127,6 +127,19 @@ Documentation versions follow semantic versioning conventions, adapted for engin
 
 ---
 
+## Documentation v1.6
+
+**Date:** 2026-09-29
+
+**Changed**
+- Marked Phase 5.5 (Search Inside PDF) as completed in the Roadmap and Context files.
+- Transitioned Current Phase to Phase 5.6 (Reading Insights), with objectives drafted from the Roadmap and Product Guidelines, pending UX and architecture approval.
+
+**Breaking Changes**
+- None.
+
+---
+
 ## Future Entries
 
 *Use the following template for future updates to this document:*
