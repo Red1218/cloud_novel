@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { PDFPageProxy, PageViewport } from 'pdfjs-dist';
-import { TextLayer } from 'pdfjs-dist';
+import { TextLayer } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { TextContent } from '../../services/textLayerService';
 import './PdfTextLayer.css';
 

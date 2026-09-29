@@ -90,8 +90,8 @@ The PDF.js dependency is strictly isolated to prevent performance bottlenecks an
 ### Bookmark Engine
 The Bookmark Engine (`src/features/reader/bookmarks`) follows a strict vertical slice architecture:
 - **Persistence:** `bookmarkService.ts` directly interfaces with IndexedDB to save page positions, keeping persistence separate from React.
-- **State Management:** `useReaderBookmarks.ts` exposes headless hooks (`toggleBookmark`, `addBookmark`, `removeBookmark`) for UI interaction.
-- **Presentation:** The Bookmark Engine is designed to support dedicated UI components through the `useReaderBookmarks` headless hook, ensuring the presentation layer remains decoupled from persistence.
+- **State Management:** `useReaderBookmarks.ts` exposes headless hooks (`toggleBookmark`, `addBookmark`, `removeBookmark`, `renameBookmark`) for UI interaction.
+- **Presentation:** The Bookmark Engine is designed to support dedicated UI components through the `useReaderBookmarks` headless hook, ensuring the presentation layer remains decoupled from persistence. `BookmarkButton`, `BookmarkPanel`, and `BookmarkItem` are purely presentational: `ReaderPage` feeds them state from `useReaderBookmarks`, and selecting a bookmark navigates through `useReader`'s `goToPage`. They never access IndexedDB.
 
 ---
 

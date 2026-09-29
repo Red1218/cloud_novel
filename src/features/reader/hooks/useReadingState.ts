@@ -1,21 +1,8 @@
 import { useCallback, useRef, useEffect } from 'react';
-import type { ScaleMode } from '../types';
 import { BookRepository } from '@/repositories/BookRepository';
+import type { ReadingStateUpdate } from '@/repositories/BookRepository';
 
-/**
- * Reading state that is persisted to IndexedDB.
- */
-export interface PersistedReadingState {
-  currentPage: number;
-  zoom: number;
-  scaleMode: ScaleMode;
-  lastOpened: number;
-}
-
-/**
- * Partial state for updates (all fields optional).
- */
-export type ReadingStateUpdate = Partial<PersistedReadingState>;
+export type { ReadingStateUpdate };
 
 /**
  * Result of the useReadingState hook.
