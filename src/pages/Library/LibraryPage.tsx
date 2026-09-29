@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants';
 import {
   SectionHeader,
   StatsCard,
-  LibraryToolbar,
+  SortDropdown,
   BookGrid,
   EmptyLibrary,
   ImportButton,
@@ -143,13 +143,9 @@ export function LibraryPage() {
 
         {books.length > 0 && (
           <div className="library-page__toolbar">
-            {/* Filter props are omitted here; LibraryToolbar still owns that shared control API. */}
-            <LibraryToolbar
-              search={{ onChange: (v) => console.log('Search:', v) }}
-              sort={{
-                value: Object.keys(SORT_MAP).find((key) => SORT_MAP[key] === sortBy),
-                onChange: handleSortChange
-              }}
+            <SortDropdown
+              value={Object.keys(SORT_MAP).find((key) => SORT_MAP[key] === sortBy)}
+              onChange={handleSortChange}
             />
           </div>
         )}
