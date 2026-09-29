@@ -78,8 +78,8 @@
 }
 
 .textLayer .highlight {
-  --highlight-bg-color: rgb(180 0 170 / 0.25);
-  --highlight-selected-bg-color: rgb(0 100 0 / 0.25);
+  --highlight-bg-color: var(--color-search-highlight);
+  --highlight-selected-bg-color: var(--color-search-highlight-selected);
   --highlight-backdrop-filter: none;
   --highlight-selected-backdrop-filter: none;
 
@@ -179,6 +179,10 @@
 .textLayer {
   z-index: 2;
   pointer-events: none;
+  /* PDF.js rounds layer dimensions to these steps; its viewer sets them per
+     page. --total-scale-factor is set inline by PdfTextLayer. */
+  --scale-round-x: 1px;
+  --scale-round-y: 1px;
 }
 
 .textLayer :is(span, br) {

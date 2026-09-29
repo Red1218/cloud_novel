@@ -141,6 +141,13 @@
   transform: translateX(-50%);
 }
 
+/* Search bar sits just below the top chrome: top offset + header (58px) + gap. */
+.reader-page__search-chrome {
+  top: calc(max(var(--space-3), calc(var(--space-3) + env(safe-area-inset-top))) + 58px + var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .reader-page__bottom-chrome {
   left: 50%;
   bottom: max(var(--space-5), calc(var(--space-5) + env(safe-area-inset-bottom)));
@@ -211,6 +218,10 @@
 
   .reader-page__bottom-chrome {
     bottom: max(var(--space-3), calc(var(--space-3) + env(safe-area-inset-bottom)));
+  }
+
+  .reader-page__search-chrome {
+    top: calc(max(var(--space-2), calc(var(--space-2) + env(safe-area-inset-top))) + 58px + var(--space-2));
   }
 
   /* Mobile chrome footprint is slightly smaller due to tighter offsets:

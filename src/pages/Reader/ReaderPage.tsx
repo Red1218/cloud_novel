@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -18,15 +19,19 @@ import {
   LoadingState,
   ErrorState,
   ReaderViewport,
+  SearchBar,
+  SearchResultsPanel,
   usePdfDocument,
   usePdfRenderer,
   usePdfTextLayer,
   useReader,
   useReaderBookmarks,
   useReaderEnvironment,
+  useReaderSearch,
   type ReaderOpeningMode,
   type ReaderTheme,
   type ReadingPreset,
+  type TextLayerHighlight,
 } from '@/features/reader';
 import './ReaderPage.css';
 
@@ -60,8 +65,12 @@ export function ReaderPage() {
   const [isChromeVisible, setIsChromeVisible] = useState(true);
   const [isEnvironmentOpen, setIsEnvironmentOpen] = useState(false);
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearchResultsOpen, setIsSearchResultsOpen] = useState(false);
   const [zoomFeedback, setZoomFeedback] = useState<string | null>(null);
-  const isPanelOpen = isEnvironmentOpen || isBookmarksOpen;
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  // Controls stay visible while a panel or the search bar is open.
+  const isChromePinned = isEnvironmentOpen || isBookmarksOpen || isSearchResultsOpen || isSearchOpen;
 
   const { pdfDocument, book, isLoading, error } = usePdfDocument(bookId);
   const readerEnvironment = useReaderEnvironment(bookId);
@@ -75,6 +84,7 @@ export function ReaderPage() {
   });
   const { touchLastOpened } = reader;
   const loadedBookId = book?.id;
+  const search = useReaderSearch(pdfDocument, reader.currentPage);
 
   useEffect(() => {
     if (loadedBookId) {
@@ -113,7 +123,7 @@ export function ReaderPage() {
   }, []);
 
   const scheduleChromeHide = useCallback((): void => {
-    if (!readerEnvironment.settings.autoHideControls || isPanelOpen) {
+    if (!readerEnvironment.settings.autoHideControls || isChromePinned) {
       clearChromeTimer();
       return;
     }
@@ -127,7 +137,7 @@ export function ReaderPage() {
     }, CHROME_HIDE_DELAY_MS);
   }, [
     clearChromeTimer,
-    isPanelOpen,
+    isChromePinned,
     readerEnvironment.settings.autoHideControls,
   ]);
 
@@ -232,6 +242,7 @@ export function ReaderPage() {
     isChromeVisibleRef.current = true;
     setIsChromeVisible(true);
     setIsBookmarksOpen(false);
+    setIsSearchResultsOpen(false);
     setIsEnvironmentOpen(true);
   }, [clearChromeTimer]);
 
@@ -247,12 +258,44 @@ export function ReaderPage() {
     isChromeVisibleRef.current = true;
     setIsChromeVisible(true);
     setIsEnvironmentOpen(false);
+    setIsSearchResultsOpen(false);
     setIsBookmarksOpen(true);
   }, [clearChromeTimer]);
 
   const closeBookmarks = useCallback((): void => {
     setIsBookmarksOpen(false);
   }, []);
+
+  const openSearch = useCallback((): void => {
+    clearChromeTimer();
+    isChromeVisibleRef.current = true;
+    setIsChromeVisible(true);
+    setIsSearchOpen(true);
+    // Already open: bring focus back to the field (it autofocuses on mount).
+    searchInputRef.current?.focus();
+    searchInputRef.current?.select();
+  }, [clearChromeTimer]);
+
+  const closeSearch = useCallback((): void => {
+    setIsSearchOpen(false);
+    setIsSearchResultsOpen(false);
+  }, []);
+
+  const openSearchResults = useCallback((): void => {
+    setIsEnvironmentOpen(false);
+    setIsBookmarksOpen(false);
+    setIsSearchResultsOpen(true);
+  }, []);
+
+  const closeSearchResults = useCallback((): void => {
+    setIsSearchResultsOpen(false);
+  }, []);
+
+  const { selectMatch } = search;
+  const handleSelectSearchResult = useCallback((index: number): void => {
+    selectMatch(index);
+    setIsSearchResultsOpen(false);
+  }, [selectMatch]);
 
   const { toggleBookmark, removeBookmark, renameBookmark } = readerBookmarks;
   const { currentPage, goToPage } = reader;
@@ -278,6 +321,25 @@ export function ReaderPage() {
     goToPage(page);
     setIsBookmarksOpen(false);
   }, [goToPage]);
+
+  // Move to the current search match's page when the match changes (only
+  // then, so reopening search or reading on doesn't jump back).
+  const goToPageRef = useRef(goToPage);
+  useEffect(() => {
+    goToPageRef.current = goToPage;
+  }, [goToPage]);
+
+  const { currentMatch, results: searchResults } = search;
+  useEffect(() => {
+    if (currentMatch) goToPageRef.current(currentMatch.pageNumber);
+  }, [currentMatch]);
+
+  const searchHighlights = useMemo((): TextLayerHighlight[] | undefined => {
+    if (!isSearchOpen || !searchResults) return undefined;
+    return searchResults.matches
+      .filter(match => match.pageNumber === currentPage)
+      .map(match => ({ ranges: match.ranges, selected: match.index === currentMatch?.index }));
+  }, [currentMatch, currentPage, isSearchOpen, searchResults]);
 
   const applyReadingPreset = useCallback((preset: ReadingPreset): void => {
     readerEnvironment.updateSettings({
@@ -318,10 +380,10 @@ export function ReaderPage() {
       return;
     }
 
-    if (!isPanelOpen && isChromeVisibleRef.current) {
+    if (!isChromePinned && isChromeVisibleRef.current) {
       scheduleChromeHide();
     }
-  }, [clearChromeTimer, isPanelOpen, readerEnvironment, scheduleChromeHide]);
+  }, [clearChromeTimer, isChromePinned, readerEnvironment, scheduleChromeHide]);
 
   const readerEnvironmentStyle = {
     '--reader-environment-dim-opacity': readerEnvironment.dimOpacity.toString(),
@@ -338,27 +400,47 @@ export function ReaderPage() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {
+      // Ctrl/Cmd+F searches the book: the browser's own find can't see PDF text.
+      if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'f') {
+        if (!loadedBookId) return;
+        event.preventDefault();
+        openSearch();
+        return;
+      }
       if (event.key !== 'Escape') return;
       if (isEnvironmentOpen) closeReadingEnvironment();
       if (isBookmarksOpen) closeBookmarks();
+      if (isSearchResultsOpen) closeSearchResults();
+      else if (isSearchOpen && !isEnvironmentOpen && !isBookmarksOpen) closeSearch();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [closeBookmarks, closeReadingEnvironment, isBookmarksOpen, isEnvironmentOpen]);
+  }, [
+    closeBookmarks,
+    closeReadingEnvironment,
+    closeSearch,
+    closeSearchResults,
+    isBookmarksOpen,
+    isEnvironmentOpen,
+    isSearchOpen,
+    isSearchResultsOpen,
+    loadedBookId,
+    openSearch,
+  ]);
 
   useEffect(() => {
     if (
-      !isPanelOpen
+      !isChromePinned
       && isChromeVisibleRef.current
       && readerEnvironment.settings.autoHideControls
     ) {
       scheduleChromeHide();
     }
   }, [
-    isPanelOpen,
+    isChromePinned,
     readerEnvironment.settings.autoHideControls,
     scheduleChromeHide,
   ]);
@@ -411,8 +493,32 @@ export function ReaderPage() {
           isBookmarked={readerBookmarks.isBookmarked(reader.currentPage)}
           onToggleBookmark={book ? handleToggleBookmark : undefined}
           onOpenBookmarks={book ? openBookmarks : undefined}
+          onOpenSearch={book ? openSearch : undefined}
         />
       </div>
+
+      {isSearchOpen && (
+        <div
+          className="reader-page__search-chrome reader-page__chrome"
+          onPointerDown={handleChromePointerDown}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <SearchBar
+            query={search.query}
+            onQueryChange={search.setQuery}
+            status={search.status}
+            progress={search.progress}
+            matchCount={searchResults?.matches.length ?? 0}
+            truncated={searchResults?.truncated ?? false}
+            currentPosition={currentMatch ? currentMatch.index + 1 : 0}
+            onNext={search.next}
+            onPrevious={search.previous}
+            onShowResults={openSearchResults}
+            onClose={closeSearch}
+            inputRef={searchInputRef}
+          />
+        </div>
+      )}
 
       <main className="reader-page__content">
         {isLoading && <LoadingState />}
@@ -423,6 +529,7 @@ export function ReaderPage() {
           page={reader.page}
           viewport={reader.viewport}
           textContent={textContent}
+          highlights={searchHighlights}
           isLoading={isLoading}
           error={error}
           canvasRef={canvasRef}
@@ -494,6 +601,30 @@ export function ReaderPage() {
               onRemove={handleRemoveBookmark}
               onRename={handleRenameBookmark}
               onClose={closeBookmarks}
+            />
+          </div>
+        </>
+      )}
+
+      {isSearchResultsOpen && searchResults && (
+        <>
+          <button
+            type="button"
+            className="reader-page__environment-scrim"
+            onClick={closeSearchResults}
+            aria-label="Close matches"
+          />
+          <div
+            className="reader-page__environment-panel"
+            onPointerDown={handleChromePointerDown}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <SearchResultsPanel
+              matches={searchResults.matches}
+              truncated={searchResults.truncated}
+              currentIndex={currentMatch?.index ?? -1}
+              onSelect={handleSelectSearchResult}
+              onClose={closeSearchResults}
             />
           </div>
         </>

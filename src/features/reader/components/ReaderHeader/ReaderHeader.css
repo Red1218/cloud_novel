@@ -34,7 +34,7 @@
 
 .reader-header__back-btn,
 .reader-header__page-btn,
-.reader-header__bookmarks-btn {
+.reader-header__icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -47,7 +47,7 @@
 
 .reader-header__back-btn:hover,
 .reader-header__page-btn:hover:not(:disabled),
-.reader-header__bookmarks-btn:hover {
+.reader-header__icon-btn:hover {
   background-color: var(--reader-chrome-hover-bg);
 }
 
@@ -114,7 +114,7 @@
 @media (prefers-reduced-motion: reduce) {
   .reader-header__back-btn,
   .reader-header__page-btn,
-  .reader-header__bookmarks-btn {
+  .reader-header__icon-btn {
     transition: none;
   }
 }

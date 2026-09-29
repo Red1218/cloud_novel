@@ -3,6 +3,7 @@ import type { PDFPageProxy, PageViewport } from 'pdfjs-dist';
 import type { TextContent } from '../../services/textLayerService';
 import { PdfCanvas }     from '../PdfCanvas/PdfCanvas';
 import { PdfTextLayer }  from '../PdfTextLayer/PdfTextLayer';
+import type { TextLayerHighlight } from '../../search/types';
 import './ReaderViewport.css';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -15,6 +16,8 @@ interface ReaderViewportProps {
   viewport:     PageViewport | null;
   /** Text content for the current page, fetched by usePdfTextLayer. */
   textContent:  TextContent | null;
+  /** Search matches on this page, highlighted in the text layer. */
+  highlights?:  TextLayerHighlight[];
   /** Whether the PDF document is still loading. */
   isLoading:    boolean;
   /** Error message, or null when there is no error. */
@@ -47,6 +50,7 @@ export function ReaderViewport({
   page,
   viewport,
   textContent,
+  highlights,
   isLoading,
   error,
   canvasRef,
@@ -64,6 +68,7 @@ export function ReaderViewport({
           page={page}
           textContent={textContent}
           viewport={viewport}
+          highlights={highlights}
         />
       </div>
     </div>
