@@ -7,7 +7,7 @@ import {
   type PointerEvent,
 } from 'react';
 import { useParams } from 'react-router-dom';
-import { TextLayer } from 'pdfjs-dist';
+import { TextLayer } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { useDocumentTitle, useToast } from '@/hooks';
 import {
   BookmarkPanel,

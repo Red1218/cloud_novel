@@ -1,6 +1,10 @@
-import * as pdfjsLib from 'pdfjs-dist';
+// The legacy build polyfills newer JS built-ins (e.g. Map.prototype.getOrInsertComputed)
+// that the modern pdf.js 6 build requires; without it pages render blank in browsers that lack
+// them (seen in Chromium 141).
+// Import pdf.js from this path everywhere so only one copy is bundled.
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 // Explicitly import the worker URL to satisfy Vite's bundler and PDF.js requirements.
-import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
+import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 
 // Configure the worker for pdf.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
