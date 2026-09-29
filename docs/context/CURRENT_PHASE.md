@@ -1,24 +1,24 @@
 # Current Phase
 
 ## Current Phase Name
-- Phase 5.3: Reading Environment
+- Phase 5.5: Search Inside PDF
 
 ## Objectives
-- Build the core reading environment and implement the PDF rendering pipeline.
-- Adhere to the "Published Page is Sacred" philosophy.
-- Ensure performant loading and rendering of pages.
+- Build text search capabilities within the PDF reader.
+- Enable finding and highlighting specific keywords or phrases in the book.
+- Ensure performant searching without compromising render speed.
 
 ## Out of Scope Items
-- Search inside PDF (Phase 5.5).
 - Cloud Sync (Phase 5.7).
 - Advanced Reading Insights (Phase 5.6).
+- AI Reading Assistant (Future).
 
 ## Expected Deliverables
-- Functional PDF reader view.
-- Isolated rendering engine decoupled from UI.
-- Paging and basic navigation within the document.
+- Search UI within the reader environment.
+- Background search worker or integrated PDF.js search hooks.
+- Highlighting of search results on the canvas/text layer.
 
 ## Success Criteria
-- User can open and read a PDF novel seamlessly.
-- Application performance remains high during rapid paging.
-- AI assistants correctly identify Phase 5.3 context.
+- User can search for text and jump between results.
+- Application performance remains high during search operations.
+- AI assistants correctly identify Phase 5.5 context.

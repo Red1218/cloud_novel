@@ -37,3 +37,8 @@ For every new AI session, the user must use the standardized prompt (found in `d
 ## Branch Workflow
 - Work on feature branches. Do not commit directly to `main` or `master` unless explicitly instructed by the user.
 - Provide descriptive commit messages summarizing the "why" as well as the "what".
+
+## Bookmark Engine Conventions
+- **Permanent Rule:** AI assistants must not couple IndexedDB bookmark persistence directly within UI components.
+- **Convention:** Always use the headless hook `useReaderBookmarks` to interact with bookmarks in the React layer.
+- **Convention:** `bookmarkService.ts` is strictly for database interactions and should contain no UI or React-specific logic.

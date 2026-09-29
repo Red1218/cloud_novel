@@ -85,6 +85,20 @@ Documentation versions follow semantic versioning conventions, adapted for engin
 
 ---
 
+## Documentation v1.4
+
+**Date:** 2026-07-22
+
+**Added**
+- Updated architectural documentation to reflect the Bookmark Engine vertical slice pattern.
+- Marked Phase 5.3 (Reading Environment) and Phase 5.4 (Bookmarks & Reading Navigation) as completed in the Roadmap and Context files.
+- Transitioned Current Phase to Phase 5.5 (Search Inside PDF).
+
+**Breaking Changes**
+- None.
+
+---
+
 ## Future Entries
 
 *Use the following template for future updates to this document:*
