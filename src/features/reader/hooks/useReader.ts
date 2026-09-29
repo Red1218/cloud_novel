@@ -32,7 +32,6 @@ export interface UseReaderResult {
   // Navigation
   readonly nextPage: () => void;
   readonly previousPage: () => void;
-  readonly goToPage: (targetPage: number) => void;
 
   // Zoom
   readonly zoomIn: () => void;
@@ -44,8 +43,6 @@ export interface UseReaderResult {
   // Persistence control
   /** Immediately persist lastOpened timestamp. Call when book is opened. */
   readonly touchLastOpened: () => Promise<void>;
-  /** Flush any pending persistence updates immediately. */
-  readonly flushPersistence: () => Promise<void>;
 }
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
@@ -81,7 +78,6 @@ export function useReader(
   // Destructure callbacks for stable dependencies
   const {
     queueUpdate,
-    flush,
     touchLastOpened,
   } = useReadingState(bookId);
 
@@ -148,13 +144,11 @@ export function useReader(
     effectiveZoom: vp.effectiveZoom,
     nextPage: nav.nextPage,
     previousPage: nav.previousPage,
-    goToPage: nav.goToPage,
     zoomIn: zoom.zoomIn,
     zoomOut: zoom.zoomOut,
     resetZoom: zoom.resetZoom,
     fitWidth: zoom.fitWidth,
     fitPage: zoom.fitPage,
     touchLastOpened,
-    flushPersistence: flush,
   };
 }

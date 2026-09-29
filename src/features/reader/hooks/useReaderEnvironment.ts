@@ -43,10 +43,6 @@ function getStorageKey(bookId: string | undefined): string {
 }
 
 function readSettings(storageKey: string): ReaderEnvironmentSettings {
-  if (typeof window === 'undefined') {
-    return DEFAULT_READER_ENVIRONMENT;
-  }
-
   const raw = window.localStorage.getItem(storageKey);
   if (!raw) {
     return DEFAULT_READER_ENVIRONMENT;
@@ -71,7 +67,6 @@ function readSettings(storageKey: string): ReaderEnvironmentSettings {
 }
 
 function writeSettings(storageKey: string, settings: ReaderEnvironmentSettings): void {
-  if (typeof window === 'undefined') return;
   window.localStorage.setItem(storageKey, JSON.stringify(settings));
 }
 

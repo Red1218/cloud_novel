@@ -7,15 +7,7 @@ interface CloudNovelDBSchema extends DBSchema {
     value: StoredBook;
     indexes: {
       'by-hash': string;
-      'by-title': string;
-      'by-importedAt': number;
-      'by-lastOpened': number;
     };
-  };
-  // Future phases will use this
-  settings: {
-    key: string;
-    value: any;
   };
 }
 
@@ -39,15 +31,7 @@ export function getDB(): Promise<IDBPDatabase<CloudNovelDBSchema>> {
         
         const bookStore = db.createObjectStore('books', { keyPath: 'id' });
         
-        // Create indexes
         bookStore.createIndex('by-hash', 'hash', { unique: true });
-        bookStore.createIndex('by-title', 'title');
-        bookStore.createIndex('by-importedAt', 'importedAt');
-        bookStore.createIndex('by-lastOpened', 'lastOpened');
-
-        if (!db.objectStoreNames.contains('settings')) {
-          db.createObjectStore('settings');
-        }
       },
     });
   }

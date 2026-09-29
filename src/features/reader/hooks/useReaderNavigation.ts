@@ -12,7 +12,6 @@ export interface UseReaderNavigationResult {
   currentPage: number;
   nextPage: () => void;
   previousPage: () => void;
-  goToPage: (targetPage: number) => void;
 }
 
 /**
@@ -60,16 +59,5 @@ export function useReaderNavigation(
     });
   }, [onPageChange]);
 
-  const goToPage = useCallback((targetPage: number) => {
-    const total = totalPagesRef.current;
-    setCurrentPage(prev => {
-      const next = Math.min(Math.max(1, targetPage), Math.max(1, total));
-      if (next !== prev) {
-        onPageChange?.(next);
-      }
-      return next;
-    });
-  }, [onPageChange]);
-
-  return { currentPage, nextPage, previousPage, goToPage };
+  return { currentPage, nextPage, previousPage };
 }
