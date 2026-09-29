@@ -50,6 +50,9 @@ export function ReaderPage() {
   const previousZoomPctRef = useRef<number | null>(null);
   const clickStartRef = useRef<{ x: number; y: number } | null>(null);
   const isChromeVisibleRef = useRef(true);
+  // True while the controls are showing only because the mouse moved over
+  // the page. The click that usually follows should keep them, not hide them.
+  const revealedByHoverRef = useRef(false);
   const isCoarsePointerRef = useRef(
     window.matchMedia('(hover: none), (pointer: coarse)').matches,
   );
@@ -117,6 +120,7 @@ export function ReaderPage() {
 
     clearChromeTimer();
     chromeTimerRef.current = setTimeout(() => {
+      revealedByHoverRef.current = false;
       isChromeVisibleRef.current = false;
       setIsChromeVisible(false);
       chromeTimerRef.current = null;
@@ -139,6 +143,7 @@ export function ReaderPage() {
   }, [scheduleChromeHide]);
 
   const toggleChrome = useCallback((): void => {
+    revealedByHoverRef.current = false;
     setIsChromeVisible((current) => {
       const next = !current;
       isChromeVisibleRef.current = next;
@@ -160,6 +165,9 @@ export function ReaderPage() {
 
   const handlePointerMove = useCallback((): void => {
     if (!isCoarsePointerRef.current) {
+      if (!isChromeVisibleRef.current) {
+        revealedByHoverRef.current = true;
+      }
       revealChrome();
     }
   }, [revealChrome]);
@@ -194,11 +202,20 @@ export function ReaderPage() {
       }
     }
 
+    if (revealedByHoverRef.current) {
+      // Moving the mouse to click already showed the controls; keep them
+      // shown rather than toggling them straight back off.
+      revealedByHoverRef.current = false;
+      scheduleChromeHide();
+      return;
+    }
+
     toggleChrome();
-  }, [toggleChrome]);
+  }, [scheduleChromeHide, toggleChrome]);
 
   const handleChromePointerDown = useCallback((event: PointerEvent): void => {
     event.stopPropagation();
+    revealedByHoverRef.current = false;
     revealChrome();
   }, [revealChrome]);
 
