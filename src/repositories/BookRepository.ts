@@ -55,32 +55,11 @@ export const BookRepository = {
   },
 
   /**
-   * Retrieves the full StoredBook (including the PDF blob) for reading by hash.
-   */
-  async getStoredBookByHash(hash: string): Promise<StoredBook | undefined> {
-    const db = await getDB();
-    return db.getFromIndex('books', 'by-hash', hash);
-  },
-
-  /**
    * Persists a new StoredBook to the database.
    */
   async save(book: StoredBook): Promise<void> {
     const db = await getDB();
     await db.put('books', book);
-  },
-
-  /**
-   * Deletes a book from the database by its hash.
-   * First resolves the hash to the primary key (id), then deletes.
-   */
-  async delete(hash: string): Promise<void> {
-    const db = await getDB();
-    // In Phase 3.1, the primary key is 'id', so we must look up the id via the hash index first.
-    const key = await db.getKeyFromIndex('books', 'by-hash', hash);
-    if (key) {
-      await db.delete('books', key);
-    }
   },
 
   /**

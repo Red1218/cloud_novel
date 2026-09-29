@@ -3,7 +3,7 @@ import type { Book } from '@/types';
 /**
  * Supported sort options for the library.
  */
-export type SortOption = 'lastOpened' | 'recentlyAdded' | 'title';
+export type SortOption = 'lastOpened' | 'recentlyAdded' | 'title' | 'author';
 
 /**
  * Sorts books according to the specified sort option.
@@ -13,6 +13,7 @@ export type SortOption = 'lastOpened' | 'recentlyAdded' | 'title';
  * - 'lastOpened': Most recently opened first (books without lastOpened go to end, stable)
  * - 'recentlyAdded': Most recently imported first
  * - 'title': Alphabetical by title (A-Z), case-insensitive, natural sort
+ * - 'author': Alphabetical by author (A-Z), same collation as title (books without author go to end)
  *
  * Tie-breaking: For equal values, original order is preserved (stable sort).
  *
@@ -47,6 +48,19 @@ export function sortBooks(
 
         // Equal title values return 0 so stable sort preserves original order.
         return a.title.localeCompare(otherTitle, undefined, {
+          sensitivity: 'base',
+          numeric: true,
+        });
+      });
+    }
+
+    case 'author': {
+      return sorted.sort((a, b) => {
+        // Books without author go to the end
+        if (!a.author && !b.author) return 0;
+        if (!a.author) return 1;
+        if (!b.author) return -1;
+        return a.author.localeCompare(b.author, undefined, {
           sensitivity: 'base',
           numeric: true,
         });

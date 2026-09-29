@@ -8,9 +8,6 @@ interface CloudNovelDBSchema extends DBSchema {
     value: StoredBook;
     indexes: {
       'by-hash': string;
-      'by-title': string;
-      'by-importedAt': number;
-      'by-lastOpened': number;
     };
   };
   bookmarks: {
@@ -19,11 +16,6 @@ interface CloudNovelDBSchema extends DBSchema {
     indexes: {
       'by-bookId': string;
     };
-  };
-  // Future phases will use this
-  settings: {
-    key: string;
-    value: any;
   };
 }
 
@@ -45,23 +37,14 @@ export function getDB(): Promise<IDBPDatabase<CloudNovelDBSchema>> {
           if (db.objectStoreNames.contains('books')) {
             db.deleteObjectStore('books');
           }
-          
+
           const bookStore = db.createObjectStore('books', { keyPath: 'id' });
-          
-          // Create indexes
           bookStore.createIndex('by-hash', 'hash', { unique: true });
-          bookStore.createIndex('by-title', 'title');
-          bookStore.createIndex('by-importedAt', 'importedAt');
-          bookStore.createIndex('by-lastOpened', 'lastOpened');
         }
 
         if (oldVersion < 3 && !db.objectStoreNames.contains('bookmarks')) {
           const bookmarkStore = db.createObjectStore('bookmarks', { keyPath: 'id' });
           bookmarkStore.createIndex('by-bookId', 'bookId');
-        }
-
-        if (!db.objectStoreNames.contains('settings')) {
-          db.createObjectStore('settings');
         }
       },
     });
