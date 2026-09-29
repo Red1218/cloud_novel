@@ -32,26 +32,39 @@
   text-align: left;
 }
 
-.bookmark-item__page {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-}
-
-.bookmark-item__label {
+.bookmark-item__title {
   max-width: 100%;
   overflow: hidden;
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.bookmark-item__date {
+.bookmark-item__meta {
   color: var(--reader-panel-muted);
   font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
 }
 
-.bookmark-item__remove {
+.bookmark-item__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 52px;
+  padding: var(--space-2) var(--space-3);
+  color: var(--reader-panel-text);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--reader-panel-selected-border);
+  border-radius: var(--radius-md);
+  background: var(--reader-panel-control-bg);
+}
+
+.bookmark-item__input::placeholder {
+  color: var(--reader-panel-muted);
+}
+
+.bookmark-item__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -62,14 +75,14 @@
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
-.bookmark-item__remove:hover {
+.bookmark-item__action:hover {
   color: var(--reader-panel-text);
   background: var(--reader-panel-control-hover-bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .bookmark-item,
-  .bookmark-item__remove {
+  .bookmark-item__action {
     transition: none;
   }
 }

@@ -11,6 +11,8 @@ export interface UseReaderBookmarksResult {
   addBookmark: (page: number, label?: string) => Promise<void>;
   /** Removes a bookmark by ID and updates state. */
   removeBookmark: (bookmarkId: string) => Promise<void>;
+  /** Sets a bookmark's label (an empty label clears it) and updates state. */
+  renameBookmark: (bookmarkId: string, label: string) => Promise<void>;
   /** Toggles a bookmark on a page, delegating to add/remove based on state. */
   toggleBookmark: (page: number) => Promise<void>;
   /** Reloads bookmarks from IndexedDB into state. */
@@ -22,7 +24,7 @@ export interface UseReaderBookmarksResult {
  *
  * Responsibilities:
  * - Load bookmarks when the book changes
- * - Keep state in sync after add/remove/toggle mutations
+ * - Keep state in sync after add/remove/toggle/rename mutations
  *
  * This hook owns NO persistence logic — all IndexedDB access is
  * delegated to `bookmarkService`. It is consumed independently of
@@ -63,6 +65,12 @@ export function useReaderBookmarks(bookId: string): UseReaderBookmarksResult {
     setBookmarks(prev => prev.filter(bookmark => bookmark.id !== bookmarkId));
   }, []);
 
+  const renameBookmark = useCallback(async (bookmarkId: string, label: string): Promise<void> => {
+    const updated = await bookmarkService.updateBookmarkLabel(bookmarkId, label);
+    if (!updated) return;
+    setBookmarks(prev => prev.map(bookmark => (bookmark.id === bookmarkId ? updated : bookmark)));
+  }, []);
+
   const toggleBookmark = useCallback(
     async (page: number): Promise<void> => {
       const existing = bookmarks.find(bookmark => bookmark.page === page);
@@ -80,6 +88,7 @@ export function useReaderBookmarks(bookId: string): UseReaderBookmarksResult {
     isBookmarked,
     addBookmark,
     removeBookmark,
+    renameBookmark,
     toggleBookmark,
     refreshBookmarks,
   };

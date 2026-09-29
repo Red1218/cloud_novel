@@ -104,7 +104,7 @@ Documentation versions follow semantic versioning conventions, adapted for engin
 **Date:** 2026-09-29
 
 **Changed**
-- Recorded the Bookmark UI (top-bar toggle and Bookmarks panel) in the Roadmap, Architecture (Bookmark Engine presentation layer), and Current State.
+- Recorded the Bookmark UI (top-bar toggle and Bookmarks panel, including bookmark naming) in the Roadmap, Architecture (Bookmark Engine presentation layer and the new `renameBookmark` hook action), and Current State.
 
 **Breaking Changes**
 - None.

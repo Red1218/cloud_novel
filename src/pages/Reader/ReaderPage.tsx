@@ -192,7 +192,7 @@ export function ReaderPage() {
     setIsBookmarksOpen(false);
   }, []);
 
-  const { toggleBookmark, removeBookmark } = readerBookmarks;
+  const { toggleBookmark, removeBookmark, renameBookmark } = readerBookmarks;
   const { currentPage, goToPage } = reader;
 
   const reportBookmarkError = useCallback((err: unknown): void => {
@@ -207,6 +207,10 @@ export function ReaderPage() {
   const handleRemoveBookmark = useCallback((bookmarkId: string): void => {
     removeBookmark(bookmarkId).catch(reportBookmarkError);
   }, [removeBookmark, reportBookmarkError]);
+
+  const handleRenameBookmark = useCallback((bookmarkId: string, label: string): void => {
+    renameBookmark(bookmarkId, label).catch(reportBookmarkError);
+  }, [renameBookmark, reportBookmarkError]);
 
   const handleSelectBookmark = useCallback((page: number): void => {
     goToPage(page);
@@ -425,6 +429,7 @@ export function ReaderPage() {
               currentPage={reader.currentPage}
               onSelect={handleSelectBookmark}
               onRemove={handleRemoveBookmark}
+              onRename={handleRenameBookmark}
               onClose={closeBookmarks}
             />
           </div>

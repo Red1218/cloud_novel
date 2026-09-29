@@ -10,6 +10,8 @@ interface BookmarkPanelProps {
   /** Called with a bookmark's page when the reader selects it. */
   onSelect: (page: number) => void;
   onRemove: (bookmarkId: string) => void;
+  /** Called with a bookmark's new label; an empty label clears it. */
+  onRename: (bookmarkId: string, label: string) => void;
   onClose: () => void;
 }
 
@@ -19,7 +21,7 @@ interface BookmarkPanelProps {
  * Presentational only — bookmark state and persistence live in
  * `useReaderBookmarks`; navigation is handled by the caller.
  */
-export function BookmarkPanel({ bookmarks, currentPage, onSelect, onRemove, onClose }: BookmarkPanelProps) {
+export function BookmarkPanel({ bookmarks, currentPage, onSelect, onRemove, onRename, onClose }: BookmarkPanelProps) {
   return (
     <section
       className="bookmark-panel"
@@ -66,6 +68,7 @@ export function BookmarkPanel({ bookmarks, currentPage, onSelect, onRemove, onCl
               isCurrent={bookmark.page === currentPage}
               onSelect={onSelect}
               onRemove={onRemove}
+              onRename={onRename}
             />
           ))}
         </ul>
