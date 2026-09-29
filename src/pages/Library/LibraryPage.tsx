@@ -25,6 +25,7 @@ const SORT_MAP: Readonly<Record<string, SortOption>> = {
   recent: 'recentlyAdded',
   opened: 'lastOpened',
   title: 'title',
+  author: 'author',
 };
 
 /**
@@ -146,7 +147,7 @@ export function LibraryPage() {
             <LibraryToolbar
               search={{ onChange: (v) => console.log('Search:', v) }}
               sort={{
-                value: sortBy === 'recentlyAdded' ? 'recent' : sortBy === 'lastOpened' ? 'opened' : 'title',
+                value: Object.keys(SORT_MAP).find((key) => SORT_MAP[key] === sortBy),
                 onChange: handleSortChange
               }}
             />
