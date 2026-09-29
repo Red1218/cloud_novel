@@ -99,6 +99,18 @@ Documentation versions follow semantic versioning conventions, adapted for engin
 
 ---
 
+## Documentation v1.4.1
+
+**Date:** 2026-09-29
+
+**Changed**
+- Recorded the Bookmark UI (top-bar toggle and Bookmarks panel) in the Roadmap, Architecture (Bookmark Engine presentation layer), and Current State.
+
+**Breaking Changes**
+- None.
+
+---
+
 ## Future Entries
 
 *Use the following template for future updates to this document:*

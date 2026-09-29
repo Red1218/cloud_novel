@@ -8,8 +8,9 @@ import {
 } from 'react';
 import { useParams } from 'react-router-dom';
 import { TextLayer } from 'pdfjs-dist';
-import { useDocumentTitle } from '@/hooks';
+import { useDocumentTitle, useToast } from '@/hooks';
 import {
+  BookmarkPanel,
   ReaderHeader,
   ReaderToolbar,
   ReadingEnvironmentPanel,
@@ -20,6 +21,7 @@ import {
   usePdfRenderer,
   usePdfTextLayer,
   useReader,
+  useReaderBookmarks,
   useReaderEnvironment,
   type ReaderOpeningMode,
   type ReaderTheme,
@@ -51,10 +53,14 @@ export function ReaderPage() {
 
   const [isChromeVisible, setIsChromeVisible] = useState(false);
   const [isEnvironmentOpen, setIsEnvironmentOpen] = useState(false);
+  const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
   const [zoomFeedback, setZoomFeedback] = useState<string | null>(null);
+  const isPanelOpen = isEnvironmentOpen || isBookmarksOpen;
 
   const { pdfDocument, book, isLoading, error } = usePdfDocument(bookId);
   const readerEnvironment = useReaderEnvironment(bookId);
+  const readerBookmarks = useReaderBookmarks(bookId ?? '');
+  const { showToast } = useToast();
 
   const reader = useReader(pdfDocument, containerRef, bookId, {
     initialPage: book?.currentPage ?? 1,
@@ -101,7 +107,7 @@ export function ReaderPage() {
   }, []);
 
   const scheduleChromeHide = useCallback((): void => {
-    if (!readerEnvironment.settings.autoHideControls || isEnvironmentOpen) {
+    if (!readerEnvironment.settings.autoHideControls || isPanelOpen) {
       clearChromeTimer();
       return;
     }
@@ -114,7 +120,7 @@ export function ReaderPage() {
     }, CHROME_HIDE_DELAY_MS);
   }, [
     clearChromeTimer,
-    isEnvironmentOpen,
+    isPanelOpen,
     readerEnvironment.settings.autoHideControls,
   ]);
 
@@ -163,6 +169,7 @@ export function ReaderPage() {
     clearChromeTimer();
     isChromeVisibleRef.current = true;
     setIsChromeVisible(true);
+    setIsBookmarksOpen(false);
     setIsEnvironmentOpen(true);
   }, [clearChromeTimer]);
 
@@ -172,6 +179,39 @@ export function ReaderPage() {
       scheduleChromeHide();
     }
   }, [readerEnvironment.settings.autoHideControls, scheduleChromeHide]);
+
+  const openBookmarks = useCallback((): void => {
+    clearChromeTimer();
+    isChromeVisibleRef.current = true;
+    setIsChromeVisible(true);
+    setIsEnvironmentOpen(false);
+    setIsBookmarksOpen(true);
+  }, [clearChromeTimer]);
+
+  const closeBookmarks = useCallback((): void => {
+    setIsBookmarksOpen(false);
+  }, []);
+
+  const { toggleBookmark, removeBookmark } = readerBookmarks;
+  const { currentPage, goToPage } = reader;
+
+  const reportBookmarkError = useCallback((err: unknown): void => {
+    console.error('Bookmark update failed:', err);
+    showToast({ type: 'error', title: 'Bookmark Error', message: 'Could not update bookmarks.' });
+  }, [showToast]);
+
+  const handleToggleBookmark = useCallback((): void => {
+    toggleBookmark(currentPage).catch(reportBookmarkError);
+  }, [currentPage, reportBookmarkError, toggleBookmark]);
+
+  const handleRemoveBookmark = useCallback((bookmarkId: string): void => {
+    removeBookmark(bookmarkId).catch(reportBookmarkError);
+  }, [removeBookmark, reportBookmarkError]);
+
+  const handleSelectBookmark = useCallback((page: number): void => {
+    goToPage(page);
+    setIsBookmarksOpen(false);
+  }, [goToPage]);
 
   const applyReadingPreset = useCallback((preset: ReadingPreset): void => {
     readerEnvironment.updateSettings({
@@ -212,10 +252,10 @@ export function ReaderPage() {
       return;
     }
 
-    if (!isEnvironmentOpen && isChromeVisibleRef.current) {
+    if (!isPanelOpen && isChromeVisibleRef.current) {
       scheduleChromeHide();
     }
-  }, [clearChromeTimer, isEnvironmentOpen, readerEnvironment, scheduleChromeHide]);
+  }, [clearChromeTimer, isPanelOpen, readerEnvironment, scheduleChromeHide]);
 
   const readerEnvironmentStyle = {
     '--reader-environment-dim-opacity': readerEnvironment.dimOpacity.toString(),
@@ -232,27 +272,27 @@ export function ReaderPage() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape' && isEnvironmentOpen) {
-        closeReadingEnvironment();
-      }
+      if (event.key !== 'Escape') return;
+      if (isEnvironmentOpen) closeReadingEnvironment();
+      if (isBookmarksOpen) closeBookmarks();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [closeReadingEnvironment, isEnvironmentOpen]);
+  }, [closeBookmarks, closeReadingEnvironment, isBookmarksOpen, isEnvironmentOpen]);
 
   useEffect(() => {
     if (
-      !isEnvironmentOpen
+      !isPanelOpen
       && isChromeVisibleRef.current
       && readerEnvironment.settings.autoHideControls
     ) {
       scheduleChromeHide();
     }
   }, [
-    isEnvironmentOpen,
+    isPanelOpen,
     readerEnvironment.settings.autoHideControls,
     scheduleChromeHide,
   ]);
@@ -301,6 +341,9 @@ export function ReaderPage() {
           totalPages={reader.totalPages}
           onPrevPage={reader.previousPage}
           onNextPage={reader.nextPage}
+          isBookmarked={readerBookmarks.isBookmarked(reader.currentPage)}
+          onToggleBookmark={book ? handleToggleBookmark : undefined}
+          onOpenBookmarks={book ? openBookmarks : undefined}
         />
       </div>
 
@@ -359,6 +402,30 @@ export function ReaderPage() {
               onAutoHideControlsChange={handleAutoHideControlsChange}
               onReset={readerEnvironment.resetSettings}
               onClose={closeReadingEnvironment}
+            />
+          </div>
+        </>
+      )}
+
+      {isBookmarksOpen && (
+        <>
+          <button
+            type="button"
+            className="reader-page__environment-scrim"
+            onClick={closeBookmarks}
+            aria-label="Close bookmarks"
+          />
+          <div
+            className="reader-page__environment-panel"
+            onPointerDown={handleChromePointerDown}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <BookmarkPanel
+              bookmarks={readerBookmarks.bookmarks}
+              currentPage={reader.currentPage}
+              onSelect={handleSelectBookmark}
+              onRemove={handleRemoveBookmark}
+              onClose={closeBookmarks}
             />
           </div>
         </>

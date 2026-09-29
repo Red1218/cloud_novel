@@ -23,6 +23,7 @@ Implementation details are explicitly omitted here. Technical breakdowns belong 
 - [x] **Phase 5.3 — Reading Environment**
 - [x] **Phase 5.4 — Bookmarks & Reading Navigation** (Completed: 2026-07-22)
   - Delivered the Bookmark Engine with IndexedDB persistence, headless React hooks, and supporting infrastructure. Bookmark UI is scheduled for a later phase.
+  - Bookmark UI added (2026-09-29): a bookmark toggle and bookmarks list button in the reader top bar, and a Bookmarks panel to jump to or remove bookmarks. Naming bookmarks is not yet supported.
 
 ### Current
 - [▶] **Phase 5.5 — Search Inside PDF**

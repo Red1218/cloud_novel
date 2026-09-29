@@ -1,0 +1,29 @@
+.bookmark-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--reader-chrome-text);
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.bookmark-button:hover:not(:disabled) {
+  background-color: var(--reader-chrome-hover-bg);
+}
+
+.bookmark-button--active {
+  color: var(--reader-panel-accent);
+}
+
+.bookmark-button:disabled {
+  color: var(--reader-chrome-text-disabled);
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bookmark-button {
+    transition: none;
+  }
+}
