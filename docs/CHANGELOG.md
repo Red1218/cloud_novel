@@ -111,6 +111,22 @@ Documentation versions follow semantic versioning conventions, adapted for engin
 
 ---
 
+## Documentation v1.5
+
+**Date:** 2026-09-29
+
+**Added**
+- ADR-015 — Search Inside PDF (accepted), and its entry in the ADR index.
+- Architecture: Search Engine section.
+
+**Changed**
+- Current State: Search Inside PDF implementation recorded (pending review).
+
+**Breaking Changes**
+- None.
+
+---
+
 ## Future Entries
 
 *Use the following template for future updates to this document:*

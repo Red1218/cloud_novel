@@ -66,6 +66,7 @@ Files must follow this naming convention:
 | ADR-012 | Reader Environment Principle | | | |
 | ADR-013 | Reading Environment | | | |
 | ADR-014 | Reader Immersion Principle | | | |
+| ADR-015 | Search Inside PDF | Accepted | 2026-09-29 | Phase 5.5 |
 
 ## Future ADRs
 

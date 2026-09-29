@@ -93,6 +93,14 @@ The Bookmark Engine (`src/features/reader/bookmarks`) follows a strict vertical 
 - **State Management:** `useReaderBookmarks.ts` exposes headless hooks (`toggleBookmark`, `addBookmark`, `removeBookmark`, `renameBookmark`) for UI interaction.
 - **Presentation:** The Bookmark Engine is designed to support dedicated UI components through the `useReaderBookmarks` headless hook, ensuring the presentation layer remains decoupled from persistence. `BookmarkButton`, `BookmarkPanel`, and `BookmarkItem` are purely presentational: `ReaderPage` feeds them state from `useReaderBookmarks`, and selecting a bookmark navigates through `useReader`'s `goToPage`. They never access IndexedDB.
 
+### Search Engine
+Search Inside PDF (`src/features/reader/search`, ADR-015) follows the same vertical slice pattern:
+- **Engine:** `searchService.ts` is framework-agnostic. It extracts each page's text lazily with PDF.js `getTextContent()` (parsed in the PDF.js worker), caches it in memory for the open document only, and matches queries case-, accent-, and ligature-insensitively, treating line breaks as spaces. Results are capped at 1,000 per query and map back to character ranges in the page's text items.
+- **Highlighting:** `TextLayerHighlighter` wraps matched characters in the PDF.js text layer's spans using PDF.js's `.highlight` styles. The canvas is never modified (ADR-002).
+- **State Management:** `useReaderSearch.ts` owns query, indexing progress, results, and the current match. It does not navigate; `ReaderPage` moves to the current match's page with `goToPage`.
+- **Presentation:** `SearchBar` (under the top bar) and `SearchResultsPanel` are purely presentational. Search opens from the top bar or with Ctrl/Cmd+F inside the reader.
+- **Text layer scale:** PDF.js 6 sizes the text layer with `--total-scale-factor`, which `PdfTextLayer` sets from the canvas viewport so selection and highlights line up with the rendered page.
+
 ---
 
 ## 5. CSS Architecture
