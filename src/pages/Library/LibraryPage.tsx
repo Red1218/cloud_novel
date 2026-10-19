@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentTitle, useLibrary } from '@/hooks';
-import { PageWrapper } from '@/components/ui';
+import { Icon, PageWrapper } from '@/components/ui';
 import { ROUTES } from '@/constants';
 import {
   SectionHeader,
@@ -65,9 +65,9 @@ export function LibraryPage() {
 
   // Format stats for display
   const statItems = [
-    { label: 'Total Books', value: stats.totalBooks, icon: '\u{1F4DA}' }, // 📚
-    { label: 'Reading', value: stats.reading, icon: '\u{1F4D6}' }, // 📖
-    { label: 'Finished', value: stats.finished, icon: '\u2705' }, // ✅
+    { label: 'Total Books', value: stats.totalBooks, icon: <Icon name="books" size={20} /> },
+    { label: 'Reading', value: stats.reading, icon: <Icon name="book" size={20} /> },
+    { label: 'Finished', value: stats.finished, icon: <Icon name="finished" size={20} /> },
   ];
 
   // Handle sort change from SortDropdown

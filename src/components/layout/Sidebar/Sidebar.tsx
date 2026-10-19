@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { NavItem } from '@/components/ui';
+import { Icon, NavItem } from '@/components/ui';
 import { NAV_ITEMS } from '@/constants';
 import './Sidebar.css';
 
@@ -54,7 +54,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Brand / Logo */}
         <div className="sidebar__brand">
           <span className="sidebar__logo" aria-hidden="true">
-            &#128216;
+            <Icon name="book" size={20} />
           </span>
           <span className="sidebar__title">Cloud Novel</span>
         </div>
@@ -72,7 +72,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Footer */}
         <div className="sidebar__footer">
-          <span className="sidebar__version">v0.1.0 · Phase 1</span>
+          <span className="sidebar__version">Stored on this device</span>
         </div>
       </aside>
     </>

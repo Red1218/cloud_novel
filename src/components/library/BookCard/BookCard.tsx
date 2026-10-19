@@ -76,7 +76,7 @@ export function BookCard({ book, onOpen }: BookCardProps) {
               aria-valuemin={0}
               aria-valuemax={100}
               role="progressbar"
-              aria-label={`Reading progress: ${book.progress}%`}
+              aria-label={`Reading progress: ${Math.round(book.progress)}%`}
             >
               <div
                 className="book-card__progress-fill"
@@ -85,7 +85,7 @@ export function BookCard({ book, onOpen }: BookCardProps) {
               />
             </div>
             <span className="book-card__progress-text" aria-hidden="true">
-              {book.progress}%
+              {Math.round(book.progress)}%
             </span>
           </div>
           {lastOpenedText && (

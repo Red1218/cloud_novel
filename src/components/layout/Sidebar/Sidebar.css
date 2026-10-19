@@ -28,8 +28,8 @@
 }
 
 .sidebar__logo {
-  font-size: 1.375rem;
-  line-height: 1;
+  display: flex;
+  color: var(--color-accent);
   flex-shrink: 0;
 }
 

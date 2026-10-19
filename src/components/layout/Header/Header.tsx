@@ -1,3 +1,4 @@
+import { Icon } from '@/components/ui';
 import './Header.css';
 
 interface HeaderProps {
@@ -25,9 +26,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
           aria-expanded={isSidebarOpen}
           aria-controls="app-sidebar"
         >
-          <span className="header__menu-icon" aria-hidden="true">
-            &#9776;
-          </span>
+          <Icon name="menu" />
         </button>
         <span className="header__brand">Cloud Novel</span>
       </div>

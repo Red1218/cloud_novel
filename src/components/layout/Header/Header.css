@@ -42,12 +42,6 @@
   color: var(--color-text-primary);
 }
 
-.header__menu-icon {
-  display: block;
-  line-height: 1;
-  font-size: 1.125rem;
-}
-
 .header__brand {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
@@ -65,6 +59,13 @@
 }
 
 /* ---- Responsive ----------------------------------------- */
+
+/* Desktop: the sidebar already carries the brand, so the bar is not needed. */
+@media (min-width: 1024px) {
+  .header {
+    display: none;
+  }
+}
 
 @media (max-width: 1023px) {
   .header__menu-btn {

@@ -3,31 +3,26 @@ import type { NavItemConfig } from '@/types';
 
 /**
  * Sidebar navigation items, ordered as they appear in the UI.
- * Icons use Unicode/emoji for Phase 1 (no icon library dependency).
+ * The reader has no entry of its own: it always needs a book, so it is
+ * reached by opening one from the Dashboard or Library.
  */
 export const NAV_ITEMS: NavItemConfig[] = [
   {
-    label: 'Dashboard',
+    label: 'Home',
     path: ROUTES.DASHBOARD,
-    icon: '\u229E',
-    ariaLabel: 'Go to Dashboard',
+    icon: 'home',
+    ariaLabel: 'Go to Home',
   },
   {
     label: 'Library',
     path: ROUTES.LIBRARY,
-    icon: '\u{1F4DA}',
+    icon: 'library',
     ariaLabel: 'Go to Library',
-  },
-  {
-    label: 'Reader',
-    path: ROUTES.READER,
-    icon: '\u{1F4D6}',
-    ariaLabel: 'Go to Reader',
   },
   {
     label: 'Settings',
     path: ROUTES.SETTINGS,
-    icon: '\u2699',
+    icon: 'settings',
     ariaLabel: 'Go to Settings',
   },
 ];

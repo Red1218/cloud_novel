@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import type { NavItemConfig } from '@/types';
+import { Icon } from '../Icon';
 import './NavItem.css';
 
 type NavItemProps = NavItemConfig;
@@ -22,7 +23,7 @@ export function NavItem({ label, path, icon, ariaLabel }: NavItemProps) {
       }
     >
       <span className="nav-item__icon" aria-hidden="true">
-        {icon}
+        <Icon name={icon} />
       </span>
       <span className="nav-item__label">{label}</span>
     </NavLink>

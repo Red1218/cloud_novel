@@ -27,11 +27,10 @@
 }
 
 .nav-item__icon {
-  font-size: var(--font-size-base);
+  display: flex;
   width: 20px;
-  text-align: center;
+  justify-content: center;
   flex-shrink: 0;
-  line-height: 1;
 }
 
 .nav-item__label {
