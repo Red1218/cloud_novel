@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Book, StoredBook } from '@/types';
+import type { Book, StoredBook } from '@/types/book';
 import { BookRepository } from '@/repositories/BookRepository';
 import { extractPdfData } from '@/services/pdfService';
 import { computeSHA256 } from '@/utils/hash';

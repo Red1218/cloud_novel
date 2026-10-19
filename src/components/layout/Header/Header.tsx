@@ -1,4 +1,4 @@
-import { Icon } from '@/components/ui';
+import { Icon } from '@/components/ui/Icon/Icon';
 import './Header.css';
 
 interface HeaderProps {
@@ -31,9 +31,6 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
         <span className="header__brand">Cloud Novel</span>
       </div>
 
-      <div className="header__right">
-        {/* Reserved for future: search, notifications, user avatar */}
-      </div>
     </header>
   );
 }

@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
-import type { NavItemConfig } from '@/types';
-import { Icon } from '../Icon';
+import type { NavItemConfig } from '@/types/nav';
+import { Icon } from '@/components/ui/Icon/Icon';
 import './NavItem.css';
 
 type NavItemProps = NavItemConfig;

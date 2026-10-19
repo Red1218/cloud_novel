@@ -1,5 +1,7 @@
-import type { Book } from '@/types';
-import { CONTINUE_READING_MAX } from './constants';
+import type { Book } from '@/types/book';
+
+/** Maximum number of books to show in Continue Reading section */
+const CONTINUE_READING_MAX = 3;
 
 /**
  * Derives the list of books for the "Continue Reading" section.
@@ -26,9 +28,8 @@ export function deriveContinueReadingBooks(
       book.lastOpened !== null
   );
 
-  // Sort by lastOpened descending (stable sort)
-  const sorted = [...inProgress].sort((a, b) => b.lastOpened - a.lastOpened);
-
-  // Limit to max
-  return sorted.slice(0, CONTINUE_READING_MAX);
+  // Sort by lastOpened descending (stable sort); filter already copied the array.
+  return inProgress
+    .sort((a, b) => b.lastOpened - a.lastOpened)
+    .slice(0, CONTINUE_READING_MAX);
 }

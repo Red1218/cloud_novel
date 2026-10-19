@@ -1,23 +1,15 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ROUTES } from '@/constants';
+import { ROUTES } from '@/constants/routes';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import './NotFoundPage.css';
 
 /**
  * 404 Not Found page.
  *
  * Rendered outside the AppLayout so it is fully standalone.
- * Uses useEffect directly (no useDocumentTitle hook) since
- * this page unmounts immediately on navigation.
  */
 export function NotFoundPage() {
-  useEffect(() => {
-    const previous = document.title;
-    document.title = 'Cloud Novel \u2022 404 Not Found';
-    return () => {
-      document.title = previous;
-    };
-  }, []);
+  useDocumentTitle('404 Not Found');
 
   return (
     <div className="not-found">

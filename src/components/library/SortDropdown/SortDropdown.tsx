@@ -1,15 +1,15 @@
+import type { SortOption } from '@/features/library/utils/sortBooks';
 import './SortDropdown.css';
 
 export interface SortDropdownProps {
   /** The current selected sort value */
-  value?: string;
+  value: SortOption;
   /** Callback fired when the sort option changes */
-  onChange?: (value: string) => void;
+  onChange: (value: SortOption) => void;
 }
 
 /**
- * Reusable sort dropdown component.
- * UI only - functionality will be added in a future phase.
+ * Sort dropdown for the library grid.
  */
 export function SortDropdown({ value, onChange }: SortDropdownProps) {
   return (
@@ -17,11 +17,11 @@ export function SortDropdown({ value, onChange }: SortDropdownProps) {
       <select
         className="sort-dropdown__select"
         value={value}
-        onChange={(e) => onChange?.(e.target.value)}
+        onChange={(e) => onChange(e.target.value as SortOption)}
         aria-label="Sort library"
       >
-        <option value="recent">Recently Added</option>
-        <option value="opened">Recently Opened</option>
+        <option value="recentlyAdded">Recently Added</option>
+        <option value="lastOpened">Recently Opened</option>
         <option value="title">Title</option>
         <option value="author">Author</option>
       </select>

@@ -2,23 +2,6 @@ import { useState, useCallback, useEffect } from 'react';
 import type { Bookmark } from '../types';
 import { bookmarkService } from '../services/bookmarkService';
 
-export interface UseReaderBookmarksResult {
-  /** All bookmarks for the book, ordered by page ascending. */
-  bookmarks: Bookmark[];
-  /** Synchronously checks the loaded state for a bookmark on a page. */
-  isBookmarked: (page: number) => boolean;
-  /** Adds a bookmark on a page and refreshes state. */
-  addBookmark: (page: number, label?: string) => Promise<void>;
-  /** Removes a bookmark by ID and updates state. */
-  removeBookmark: (bookmarkId: string) => Promise<void>;
-  /** Sets a bookmark's label (an empty label clears it) and updates state. */
-  renameBookmark: (bookmarkId: string, label: string) => Promise<void>;
-  /** Toggles a bookmark on a page, delegating to add/remove based on state. */
-  toggleBookmark: (page: number) => Promise<void>;
-  /** Reloads bookmarks from IndexedDB into state. */
-  refreshBookmarks: () => Promise<void>;
-}
-
 /**
  * Manages bookmark state for the Reader.
  *
@@ -32,7 +15,7 @@ export interface UseReaderBookmarksResult {
  *
  * @param bookId - The UUID of the book being read
  */
-export function useReaderBookmarks(bookId: string): UseReaderBookmarksResult {
+export function useReaderBookmarks(bookId: string) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
 
   const refreshBookmarks = useCallback(async (): Promise<void> => {
@@ -53,8 +36,8 @@ export function useReaderBookmarks(bookId: string): UseReaderBookmarksResult {
   );
 
   const addBookmark = useCallback(
-    async (page: number, label?: string): Promise<void> => {
-      await bookmarkService.addBookmark({ bookId, page, label });
+    async (page: number): Promise<void> => {
+      await bookmarkService.addBookmark({ bookId, page });
       await refreshBookmarks();
     },
     [bookId, refreshBookmarks],
@@ -86,10 +69,8 @@ export function useReaderBookmarks(bookId: string): UseReaderBookmarksResult {
   return {
     bookmarks,
     isBookmarked,
-    addBookmark,
     removeBookmark,
     renameBookmark,
     toggleBookmark,
-    refreshBookmarks,
   };
 }

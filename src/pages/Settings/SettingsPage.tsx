@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useDocumentTitle, useLibrary } from '@/hooks';
-import { PageWrapper } from '@/components/ui';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useLibrary } from '@/hooks/useLibrary';
+import { PageWrapper } from '@/components/ui/PageWrapper/PageWrapper';
 import './SettingsPage.css';
 
 const SHORTCUTS: ReadonlyArray<[keys: string, action: string]> = [

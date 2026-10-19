@@ -1,7 +1,6 @@
 import type { RefObject } from 'react';
 import type { PDFPageProxy, PageViewport } from 'pdfjs-dist';
-import type { TextContent } from '../../services/textLayerService';
-import { PdfCanvas }     from '../PdfCanvas/PdfCanvas';
+import type { TextContent } from '../../types';
 import { PdfTextLayer }  from '../PdfTextLayer/PdfTextLayer';
 import type { TextLayerHighlight } from '../../search/types';
 import './ReaderViewport.css';
@@ -22,7 +21,7 @@ interface ReaderViewportProps {
   isLoading:    boolean;
   /** Error message, or null when there is no error. */
   error:        string | null;
-  /** Forwarded to PdfCanvas for the canvas rendering hook (usePdfRenderer). */
+  /** Drawn on by the canvas rendering hook (usePdfRenderer). */
   canvasRef:    RefObject<HTMLCanvasElement | null>;
   /** Attached to the scroll container so useReaderViewport can measure
    *  available dimensions for fit-width / fit-page calculations. */
@@ -34,15 +33,8 @@ interface ReaderViewportProps {
 /**
  * Layout and composition component — no hooks, no data fetching.
  *
- * Establishes the stacking context that holds all rendering layers in order:
- *
- *   z-index 1  PdfCanvas       (canvas rendering)
- *   z-index 2  PdfTextLayer    (text selection)
- *   z-index 3  HighlightLayer  (future)
- *   z-index 4  AnnotationLayer (future)
- *
- * PdfCanvas and PdfTextLayer are siblings — neither knows about the other.
- * Adding a new layer in the future means adding one sibling here only.
+ * Establishes the stacking context that holds the rendering layers in order:
+ * the page canvas, then PdfTextLayer (text selection) on top of it.
  *
  * ReaderPage owns all orchestration hooks and passes the results down as props.
  */
@@ -59,10 +51,9 @@ export function ReaderViewport({
   return (
     <div className="reader-viewport-scroll" ref={containerRef}>
       <div className="reader-viewport-page">
-        <PdfCanvas
+        <canvas
           ref={canvasRef}
-          isLoading={isLoading}
-          error={error}
+          className={`pdf-canvas ${isLoading || error ? 'pdf-canvas--hidden' : ''}`}
         />
         <PdfTextLayer
           page={page}

@@ -1,5 +1,5 @@
-import { ErrorBoundary } from '@/components/common';
-import { ToastProvider } from '@/contexts';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary/ErrorBoundary';
+import { ToastProvider } from '@/contexts/ToastContext';
 import { AppRouter } from './router';
 
 /**

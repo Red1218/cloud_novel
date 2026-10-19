@@ -1,33 +1,18 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
-
-export interface UseReaderNavigationOptions {
-  /** Initial page number from persisted state (1-based). Defaults to 1. */
-  initialPage?: number;
-  /** Callback invoked whenever currentPage changes (for persistence). */
-  onPageChange?: (page: number) => void;
-}
-
-export interface UseReaderNavigationResult {
-  currentPage: number;
-  nextPage: () => void;
-  previousPage: () => void;
-  goToPage: (targetPage: number) => void;
-}
+import type { ReadingStateUpdate } from '@/repositories/BookRepository';
 
 /**
  * Manages page navigation state for the Reader.
  *
- * Accepts initialPage from persisted state and reports changes via onPageChange.
- * Resets to initialPage (or 1) whenever the document changes.
- * All action callbacks are stable (useCallback with empty or constant deps).
+ * Resets to initialPage whenever the document changes and reports every
+ * page change to `persist`. All action callbacks are stable.
  */
 export function useReaderNavigation(
   pdfDocument: PDFDocumentProxy | null,
-  options: UseReaderNavigationOptions = {},
-): UseReaderNavigationResult {
-  const { initialPage = 1, onPageChange } = options;
-
+  initialPage: number,
+  persist: (update: ReadingStateUpdate) => void,
+) {
   const [currentPage, setCurrentPage] = useState(initialPage);
 
   // Stable ref to total pages so callbacks never need it in their dep arrays.
@@ -39,37 +24,20 @@ export function useReaderNavigation(
     setCurrentPage(initialPage);
   }, [pdfDocument, initialPage]);
 
-  const previousPage = useCallback(() => {
-    setCurrentPage(prev => {
-      const next = Math.max(1, prev - 1);
-      if (next !== prev) {
-        onPageChange?.(next);
-      }
-      return next;
-    });
-  }, [onPageChange]);
-
-  const nextPage = useCallback(() => {
+  /** Moves to the page `target` picks, clamped to the document. */
+  const move = useCallback((target: (prev: number) => number) => {
     setCurrentPage(prev => {
       const total = totalPagesRef.current;
-      const next = total > 0 ? Math.min(total, prev + 1) : prev;
-      if (next !== prev) {
-        onPageChange?.(next);
-      }
+      if (total === 0) return prev;
+      const next = Math.min(Math.max(1, target(prev)), total);
+      if (next !== prev) persist({ currentPage: next });
       return next;
     });
-  }, [onPageChange]);
+  }, [persist]);
 
-  const goToPage = useCallback((targetPage: number) => {
-    const total = totalPagesRef.current;
-    setCurrentPage(prev => {
-      const next = Math.min(Math.max(1, targetPage), Math.max(1, total));
-      if (next !== prev) {
-        onPageChange?.(next);
-      }
-      return next;
-    });
-  }, [onPageChange]);
+  const previousPage = useCallback(() => move(prev => prev - 1), [move]);
+  const nextPage = useCallback(() => move(prev => prev + 1), [move]);
+  const goToPage = useCallback((page: number) => move(() => page), [move]);
 
   return { currentPage, nextPage, previousPage, goToPage };
 }

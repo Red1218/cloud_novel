@@ -1,13 +1,11 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AppLayout } from '@/layouts';
-import { ROUTES } from '@/constants';
-import {
-  DashboardPage,
-  LibraryPage,
-  ReaderPage,
-  SettingsPage,
-  NotFoundPage,
-} from '@/pages';
+import { AppLayout } from '@/layouts/AppLayout';
+import { ROUTES } from '@/constants/routes';
+import { DashboardPage } from '@/pages/Dashboard/DashboardPage';
+import { LibraryPage } from '@/pages/Library/LibraryPage';
+import { ReaderPage } from '@/pages/Reader/ReaderPage';
+import { SettingsPage } from '@/pages/Settings/SettingsPage';
+import { NotFoundPage } from '@/pages/NotFound/NotFoundPage';
 
 /**
  * Application router.

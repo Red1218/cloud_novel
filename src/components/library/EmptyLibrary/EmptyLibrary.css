@@ -86,17 +86,6 @@
   transform: scale(0.98);
 }
 
-.empty-library__action--secondary {
-  background-color: transparent;
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-strong);
-}
-
-.empty-library__action--secondary:hover {
-  background-color: var(--color-bg-surface-hover);
-  border-color: var(--color-border);
-}
-
 /* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .empty-library__action {

@@ -7,37 +7,79 @@ import {
   type CSSProperties,
   type MouseEvent,
   type PointerEvent,
+  type ReactNode,
 } from 'react';
 import { useParams } from 'react-router-dom';
 import { TextLayer } from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { useDocumentTitle, useToast } from '@/hooks';
-import {
-  BookmarkPanel,
-  ReaderHeader,
-  ReaderToolbar,
-  ReadingEnvironmentPanel,
-  LoadingState,
-  ErrorState,
-  ReaderViewport,
-  SearchBar,
-  SearchResultsPanel,
-  usePdfDocument,
-  usePdfRenderer,
-  usePdfTextLayer,
-  useReader,
-  useReaderBookmarks,
-  useReaderEnvironment,
-  useReaderSearch,
-  type ReaderOpeningMode,
-  type ReaderTheme,
-  type ReadingPreset,
-  type TextLayerHighlight,
-} from '@/features/reader';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useToast } from '@/hooks/useToast';
+import { BookmarkPanel } from '@/features/reader/bookmarks/components/BookmarkPanel/BookmarkPanel';
+import { ReaderHeader } from '@/features/reader/components/ReaderHeader/ReaderHeader';
+import { ReaderToolbar } from '@/features/reader/components/ReaderToolbar/ReaderToolbar';
+import { ReadingEnvironmentPanel } from '@/features/reader/components/ReadingEnvironmentPanel/ReadingEnvironmentPanel';
+import { LoadingState } from '@/features/reader/components/LoadingState/LoadingState';
+import { ErrorState } from '@/features/reader/components/ErrorState/ErrorState';
+import { ReaderViewport } from '@/features/reader/components/ReaderViewport/ReaderViewport';
+import { SearchBar } from '@/features/reader/search/components/SearchBar/SearchBar';
+import { SearchResultsPanel } from '@/features/reader/search/components/SearchResultsPanel/SearchResultsPanel';
+import { usePdfDocument } from '@/features/reader/hooks/usePdfDocument';
+import { usePdfRenderer } from '@/features/reader/hooks/usePdfRenderer';
+import { usePdfTextLayer } from '@/features/reader/hooks/usePdfTextLayer';
+import { useReader } from '@/features/reader/hooks/useReader';
+import { useReaderBookmarks } from '@/features/reader/bookmarks/hooks/useReaderBookmarks';
+import { useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
+import { useReaderSearch } from '@/features/reader/search/hooks/useReaderSearch';
+import type { ReaderOpeningMode } from '@/features/reader/types';
+import { type TextLayerHighlight } from '@/features/reader/search/types';
 import './ReaderPage.css';
 
 const CHROME_HIDE_DELAY_MS = 10_000;
 const ZOOM_FEEDBACK_DELAY_MS = 1_000;
 const CLICK_TOGGLE_DRAG_THRESHOLD_PX = 6;
+
+type Panel = 'environment' | 'bookmarks' | 'results';
+
+interface ReaderSheetProps {
+  /** Id of the panel heading that names the dialog. */
+  labelledBy: string;
+  onClose: () => void;
+  onPointerDown: (event: PointerEvent) => void;
+  children: ReactNode;
+}
+
+/**
+ * Shows a reader panel as a modal <dialog>. The browser closes it on Escape;
+ * a click on the transparent area around the panel closes it too.
+ */
+function ReaderSheet({ labelledBy, onClose, onPointerDown, children }: ReaderSheetProps) {
+  const ref = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, []);
+
+  return (
+    <dialog
+      ref={ref}
+      className="reader-page__sheet"
+      aria-labelledby={labelledBy}
+      // Escape fires `cancel` at once; `close` waits for the next frame.
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClose={onClose}
+      onPointerDown={onPointerDown}
+      onClick={(event) => {
+        event.stopPropagation();
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      {children}
+    </dialog>
+  );
+}
 
 /**
  * Reader page - composition and orchestration only.
@@ -63,14 +105,12 @@ export function ReaderPage() {
   );
 
   const [isChromeVisible, setIsChromeVisible] = useState(true);
-  const [isEnvironmentOpen, setIsEnvironmentOpen] = useState(false);
-  const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
+  const [panel, setPanel] = useState<Panel | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSearchResultsOpen, setIsSearchResultsOpen] = useState(false);
   const [zoomFeedback, setZoomFeedback] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   // Controls stay visible while a panel or the search bar is open.
-  const isChromePinned = isEnvironmentOpen || isBookmarksOpen || isSearchResultsOpen || isSearchOpen;
+  const isChromePinned = panel !== null || isSearchOpen;
 
   const { pdfDocument, book, isLoading, error } = usePdfDocument(bookId);
   const readerEnvironment = useReaderEnvironment(bookId);
@@ -92,7 +132,7 @@ export function ReaderPage() {
     }
   }, [loadedBookId, touchLastOpened]);
 
-  const { textContent } = usePdfTextLayer(reader.page);
+  const textContent = usePdfTextLayer(reader.page);
 
   useDocumentTitle(
     book?.title ? `${book.title} - Page ${reader.currentPage}` : 'Reader',
@@ -237,64 +277,38 @@ export function ReaderPage() {
     scheduleChromeHide();
   }, [loadedBookId, scheduleChromeHide]);
 
-  const openReadingEnvironment = useCallback((): void => {
+  const openPanel = useCallback((next: Panel): void => {
     clearChromeTimer();
     isChromeVisibleRef.current = true;
     setIsChromeVisible(true);
-    setIsBookmarksOpen(false);
-    setIsSearchResultsOpen(false);
-    setIsEnvironmentOpen(true);
+    setPanel(next);
   }, [clearChromeTimer]);
 
-  const closeReadingEnvironment = useCallback((): void => {
-    setIsEnvironmentOpen(false);
-    if (readerEnvironment.settings.autoHideControls) {
-      scheduleChromeHide();
-    }
-  }, [readerEnvironment.settings.autoHideControls, scheduleChromeHide]);
-
-  const openBookmarks = useCallback((): void => {
-    clearChromeTimer();
-    isChromeVisibleRef.current = true;
-    setIsChromeVisible(true);
-    setIsEnvironmentOpen(false);
-    setIsSearchResultsOpen(false);
-    setIsBookmarksOpen(true);
-  }, [clearChromeTimer]);
-
-  const closeBookmarks = useCallback((): void => {
-    setIsBookmarksOpen(false);
-  }, []);
+  const closePanel = useCallback((): void => setPanel(null), []);
 
   const openSearch = useCallback((): void => {
     clearChromeTimer();
     isChromeVisibleRef.current = true;
     setIsChromeVisible(true);
+    // An open panel is modal, so close it before focusing the field.
+    setPanel(null);
     setIsSearchOpen(true);
     // Already open: bring focus back to the field (it autofocuses on mount).
-    searchInputRef.current?.focus();
-    searchInputRef.current?.select();
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+      searchInputRef.current?.select();
+    });
   }, [clearChromeTimer]);
 
   const closeSearch = useCallback((): void => {
     setIsSearchOpen(false);
-    setIsSearchResultsOpen(false);
-  }, []);
-
-  const openSearchResults = useCallback((): void => {
-    setIsEnvironmentOpen(false);
-    setIsBookmarksOpen(false);
-    setIsSearchResultsOpen(true);
-  }, []);
-
-  const closeSearchResults = useCallback((): void => {
-    setIsSearchResultsOpen(false);
+    setPanel(current => (current === 'results' ? null : current));
   }, []);
 
   const { selectMatch } = search;
   const handleSelectSearchResult = useCallback((index: number): void => {
     selectMatch(index);
-    setIsSearchResultsOpen(false);
+    setPanel(null);
   }, [selectMatch]);
 
   const { toggleBookmark, removeBookmark, renameBookmark } = readerBookmarks;
@@ -319,7 +333,7 @@ export function ReaderPage() {
 
   const handleSelectBookmark = useCallback((page: number): void => {
     goToPage(page);
-    setIsBookmarksOpen(false);
+    setPanel(null);
   }, [goToPage]);
 
   // Move to the current search match's page when the match changes (only
@@ -341,38 +355,12 @@ export function ReaderPage() {
       .map(match => ({ ranges: match.ranges, selected: match.index === currentMatch?.index }));
   }, [currentMatch, currentPage, isSearchOpen, searchResults]);
 
-  const applyReadingPreset = useCallback((preset: ReadingPreset): void => {
-    readerEnvironment.updateSettings({
-      theme: preset.theme,
-      brightness: preset.brightness,
-    });
+  const applyOpeningMode = (openingMode: ReaderOpeningMode): void => {
+    if (openingMode === 'fit-page') reader.fitPage();
+    else reader.fitWidth();
+  };
 
-    if (preset.openingMode === 'fit-page') {
-      reader.fitPage();
-      return;
-    }
-
-    reader.fitWidth();
-  }, [reader, readerEnvironment]);
-
-  const handleThemeChange = useCallback((theme: ReaderTheme): void => {
-    readerEnvironment.updateSettings({ theme });
-  }, [readerEnvironment]);
-
-  const handleBrightnessChange = useCallback((brightness: number): void => {
-    readerEnvironment.updateSettings({ brightness });
-  }, [readerEnvironment]);
-
-  const handleOpeningModeChange = useCallback((openingMode: ReaderOpeningMode): void => {
-    if (openingMode === 'fit-page') {
-      reader.fitPage();
-      return;
-    }
-
-    reader.fitWidth();
-  }, [reader]);
-
-  const handleAutoHideControlsChange = useCallback((autoHideControls: boolean): void => {
+  const handleAutoHideControlsChange = (autoHideControls: boolean): void => {
     readerEnvironment.updateSettings({ autoHideControls });
 
     if (!autoHideControls) {
@@ -383,7 +371,7 @@ export function ReaderPage() {
     if (!isChromePinned && isChromeVisibleRef.current) {
       scheduleChromeHide();
     }
-  }, [clearChromeTimer, isChromePinned, readerEnvironment, scheduleChromeHide]);
+  };
 
   const readerEnvironmentStyle = {
     '--reader-environment-dim-opacity': readerEnvironment.dimOpacity.toString(),
@@ -407,29 +395,15 @@ export function ReaderPage() {
         openSearch();
         return;
       }
-      if (event.key !== 'Escape') return;
-      if (isEnvironmentOpen) closeReadingEnvironment();
-      if (isBookmarksOpen) closeBookmarks();
-      if (isSearchResultsOpen) closeSearchResults();
-      else if (isSearchOpen && !isEnvironmentOpen && !isBookmarksOpen) closeSearch();
+      // Open panels are dialogs and close themselves on Escape.
+      if (event.key === 'Escape' && !panel && isSearchOpen) closeSearch();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [
-    closeBookmarks,
-    closeReadingEnvironment,
-    closeSearch,
-    closeSearchResults,
-    isBookmarksOpen,
-    isEnvironmentOpen,
-    isSearchOpen,
-    isSearchResultsOpen,
-    loadedBookId,
-    openSearch,
-  ]);
+  }, [closeSearch, isSearchOpen, loadedBookId, openSearch, panel]);
 
   useEffect(() => {
     if (
@@ -492,7 +466,7 @@ export function ReaderPage() {
           onNextPage={reader.nextPage}
           isBookmarked={readerBookmarks.isBookmarked(reader.currentPage)}
           onToggleBookmark={book ? handleToggleBookmark : undefined}
-          onOpenBookmarks={book ? openBookmarks : undefined}
+          onOpenBookmarks={book ? () => openPanel('bookmarks') : undefined}
           onOpenSearch={book ? openSearch : undefined}
         />
       </div>
@@ -513,7 +487,7 @@ export function ReaderPage() {
             currentPosition={currentMatch ? currentMatch.index + 1 : 0}
             onNext={search.next}
             onPrevious={search.previous}
-            onShowResults={openSearchResults}
+            onShowResults={() => openPanel('results')}
             onClose={closeSearch}
             inputRef={searchInputRef}
           />
@@ -549,85 +523,64 @@ export function ReaderPage() {
           onResetZoom={reader.resetZoom}
           onFitWidth={reader.fitWidth}
           onFitPage={reader.fitPage}
-          onOpenReadingEnvironment={openReadingEnvironment}
+          onOpenReadingEnvironment={() => openPanel('environment')}
         />
       </div>
 
-      {isEnvironmentOpen && (
-        <>
-          <button
-            type="button"
-            className="reader-page__environment-scrim"
-            onClick={closeReadingEnvironment}
-            aria-label="Close reading environment"
+      {panel === 'environment' && (
+        <ReaderSheet
+          labelledBy="reading-environment-title"
+          onClose={closePanel}
+          onPointerDown={handleChromePointerDown}
+        >
+          <ReadingEnvironmentPanel
+            settings={readerEnvironment.settings}
+            scaleMode={reader.scaleMode}
+            onApplyPreset={(preset) => {
+              readerEnvironment.updateSettings({ theme: preset.theme, brightness: preset.brightness });
+              applyOpeningMode(preset.openingMode);
+            }}
+            onThemeChange={(theme) => readerEnvironment.updateSettings({ theme })}
+            onBrightnessChange={(brightness) => readerEnvironment.updateSettings({ brightness })}
+            onOpeningModeChange={applyOpeningMode}
+            onAutoHideControlsChange={handleAutoHideControlsChange}
+            onReset={readerEnvironment.resetSettings}
+            onClose={closePanel}
           />
-          <div
-            className="reader-page__environment-panel"
-            onPointerDown={handleChromePointerDown}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <ReadingEnvironmentPanel
-              settings={readerEnvironment.settings}
-              scaleMode={reader.scaleMode}
-              onApplyPreset={applyReadingPreset}
-              onThemeChange={handleThemeChange}
-              onBrightnessChange={handleBrightnessChange}
-              onOpeningModeChange={handleOpeningModeChange}
-              onAutoHideControlsChange={handleAutoHideControlsChange}
-              onReset={readerEnvironment.resetSettings}
-              onClose={closeReadingEnvironment}
-            />
-          </div>
-        </>
+        </ReaderSheet>
       )}
 
-      {isBookmarksOpen && (
-        <>
-          <button
-            type="button"
-            className="reader-page__environment-scrim"
-            onClick={closeBookmarks}
-            aria-label="Close bookmarks"
+      {panel === 'bookmarks' && (
+        <ReaderSheet
+          labelledBy="bookmark-panel-title"
+          onClose={closePanel}
+          onPointerDown={handleChromePointerDown}
+        >
+          <BookmarkPanel
+            bookmarks={readerBookmarks.bookmarks}
+            currentPage={reader.currentPage}
+            onSelect={handleSelectBookmark}
+            onRemove={handleRemoveBookmark}
+            onRename={handleRenameBookmark}
+            onClose={closePanel}
           />
-          <div
-            className="reader-page__environment-panel"
-            onPointerDown={handleChromePointerDown}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <BookmarkPanel
-              bookmarks={readerBookmarks.bookmarks}
-              currentPage={reader.currentPage}
-              onSelect={handleSelectBookmark}
-              onRemove={handleRemoveBookmark}
-              onRename={handleRenameBookmark}
-              onClose={closeBookmarks}
-            />
-          </div>
-        </>
+        </ReaderSheet>
       )}
 
-      {isSearchResultsOpen && searchResults && (
-        <>
-          <button
-            type="button"
-            className="reader-page__environment-scrim"
-            onClick={closeSearchResults}
-            aria-label="Close matches"
+      {panel === 'results' && searchResults && (
+        <ReaderSheet
+          labelledBy="search-results-title"
+          onClose={closePanel}
+          onPointerDown={handleChromePointerDown}
+        >
+          <SearchResultsPanel
+            matches={searchResults.matches}
+            truncated={searchResults.truncated}
+            currentIndex={currentMatch?.index ?? -1}
+            onSelect={handleSelectSearchResult}
+            onClose={closePanel}
           />
-          <div
-            className="reader-page__environment-panel"
-            onPointerDown={handleChromePointerDown}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <SearchResultsPanel
-              matches={searchResults.matches}
-              truncated={searchResults.truncated}
-              currentIndex={currentMatch?.index ?? -1}
-              onSelect={handleSelectSearchResult}
-              onClose={closeSearchResults}
-            />
-          </div>
-        </>
+        </ReaderSheet>
       )}
 
       <div

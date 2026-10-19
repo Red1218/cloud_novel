@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
-import type { StoredBook } from '@/types';
-import { readerService } from '../services/readerService';
+import type { StoredBook } from '@/types/book';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { BookRepository } from '@/repositories/BookRepository';
 
 interface UsePdfDocumentResult {
   pdfDocument: PDFDocumentProxy | null;
@@ -21,7 +22,7 @@ export function usePdfDocument(bookId: string | undefined): UsePdfDocumentResult
 
   useEffect(() => {
     let isMounted = true;
-    let currentTask: any = null;
+    let currentTask: ReturnType<typeof pdfjsLib.getDocument> | null = null;
 
     async function load() {
       if (!bookId) {
@@ -34,14 +35,15 @@ export function usePdfDocument(bookId: string | undefined): UsePdfDocumentResult
       setError(null);
 
       try {
-        const storedBook = await readerService.loadBook(bookId);
+        const storedBook = await BookRepository.getStoredBookById(bookId);
+        if (!storedBook) throw new Error('Book not found in library.');
         if (!isMounted) return;
         setBook(storedBook);
 
-        const arrayBuffer = await readerService.convertBlobToArrayBuffer(storedBook.pdf);
+        const data = new Uint8Array(await storedBook.pdf.arrayBuffer());
         if (!isMounted) return;
 
-        const loadingTask = readerService.loadPdfDocument(arrayBuffer);
+        const loadingTask = pdfjsLib.getDocument({ data });
         currentTask = loadingTask;
         
         const doc = await loadingTask.promise;

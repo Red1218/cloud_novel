@@ -1,4 +1,4 @@
-import type { IconName } from '@/components/ui';
+import type { IconName } from '@/components/ui/Icon/Icon';
 
 /**
  * Navigation item configuration.

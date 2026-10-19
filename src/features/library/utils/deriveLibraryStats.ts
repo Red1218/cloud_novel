@@ -1,4 +1,4 @@
-import type { Book } from '@/types';
+import type { Book } from '@/types/book';
 
 /**
  * Library statistics derived from the book collection.
@@ -13,26 +13,16 @@ export interface LibraryStats {
 }
 
 /**
- * Derives library statistics from a collection of books.
- *
- * Rules:
- * - Single O(n) pass
- * - No sorting, no filtering, no mutation
- * - Returns immutable frozen stats object
+ * Derives library statistics from a collection of books in a single pass.
  *
  * @param books - The source array of books (readonly)
- * @returns Frozen LibraryStats containing total, reading, and finished counts
+ * @returns LibraryStats containing total, reading, and finished counts
  */
-export function deriveLibraryStats(
-  books: readonly Book[]
-): Readonly<LibraryStats> {
-  let totalBooks = 0;
+export function deriveLibraryStats(books: readonly Book[]): LibraryStats {
   let reading = 0;
   let finished = 0;
 
   for (const book of books) {
-    totalBooks++;
-
     if (book.progress === 100) {
       finished++;
     } else if (book.progress > 0) {
@@ -40,9 +30,5 @@ export function deriveLibraryStats(
     }
   }
 
-  return Object.freeze({
-    totalBooks,
-    reading,
-    finished,
-  });
+  return { totalBooks: books.length, reading, finished };
 }

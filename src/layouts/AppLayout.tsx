@@ -1,10 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Header } from '@/components/layout/Header';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { Header } from '@/components/layout/Header/Header';
+import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import './AppLayout.css';
-
-const DESKTOP_BREAKPOINT = 1024;
 
 /**
  * The single application shell.
@@ -22,17 +20,6 @@ const DESKTOP_BREAKPOINT = 1024;
  */
 export function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  /* Auto-close drawer when viewport grows to desktop width. */
-  useEffect(() => {
-    function handleResize(): void {
-      if (window.innerWidth >= DESKTOP_BREAKPOINT) {
-        setIsSidebarOpen(false);
-      }
-    }
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
 

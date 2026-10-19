@@ -193,22 +193,24 @@
   opacity: 1;
 }
 
-.reader-page__environment-scrim {
-  position: absolute;
+/* Full-screen transparent <dialog>; the panel inside positions itself. */
+.reader-page__sheet {
+  position: fixed;
   inset: 0;
-  z-index: var(--z-backdrop);
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
   background: transparent;
+  color: inherit;
+  overflow: visible;
 }
 
-.reader-page__environment-panel {
-  position: absolute;
-  inset: 0;
-  z-index: var(--z-modal);
-  pointer-events: none;
-}
-
-.reader-page__environment-panel .reading-environment {
-  pointer-events: auto;
+.reader-page__sheet::backdrop {
+  background: transparent;
 }
 
 @media (max-width: 767px) {

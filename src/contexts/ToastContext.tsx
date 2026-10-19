@@ -1,10 +1,9 @@
 import { createContext, useState, useCallback, type ReactNode } from 'react';
-import type { ToastMessage } from '@/types';
-import { ToastContainer } from '@/components/common/Toast';
+import type { ToastMessage } from '@/types/toast';
+import { ToastContainer } from '@/components/common/Toast/ToastContainer';
 
 interface ToastContextValue {
-  addToast: (toast: Omit<ToastMessage, 'id'> & { id?: string }) => void;
-  removeToast: (id: string) => void;
+  addToast: (toast: Omit<ToastMessage, 'id'>) => void;
 }
 
 export const ToastContext = createContext<ToastContextValue | undefined>(undefined);
@@ -16,9 +15,8 @@ interface ToastProviderProps {
 export function ToastProvider({ children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const addToast = useCallback((toast: Omit<ToastMessage, 'id'> & { id?: string }) => {
-    const id = toast.id || crypto.randomUUID();
-    setToasts((prev) => [...prev, { ...toast, id }]);
+  const addToast = useCallback((toast: Omit<ToastMessage, 'id'>) => {
+    setToasts((prev) => [...prev, { ...toast, id: crypto.randomUUID() }]);
   }, []);
 
   const removeToast = useCallback((id: string) => {
@@ -26,7 +24,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   }, []);
 
   return (
-    <ToastContext.Provider value={{ addToast, removeToast }}>
+    <ToastContext.Provider value={{ addToast }}>
       {children}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </ToastContext.Provider>

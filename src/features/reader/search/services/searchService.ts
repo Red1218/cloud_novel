@@ -2,7 +2,7 @@ import type { PDFDocumentProxy } from 'pdfjs-dist';
 import type { SearchMatch, SearchResults, TextItemRange } from '../types';
 
 /** Maximum matches returned per query (ADR-015). */
-export const MAX_SEARCH_RESULTS = 1000;
+const MAX_SEARCH_RESULTS = 1000;
 
 /** Characters of original text shown on each side of a match in snippets. */
 const SNIPPET_CONTEXT = 40;
@@ -148,20 +148,16 @@ function toSnippet(page: PageText, ranges: TextItemRange[]): SearchMatch['snippe
 
 /**
  * Finds every occurrence of `query` (already normalized) across the pages,
- * in page order, stopping at `limit` matches.
+ * in page order, stopping at MAX_SEARCH_RESULTS matches.
  */
-export function findMatches(
-  pages: PageText[],
-  query: string,
-  limit: number = MAX_SEARCH_RESULTS,
-): SearchResults {
+export function findMatches(pages: PageText[], query: string): SearchResults {
   const matches: SearchMatch[] = [];
   if (!query) return { matches, truncated: false };
 
   for (const page of pages) {
     let from = page.text.indexOf(query);
     while (from !== -1) {
-      if (matches.length === limit) return { matches, truncated: true };
+      if (matches.length === MAX_SEARCH_RESULTS) return { matches, truncated: true };
       const ranges = toRanges(page, from, from + query.length);
       if (ranges.length > 0) {
         matches.push({

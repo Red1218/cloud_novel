@@ -58,8 +58,8 @@ export function BookmarkItem({ bookmark, isCurrent, onSelect, onRemove, onRename
       event.preventDefault();
       finishEditing(event.currentTarget.value, true);
     } else if (event.key === 'Escape') {
-      // Keep Escape from also closing the panel.
-      event.stopPropagation();
+      // Keep Escape from also closing the panel's dialog.
+      event.preventDefault();
       finishEditing(null, true);
     }
   };

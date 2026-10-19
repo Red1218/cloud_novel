@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import './ReaderToolbar.css';
 
 interface ReaderToolbarProps {
@@ -21,7 +20,7 @@ export function ReaderToolbar({
   onFitPage,
   onOpenReadingEnvironment,
 }: ReaderToolbarProps) {
-  const zoomPct = useMemo(() => Math.round(zoom * 100), [zoom]);
+  const zoomPct = Math.round(zoom * 100);
 
   return (
     <div className="reader-toolbar" role="toolbar" aria-label="Reader controls">

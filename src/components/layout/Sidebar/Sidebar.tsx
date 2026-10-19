@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { Icon, NavItem } from '@/components/ui';
-import { NAV_ITEMS } from '@/constants';
+import { Icon } from '@/components/ui/Icon/Icon';
+import { NavItem } from '@/components/ui/NavItem/NavItem';
+import { NAV_ITEMS } from '@/constants/navigation';
 import './Sidebar.css';
 
 interface SidebarProps {

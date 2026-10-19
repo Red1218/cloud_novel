@@ -1,5 +1,5 @@
 import { ROUTES } from './routes';
-import type { NavItemConfig } from '@/types';
+import type { NavItemConfig } from '@/types/nav';
 
 /**
  * Sidebar navigation items, ordered as they appear in the UI.

@@ -171,12 +171,7 @@ export function ReadingEnvironmentPanel({
   const openingMode = getOpeningMode(scaleMode);
 
   return (
-    <section
-      className="reading-environment"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="reading-environment-title"
-    >
+    <section className="reading-environment">
       <div className="reading-environment__handle" aria-hidden="true" />
 
       <header className="reading-environment__header">
@@ -336,5 +331,3 @@ export function ReadingEnvironmentPanel({
     </section>
   );
 }
-
-export type { ReadingPreset };

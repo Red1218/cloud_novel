@@ -1,5 +1,5 @@
 import { getDB } from '@/services/db';
-import type { Book, StoredBook } from '@/types';
+import type { Book, StoredBook } from '@/types/book';
 import type { ScaleMode } from '@/features/reader/types';
 
 /**

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PDFPageProxy, PageViewport } from 'pdfjs-dist';
 import { TextLayer } from 'pdfjs-dist/legacy/build/pdf.mjs';
-import type { TextContent } from '../../services/textLayerService';
+import type { TextContent } from '../../types';
 import { TextLayerHighlighter } from '../../search/services/textLayerHighlighter';
 import type { TextLayerHighlight } from '../../search/types';
 import './PdfTextLayer.css';

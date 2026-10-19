@@ -1,32 +1,24 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDocumentTitle, useLibrary } from '@/hooks';
-import { Icon, PageWrapper } from '@/components/ui';
-import { ROUTES } from '@/constants';
-import {
-  SectionHeader,
-  StatsCard,
-  SortDropdown,
-  BookGrid,
-  EmptyLibrary,
-  ImportButton,
-} from '@/components/library';
-import {
-  deriveContinueReadingBooks,
-  sortBooks,
-  deriveLibraryStats,
-  DEFAULT_SKELETON_COUNT,
-  type SortOption,
-} from '@/features/library/utils';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useLibrary } from '@/hooks/useLibrary';
+import { Icon } from '@/components/ui/Icon/Icon';
+import { PageWrapper } from '@/components/ui/PageWrapper/PageWrapper';
+import { ROUTES } from '@/constants/routes';
+import { SectionHeader } from '@/components/library/SectionHeader/SectionHeader';
+import { StatsCard } from '@/components/library/StatsCard/StatsCard';
+import { SortDropdown } from '@/components/library/SortDropdown/SortDropdown';
+import { BookGrid } from '@/components/library/BookGrid/BookGrid';
+import { EmptyLibrary } from '@/components/library/EmptyLibrary/EmptyLibrary';
+import { ImportButton } from '@/components/library/ImportButton/ImportButton';
+import { deriveContinueReadingBooks } from '@/features/library/utils/deriveContinueReadingBooks';
+import { sortBooks, type SortOption } from '@/features/library/utils/sortBooks';
+import { deriveLibraryStats } from '@/features/library/utils/deriveLibraryStats';
 
 import './LibraryPage.css';
 
-const SORT_MAP: Readonly<Record<string, SortOption>> = {
-  recent: 'recentlyAdded',
-  opened: 'lastOpened',
-  title: 'title',
-  author: 'author',
-};
+/** Number of skeleton cards to show while loading. */
+const SKELETON_COUNT = 6;
 
 /**
  * Library page composing the domain components.
@@ -70,14 +62,6 @@ export function LibraryPage() {
     { label: 'Finished', value: stats.finished, icon: <Icon name="finished" size={20} /> },
   ];
 
-  // Handle sort change from SortDropdown
-  const handleSortChange = (value: string) => {
-    const mappedSort = SORT_MAP[value];
-    if (mappedSort) {
-      setSortBy(mappedSort);
-    }
-  };
-
   // Loading skeleton
   if (isLoading) {
     return (
@@ -85,7 +69,7 @@ export function LibraryPage() {
         <section className="library-page__main">
           <SectionHeader title="All Books" subtitle="Loading library..." />
           <div className="book-grid book-grid--loading">
-            {Array.from({ length: DEFAULT_SKELETON_COUNT }).map((_, index) => (
+            {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
               <div key={`book-skeleton-${index}`} className="book-card book-card--skeleton">
                 <div className="book-card__cover-wrapper">
                   <div className="book-cover book-cover--skeleton" />
@@ -144,8 +128,8 @@ export function LibraryPage() {
         {books.length > 0 && (
           <div className="library-page__toolbar">
             <SortDropdown
-              value={Object.keys(SORT_MAP).find((key) => SORT_MAP[key] === sortBy)}
-              onChange={handleSortChange}
+              value={sortBy}
+              onChange={setSortBy}
             />
           </div>
         )}

@@ -2,20 +2,6 @@ import { useCallback, useRef, useEffect } from 'react';
 import { BookRepository } from '@/repositories/BookRepository';
 import type { ReadingStateUpdate } from '@/repositories/BookRepository';
 
-export type { ReadingStateUpdate };
-
-/**
- * Result of the useReadingState hook.
- */
-export interface UseReadingStateResult {
-  /** Immediately persist lastOpened (call when book is opened). */
-  touchLastOpened: () => Promise<void>;
-  /** Queue a debounced persistence update (500ms). */
-  queueUpdate: (update: ReadingStateUpdate) => void;
-  /** Immediately flush any pending updates. */
-  flush: () => Promise<void>;
-}
-
 /** Debounce delay in milliseconds. */
 const DEBOUNCE_MS = 500;
 
@@ -32,7 +18,7 @@ const DEBOUNCE_MS = 500;
  *
  * @param bookId - The UUID of the book being read
  */
-export function useReadingState(bookId: string | undefined): UseReadingStateResult {
+export function useReadingState(bookId: string | undefined) {
   const pendingUpdateRef = useRef<ReadingStateUpdate | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isFlushingRef = useRef(false);
@@ -143,6 +129,5 @@ export function useReadingState(bookId: string | undefined): UseReadingStateResu
   return {
     touchLastOpened,
     queueUpdate,
-    flush,
   };
 }

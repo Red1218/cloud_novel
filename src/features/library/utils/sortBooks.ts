@@ -1,4 +1,4 @@
-import type { Book } from '@/types';
+import type { Book } from '@/types/book';
 
 /**
  * Supported sort options for the library.

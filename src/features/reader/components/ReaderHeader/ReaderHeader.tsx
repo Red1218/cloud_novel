@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@/constants';
-import { BookmarkButton } from '../../bookmarks/components';
+import { ROUTES } from '@/constants/routes';
+import { BookmarkButton } from '@/features/reader/bookmarks/components/BookmarkButton/BookmarkButton';
 import './ReaderHeader.css';
 
 interface ReaderHeaderProps {
@@ -32,10 +31,6 @@ export function ReaderHeader({
 }: ReaderHeaderProps) {
   const navigate = useNavigate();
   const hasPages = totalPages > 0;
-  const pageText = useMemo(
-    () => (hasPages ? `${currentPage} / ${totalPages}` : ''),
-    [currentPage, hasPages, totalPages],
-  );
 
   return (
     <header className="reader-header">
@@ -120,7 +115,7 @@ export function ReaderHeader({
             </button>
 
             <span className="reader-header__page-info">
-              {pageText}
+              {currentPage} / {totalPages}
             </span>
 
             <button

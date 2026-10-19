@@ -4,8 +4,6 @@ import './ErrorBoundary.css';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
-  /** Optional custom fallback UI. If omitted, the default error card is shown. */
-  fallback?: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -44,10 +42,6 @@ export class ErrorBoundary extends Component<
 
   render(): ReactNode {
     if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-
       return (
         <div className="error-boundary" role="alert" aria-live="assertive">
           <div className="error-boundary__card">

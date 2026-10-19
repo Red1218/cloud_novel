@@ -13,6 +13,3 @@ export const ROUTES = {
   READER: '/reader',
   SETTINGS: '/settings',
 } as const;
-
-/** Union type of all valid route paths. */
-export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];

@@ -1,14 +1,16 @@
 import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDocumentTitle, useLibrary } from '@/hooks';
-import { PageWrapper } from '@/components/ui';
-import { ROUTES } from '@/constants';
-import { BookCover, BookGrid, EmptyLibrary, SectionHeader } from '@/components/library';
-import {
-  deriveContinueReadingBooks,
-  formatRelativeTime,
-  sortBooks,
-} from '@/features/library/utils';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useLibrary } from '@/hooks/useLibrary';
+import { PageWrapper } from '@/components/ui/PageWrapper/PageWrapper';
+import { ROUTES } from '@/constants/routes';
+import { BookCover } from '@/components/library/BookCover/BookCover';
+import { BookGrid } from '@/components/library/BookGrid/BookGrid';
+import { EmptyLibrary } from '@/components/library/EmptyLibrary/EmptyLibrary';
+import { SectionHeader } from '@/components/library/SectionHeader/SectionHeader';
+import { deriveContinueReadingBooks } from '@/features/library/utils/deriveContinueReadingBooks';
+import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
+import { sortBooks } from '@/features/library/utils/sortBooks';
 import './DashboardPage.css';
 
 const RECENTLY_ADDED_MAX = 4;

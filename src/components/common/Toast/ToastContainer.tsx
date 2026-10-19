@@ -1,4 +1,4 @@
-import type { ToastMessage } from '@/types';
+import type { ToastMessage } from '@/types/toast';
 import { Toast } from './Toast';
 import './ToastContainer.css';
 

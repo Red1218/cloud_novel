@@ -1,7 +1,6 @@
-import { useCallback } from 'react';
-import type { Book } from '@/types';
-import { formatRelativeTime } from '@/features/library/utils';
-import { BookCover } from '../BookCover';
+import type { Book } from '@/types/book';
+import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
+import { BookCover } from '@/components/library/BookCover/BookCover';
 import './BookCard.css';
 
 export interface BookCardProps {
@@ -23,18 +22,14 @@ export interface BookCardProps {
  * - SVGs have aria-hidden="true" unless informative
  */
 export function BookCard({ book, onOpen }: BookCardProps) {
-  const handleOpen = useCallback(() => {
-    if (onOpen) {
-      onOpen(book.id);
-    }
-  }, [book.id, onOpen]);
+  const handleOpen = () => onOpen?.(book.id);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleOpen();
     }
-  }, [handleOpen]);
+  };
 
   const lastOpenedText = formatRelativeTime(book.lastOpened);
 

@@ -1,5 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import type { StoredBook } from '@/types';
+import type { StoredBook } from '@/types/book';
 import type { Bookmark } from '@/features/reader/bookmarks/types';
 
 interface CloudNovelDBSchema extends DBSchema {

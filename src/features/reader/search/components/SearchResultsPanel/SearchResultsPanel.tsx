@@ -21,12 +21,7 @@ export function SearchResultsPanel({ matches, truncated, currentIndex, onSelect,
   const count = `${matches.length}${truncated ? '+' : ''}`;
 
   return (
-    <section
-      className="search-results"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="search-results-title"
-    >
+    <section className="search-results">
       <div className="search-results__handle" aria-hidden="true" />
 
       <header className="search-results__header">

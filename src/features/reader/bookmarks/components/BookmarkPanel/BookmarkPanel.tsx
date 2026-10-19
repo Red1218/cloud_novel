@@ -1,5 +1,5 @@
 import type { Bookmark } from '../../types';
-import { BookmarkItem } from '../BookmarkItem';
+import { BookmarkItem } from '@/features/reader/bookmarks/components/BookmarkItem/BookmarkItem';
 import './BookmarkPanel.css';
 
 interface BookmarkPanelProps {
@@ -23,12 +23,7 @@ interface BookmarkPanelProps {
  */
 export function BookmarkPanel({ bookmarks, currentPage, onSelect, onRemove, onRename, onClose }: BookmarkPanelProps) {
   return (
-    <section
-      className="bookmark-panel"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="bookmark-panel-title"
-    >
+    <section className="bookmark-panel">
       <div className="bookmark-panel__handle" aria-hidden="true" />
 
       <header className="bookmark-panel__header">

@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import './EmptyLibrary.css';
 
 export interface EmptyLibraryProps {
@@ -10,13 +9,6 @@ export interface EmptyLibraryProps {
   buttonText: string;
   /** Callback fired when the action button is clicked */
   onAction: () => void;
-  /** Optional icon or illustration node (falls back to a default if omitted) */
-  illustration?: ReactNode;
-  /** Optional secondary action */
-  secondaryAction?: {
-    text: string;
-    onClick: () => void;
-  };
 }
 
 /**
@@ -32,14 +24,11 @@ export function EmptyLibrary({
   description,
   buttonText,
   onAction,
-  illustration,
-  secondaryAction,
 }: EmptyLibraryProps) {
   return (
     <article className="empty-library" aria-labelledby="empty-library-title">
       <div className="empty-library__illustration">
-        {illustration || (
-          <svg
+        <svg
             width="64"
             height="64"
             viewBox="0 0 24 24"
@@ -55,7 +44,6 @@ export function EmptyLibrary({
             <line x1="8" y1="7" x2="16" y2="7" />
             <line x1="8" y1="11" x2="12" y2="11" />
           </svg>
-        )}
       </div>
       <h2 id="empty-library-title" className="empty-library__title">
         {title}
@@ -71,15 +59,6 @@ export function EmptyLibrary({
         >
           {buttonText}
         </button>
-        {secondaryAction && (
-          <button
-            type="button"
-            className="empty-library__action empty-library__action--secondary"
-            onClick={secondaryAction.onClick}
-          >
-            {secondaryAction.text}
-          </button>
-        )}
       </div>
     </article>
   );

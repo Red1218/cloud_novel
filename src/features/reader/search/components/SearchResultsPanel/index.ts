@@ -1,1 +1,0 @@
-export { SearchResultsPanel } from './SearchResultsPanel';

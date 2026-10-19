@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import type { Book } from '@/types';
-import { BookCard } from '../BookCard';
+import type { Book } from '@/types/book';
+import { BookCard } from '@/components/library/BookCard/BookCard';
 import './BookGrid.css';
 
 export interface BookGridProps {
