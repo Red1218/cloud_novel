@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Cloud Novel</string>
+    <string name="title_activity_main">Cloud Novel</string>
+    <string name="package_name">com.cloud_novel.app</string>
+    <string name="custom_url_scheme">com.cloud_novel.app</string>
+</resources>

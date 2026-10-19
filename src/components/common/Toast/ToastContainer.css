@@ -1,6 +1,6 @@
 .toast-container {
   position: fixed;
-  top: var(--space-6);
+  top: calc(var(--space-6) + env(safe-area-inset-top));
   right: var(--space-6);
   display: flex;
   flex-direction: column;

@@ -89,6 +89,8 @@
     top: 0;
     left: 0;
     height: 100vh;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
     z-index: var(--z-sidebar);
     /* Drawer is off-screen by default (no transition = no animation). */
     transform: translateX(-100%);

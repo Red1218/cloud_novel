@@ -1,0 +1,7 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Open book (same path as the sidebar's "book" icon), padded into the adaptive-icon safe zone -->
+  <svg x="262" y="262" width="500" height="500" viewBox="0 0 24 24">
+    <path d="M12 6.5C10.3 5.2 8 4.5 5 4.5v13c3 0 5.3.7 7 2 1.7-1.3 4-2 7-2v-13c-3 0-5.3.7-7 2zm0 0v13"
+      fill="none" stroke="#6c8ef5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</svg>

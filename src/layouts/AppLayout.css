@@ -11,6 +11,12 @@
   grid-template-rows: 1fr;
   height: 100vh;
   overflow: hidden;
+  /* Keep content clear of the phone's status and navigation bars
+     (Android draws the app edge-to-edge); the strip behind the status
+     bar takes the header color. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background-color: var(--color-bg-header);
 }
 
 /* ---- Main column (header + scrollable content) ------------ */
