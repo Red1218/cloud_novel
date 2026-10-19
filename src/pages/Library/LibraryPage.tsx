@@ -1,155 +1,146 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { Book } from '@/types/book';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
-import { Icon } from '@/components/ui/Icon/Icon';
-import { PageWrapper } from '@/components/ui/PageWrapper/PageWrapper';
 import { ROUTES } from '@/constants/routes';
-import { SectionHeader } from '@/components/library/SectionHeader/SectionHeader';
-import { StatsCard } from '@/components/library/StatsCard/StatsCard';
-import { SortDropdown } from '@/components/library/SortDropdown/SortDropdown';
-import { BookGrid } from '@/components/library/BookGrid/BookGrid';
-import { EmptyLibrary } from '@/components/library/EmptyLibrary/EmptyLibrary';
-import { ImportButton } from '@/components/library/ImportButton/ImportButton';
-import { deriveContinueReadingBooks } from '@/features/library/utils/deriveContinueReadingBooks';
-import { sortBooks, type SortOption } from '@/features/library/utils/sortBooks';
-import { deriveLibraryStats } from '@/features/library/utils/deriveLibraryStats';
+import { BookCover } from '@/components/library/BookCover/BookCover';
+import { BookSpines } from '@/components/library/BookSpines/BookSpines';
+import { sortBooks } from '@/features/library/utils/sortBooks';
 
 import './LibraryPage.css';
 
-/** Number of skeleton cards to show while loading. */
-const SKELETON_COUNT = 6;
+type ReadState = 'new' | 'reading' | 'finished';
+type Filter = 'all' | ReadState;
+
+const FILTERS: ReadonlyArray<[Filter, string]> = [
+  ['all', 'All'],
+  ['reading', 'Reading'],
+  ['new', 'New'],
+  ['finished', 'Finished'],
+];
+
+function readState(book: Book): ReadState {
+  if (book.progress >= 100) return 'finished';
+  return book.progress > 0 ? 'reading' : 'new';
+}
 
 /**
- * Library page composing the domain components.
- * Integrates the useLibrary hook for IndexedDB persistence and PDF import.
+ * Library page: every book spine-out on one shelf, filtered by reading
+ * state; the selected spine opens a detail panel below.
  */
 export function LibraryPage() {
   useDocumentTitle('Library');
 
   const navigate = useNavigate();
   const { books, isLoading, isImporting, importBook } = useLibrary();
+  const [filter, setFilter] = useState<Filter>('all');
+  const [selectedId, setSelectedId] = useState<string>();
 
-  // Sorting state owned by LibraryPage
-  const [sortBy, setSortBy] = useState<SortOption>('recentlyAdded');
+  const ordered = useMemo(() => sortBooks(books, 'lastOpened'), [books]);
+  const counts = useMemo(() => {
+    const c: Record<Filter, number> = { all: books.length, new: 0, reading: 0, finished: 0 };
+    for (const book of books) c[readState(book)]++;
+    return c;
+  }, [books]);
 
-  // Derive statistics (single O(n) pass)
-  const stats = useMemo(() => deriveLibraryStats(books), [books]);
+  const visible = filter === 'all' ? ordered : ordered.filter((b) => readState(b) === filter);
+  const selected = visible.find((b) => b.id === selectedId) ?? visible[0];
 
-  // Derive continue reading books
-  const continueReadingBooks = useMemo(
-    () => deriveContinueReadingBooks(books),
-    [books]
+  const importButton = (
+    <button type="button" className="spines-page__import" onClick={importBook} disabled={isImporting}>
+      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      {isImporting ? 'Importing…' : 'Import'}
+    </button>
   );
-
-  // Sort books for the main grid
-  const sortedBooks = useMemo(
-    () => sortBooks(books, sortBy),
-    [books, sortBy]
-  );
-
-  const handleOpenBook = useCallback(
-    (bookId: string) => {
-      navigate(`${ROUTES.READER}/${bookId}`);
-    },
-    [navigate]
-  );
-
-  // Format stats for display
-  const statItems = [
-    { label: 'Total Books', value: stats.totalBooks, icon: <Icon name="books" size={20} /> },
-    { label: 'Reading', value: stats.reading, icon: <Icon name="book" size={20} /> },
-    { label: 'Finished', value: stats.finished, icon: <Icon name="finished" size={20} /> },
-  ];
-
-  // Loading skeleton
-  if (isLoading) {
-    return (
-      <PageWrapper title="Library" description="All your books in one place.">
-        <section className="library-page__main">
-          <SectionHeader title="All Books" subtitle="Loading library..." />
-          <div className="book-grid book-grid--loading">
-            {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-              <div key={`book-skeleton-${index}`} className="book-card book-card--skeleton">
-                <div className="book-card__cover-wrapper">
-                  <div className="book-cover book-cover--skeleton" />
-                </div>
-                <div className="book-card__info">
-                  <div className="book-card__skeleton-text book-card__skeleton-text--title" />
-                  <div className="book-card__skeleton-text book-card__skeleton-text--author" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </PageWrapper>
-    );
-  }
 
   return (
-    <PageWrapper title="Library" description="All your books in one place.">
-      {/* 1. Statistics Row */}
+    <div className="spines-page">
+      <header className="spines-page__header">
+        <div>
+          <h1 className="spines-page__title">Library</h1>
+          {!isLoading && (
+            <p className="spines-page__meta">
+              {counts.all} {counts.all === 1 ? 'book' : 'books'} · {counts.reading} reading · {counts.finished} finished
+            </p>
+          )}
+        </div>
+        {importButton}
+      </header>
+
+      {!isLoading && books.length === 0 && (
+        <div className="spines-page__empty">
+          <p className="spines-page__empty-title">Nothing on the shelf yet</p>
+          <p>Import a PDF and it stays on this device. Your page, zoom and bookmarks are remembered for every book.</p>
+        </div>
+      )}
+
       {books.length > 0 && (
-        <section className="library-page__stats" aria-label="Library statistics">
-          {statItems.map((stat) => (
-            <StatsCard
-              key={stat.label}
-              label={stat.label}
-              value={stat.value}
-              icon={stat.icon}
-            />
-          ))}
-        </section>
-      )}
-
-      {/* 2. Continue Reading Section */}
-      {continueReadingBooks.length > 0 && (
-        <section className="library-page__continue-reading" aria-labelledby="continue-reading-heading">
-          <SectionHeader
-            id="continue-reading-heading"
-            title="Continue Reading"
-            subtitle="Continue where you left off"
-          />
-          <BookGrid
-            books={continueReadingBooks}
-            onOpenBook={handleOpenBook}
-          />
-        </section>
-      )}
-
-      {/* 3. Main Library Area */}
-      <section className="library-page__main" aria-labelledby="all-books-heading">
-        <SectionHeader
-          id="all-books-heading"
-          title="All Books"
-          subtitle={`${books.length} book${books.length !== 1 ? 's' : ''}`}
-        />
-
-        {books.length > 0 && (
-          <div className="library-page__toolbar">
-            <SortDropdown
-              value={sortBy}
-              onChange={setSortBy}
-            />
+        <>
+          <div className="spines-page__filters" role="group" aria-label="Filter books">
+            {FILTERS.map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className="spines-page__chip"
+                aria-pressed={filter === id}
+                onClick={() => setFilter(id)}
+              >
+                {label} <span className="spines-page__chip-count">{counts[id]}</span>
+              </button>
+            ))}
           </div>
-        )}
 
-        <BookGrid
-          books={sortedBooks}
-          onOpenBook={handleOpenBook}
-          emptyState={
-            <EmptyLibrary
-              title="Your library is empty"
-              description="Import your first PDF to start building your personal library. Your books are stored locally in your browser."
-              buttonText={isImporting ? 'Importing...' : 'Import PDF'}
-              onAction={importBook}
-            />
-          }
-        />
-      </section>
+          <BookSpines books={visible} selectedId={selected?.id} onSelect={setSelectedId} />
 
-      {/* 4. Global Actions */}
-      <ImportButton onImport={importBook} />
-    </PageWrapper>
+          {selected ? (
+            <BookDetail book={selected} onOpen={() => navigate(`${ROUTES.READER}/${selected.id}`)} />
+          ) : (
+            <p className="spines-page__none">No books here yet.</p>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function BookDetail({ book, onOpen }: { book: Book; onOpen: () => void }) {
+  const state = readState(book);
+  const progress = Math.round(book.progress);
+  const pages = `${book.pageCount} ${book.pageCount === 1 ? 'page' : 'pages'}`;
+  const status =
+    state === 'new' ? `Not started · ${pages}`
+    : state === 'finished' ? `Finished · ${pages}`
+    : `Page ${book.currentPage ?? 1} of ${book.pageCount}`;
+  const action = state === 'new' ? 'Start reading' : state === 'finished' ? 'Read again' : 'Continue reading';
+
+  return (
+    <section className="spines-page__detail" aria-label="Selected book">
+      <div className="spines-page__cover">
+        <BookCover src={book.thumbnail} title={book.title} />
+      </div>
+      <div className="spines-page__info">
+        <h2 className="spines-page__book-title">{book.title}</h2>
+        {book.author && <p className="spines-page__author">{book.author}</p>}
+        <div className="spines-page__progress">
+          <div
+            className="spines-page__bar"
+            role="progressbar"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Reading progress: ${progress}%`}
+          >
+            <div style={{ width: `${progress}%` }} />
+          </div>
+          <span className="spines-page__status">{status}</span>
+        </div>
+        <button type="button" className="spines-page__open" onClick={onOpen}>
+          {action}
+        </button>
+      </div>
+    </section>
   );
 }

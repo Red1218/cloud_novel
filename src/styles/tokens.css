@@ -40,6 +40,13 @@
   --color-warning:          #f6ad55;
   --color-info:             #63b3ed;
 
+  /* Paper (library spines page) */
+  --paper-bg:     #f2ede3;
+  --paper-ink:    #1f1b16;
+  --paper-muted:  #5f574b;
+  --paper-line:   #d9d1c2;
+  --paper-accent: #23395b;
+
   /* Search highlights (drawn over the page, so translucent) */
   --color-search-highlight:          rgba(255, 214, 10, 0.35);
   --color-search-highlight-selected: rgba(255, 149, 0, 0.6);

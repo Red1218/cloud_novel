@@ -1,48 +1,219 @@
-/* The page wrapper provides basic spacing. We just need to layout the stats row. */
+/* ==============================================================
+   LIBRARY — spines on paper
+   The page repaints its scroll area (and, on mobile, the top bar)
+   in paper so it reads as one surface.
+   ============================================================== */
 
-.library-page__stats {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
-  width: 100%;
+.app-content:has(.spines-page) {
+  background: var(--paper-bg);
+  color: var(--paper-ink);
 }
 
-/* Continue Reading Section */
-.library-page__continue-reading {
+.app-main:has(.spines-page) .header {
+  background: var(--paper-bg);
+  border-bottom-color: var(--paper-line);
+}
+
+.app-main:has(.spines-page) .header__brand,
+.app-main:has(.spines-page) .header__menu-btn {
+  color: var(--paper-ink);
+}
+
+.app-main:has(.spines-page) .header__menu-btn:hover {
+  background-color: var(--paper-line);
+}
+
+.spines-page {
+  max-width: 720px;
+}
+
+/* ---- Header ---- */
+
+.spines-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.spines-page__title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 46px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.spines-page__meta {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  color: var(--paper-muted);
+}
+
+/* Pill buttons: outlined (Import) and filled (open book) */
+.spines-page__import,
+.spines-page__chip,
+.spines-page__open {
+  height: 44px;
+  border-radius: 22px;
+  font-family: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.spines-page__import {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  border: 1.5px solid var(--paper-ink);
+  background: none;
+  color: var(--paper-ink);
+  font-size: 15px;
+}
+
+.spines-page__import:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---- Filters ---- */
+
+.spines-page__filters {
+  display: flex;
+  gap: var(--space-2);
+  margin: 18px 0 22px;
+  overflow-x: auto;
+}
+
+.spines-page__chip {
+  flex-shrink: 0;
+  padding: 0 12px;
+  border: 1.5px solid #cfc5b3;
+  background: none;
+  color: var(--paper-ink);
+  font-size: 14px;
+}
+
+.spines-page__chip[aria-pressed='true'] {
+  border-color: var(--paper-ink);
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+}
+
+.spines-page__chip-count {
+  font-weight: var(--font-weight-medium);
+  opacity: 0.7;
+}
+
+/* ---- Selected book ---- */
+
+.spines-page__detail {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-top: 28px;
+}
+
+.spines-page__cover {
+  flex-shrink: 0;
+  width: 72px;
+}
+
+.spines-page__info {
+  flex-grow: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  width: 100%;
-  margin-bottom: var(--space-10);
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid var(--color-border);
 }
 
-.library-page__main {
+.spines-page__book-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.spines-page__author {
+  margin-top: var(--space-1);
+  font-size: 14px;
+  color: var(--paper-muted);
+}
+
+.spines-page__progress {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  width: 100%;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--space-3);
 }
 
-.library-page__toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-4);
+.spines-page__bar {
+  flex-grow: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--paper-line);
+  overflow: hidden;
 }
 
-/* Tablet Layout */
+.spines-page__bar > div {
+  height: 100%;
+  background: var(--paper-accent);
+}
+
+.spines-page__status {
+  font-size: 13px;
+  color: var(--paper-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.spines-page__open {
+  align-self: stretch;
+  margin-top: 14px;
+  border: none;
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+  font-size: 15px;
+}
+
+.spines-page__import:focus-visible,
+.spines-page__chip:focus-visible,
+.spines-page__open:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: 2px;
+}
+
 @media (min-width: 768px) {
-  .library-page__stats {
-    grid-template-columns: repeat(3, 1fr);
+  .spines-page__open {
+    align-self: flex-start;
+    padding: 0 28px;
   }
 }
 
-/* Desktop Layout */
-@media (min-width: 1024px) {
-  .library-page__stats {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
-  }
+/* ---- Empty states ---- */
+
+.spines-page__empty {
+  margin-top: var(--space-8);
+  padding: var(--space-5);
+  border: 1.5px dashed #cfc5b3;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: var(--line-height-base);
+  color: var(--paper-muted);
+}
+
+.spines-page__empty-title {
+  margin-bottom: var(--space-1);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--font-size-xl);
+  color: var(--paper-ink);
+}
+
+.spines-page__none {
+  margin-top: var(--space-6);
+  font-size: 14px;
+  color: var(--paper-muted);
 }

@@ -94,12 +94,12 @@
     z-index: var(--z-sidebar);
     /* Drawer is off-screen by default (no transition = no animation). */
     transform: translateX(-100%);
-    box-shadow: var(--shadow-xl);
   }
 
   /* When open: bring drawer on-screen instantly */
   .sidebar--open {
     transform: translateX(0);
+    box-shadow: var(--shadow-xl); /* only when open, or it bleeds onto the page edge */
   }
 
   /* Backdrop: hidden by default */
