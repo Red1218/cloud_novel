@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
 import { ROUTES } from '@/constants/routes';
-import { BookCover } from '@/components/library/BookCover/BookCover';
+import { ShelfRail } from '@/components/library/BookShelves/ShelfRail';
 import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
 import { TurningShelf } from '@/components/library/TurningShelf/TurningShelf';
 import { openLabel } from '@/features/library/utils/readingStatus';
@@ -24,7 +24,7 @@ export function DashboardPage() {
 
   const navigate = useNavigate();
   const library = useLibrary();
-  const { books, isLoading, isImporting, importBooks } = library;
+  const { books, isLoading } = library;
 
   // Books in progress (last read first), topped up with unread recent imports.
   const nowShelf = useMemo(() => {
@@ -45,18 +45,13 @@ export function DashboardPage() {
     <div className="home paper-page">
       <header className="paper-header">
         <h1 className="paper-title">Home</h1>
-        <button type="button" className="pill pill--outline" onClick={importBooks} disabled={isImporting}>
-          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          {isImporting ? 'Importing…' : 'Import'}
-        </button>
       </header>
 
       {!isLoading && books.length === 0 && (
         <div className="paper-note">
           <p className="paper-note__title">Nothing on your shelf yet</p>
-          <p>Import a PDF and it stays on this device: no account, no upload. Your page, zoom and bookmarks are remembered for every book.</p>
+          <p>Add PDFs in your Library: they stay on this device, with no account and no upload. Your page, zoom and bookmarks are remembered for every book.</p>
+          <Link to={ROUTES.LIBRARY} className="pill pill--filled home__to-library">Go to Library</Link>
         </div>
       )}
 
@@ -100,19 +95,7 @@ export function DashboardPage() {
               See all {books.length}
             </Link>
           </div>
-          <div className="home__shelf">
-            {recentlyAdded.map((book) => (
-              <button
-                key={book.id}
-                type="button"
-                className="home__shelf-book"
-                onClick={() => openBook(book.id)}
-                aria-label={book.author ? `${book.title}, ${book.author}` : book.title}
-              >
-                <BookCover src={book.thumbnail} title={book.title} />
-              </button>
-            ))}
-          </div>
+          <ShelfRail books={recentlyAdded} label="Recently added" onPick={openBook} />
         </section>
       )}
       <ImportGroupPrompt

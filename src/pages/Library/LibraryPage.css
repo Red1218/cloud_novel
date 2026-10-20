@@ -2,42 +2,30 @@
    LIBRARY — glass shelves (shared pieces live in globals.css)
    ============================================================== */
 
-/* ---- Books | Collections switch ---- */
-
-.spines-page__views {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 360px;
-  margin-top: 18px;
-  padding: 3px;
-  border-radius: 24px;
-  background: var(--paper-tint);
-}
-
-.spines-page__view {
-  min-height: 44px;
-  border: none;
-  border-radius: 22px;
-  background: none;
-  color: var(--paper-ink);
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-}
-
-.spines-page__view[aria-selected='true'] {
-  background: var(--paper-fill);
-  color: var(--paper-on-fill);
-}
-
 /* ---- Filters ---- */
 
 .spines-page__filters {
+  position: relative; /* chips' offsetLeft is measured from the row */
   display: flex;
+  align-items: center;
   gap: var(--space-2);
-  margin: 18px 0 22px;
+  /* scrolls edge to edge, like the shelves */
+  margin: var(--space-4) calc(-1 * var(--page-gutter, 0px)) var(--space-4);
+  padding: 2px var(--page-gutter, 0px);
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.spines-page__filters::-webkit-scrollbar {
+  display: none;
+}
+
+.spines-page__chip-divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 24px;
+  margin-inline: var(--space-1);
+  background: var(--paper-edge);
 }
 
 .spines-page__chip {
@@ -59,42 +47,54 @@
   opacity: 0.7;
 }
 
-/* ---- Header: "My favourite BOOKS" ---- */
+/* ---- Header: one row, title and meta left, round Import right ---- */
 
 .library-hero {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  text-align: center;
+  justify-content: space-between;
+  gap: var(--space-3);
 }
 
-.library-hero__eyebrow {
-  font-family: var(--font-family-mono);
-  font-size: 12px;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--paper-muted);
+.library-hero__text {
+  min-width: 0;
 }
 
 .library-hero__title {
-  padding-left: 0.14em; /* balances the trailing letter-spacing */
   font-family: var(--font-family-display);
-  font-size: 64px;
+  font-size: 32px;
   font-weight: var(--font-weight-bold);
-  line-height: 1;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  line-height: 1.1;
   color: var(--paper-ink);
-  text-shadow: 0 0 calc(24px * var(--glow)) color-mix(in srgb, var(--paper-accent) 45%, transparent);
+  /* glows on the dark palettes only */
+  text-shadow: 0 0 calc(20px * var(--text-glow, var(--glow))) color-mix(in srgb, var(--paper-accent) 45%, transparent);
 }
 
 .library-hero__meta {
-  font-family: var(--font-family-mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--paper-accent);
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--paper-muted);
+}
+
+.library-hero__import {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
+  box-shadow: 0 0 calc(16px * var(--glow)) color-mix(in srgb, var(--paper-fill) 55%, transparent);
+}
+
+.library-hero__import:disabled {
+  opacity: 0.5;
+}
+
+.library-hero__import:focus-visible {
+  outline-color: var(--paper-accent);
 }
 
 .library-hero__new-shelf {
@@ -142,22 +142,38 @@
 }
 
 .collections-view__shelf {
+  position: relative;
   flex-shrink: 0;
   display: flex;
   align-items: flex-end;
-  gap: 2px;
-  width: 84px;
-  height: 60px;
-  box-sizing: border-box;
-  padding: 0 4px;
-  border-bottom: 2px solid var(--paper-ink);
+  gap: 4px;
+  width: 92px;
+  height: 64px;
+  padding: 0 4px 6px;
 }
 
-.collections-view__spine {
+.collections-view__cover {
   flex-shrink: 0;
-  width: 13px;
-  border-radius: 2px 2px 0 0;
-  box-shadow: inset 1.5px 0 0 rgba(255, 255, 255, 0.14), inset -1.5px 0 0 rgba(0, 0, 0, 0.18);
+  width: 26px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.collections-view__cover .book-cover {
+  border-radius: 2px;
+}
+
+.collections-view__cover .book-cover--placeholder {
+  padding: 2px;
+}
+
+.collections-view__cover .book-cover__placeholder-text {
+  font-size: 6px;
+}
+
+.collections-view__shelf .glass-shelf {
+  bottom: 0;
+  height: 18px;
+  border-radius: 3px;
 }
 
 .collections-view__text {
@@ -179,10 +195,6 @@
 .collections-view__meta {
   font-size: 13px;
   color: var(--paper-muted);
-}
-
-.collections-view__first {
-  margin-top: var(--space-3);
 }
 
 .collections-view__row:focus-visible,
