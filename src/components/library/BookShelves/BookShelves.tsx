@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
-import { BookCover } from '@/components/library/BookCover/BookCover';
 import type { Shelf } from '@/features/library/utils/shelves';
-import './BookShelves.css';
+import { ShelfRail } from './ShelfRail';
 
 export interface BookShelvesProps {
   shelves: readonly Shelf[];
@@ -65,40 +64,12 @@ export function BookShelves({ shelves, editing, onEdit, onRename, onDelete, onPi
             </div>
           )}
 
-          <div className="shelf__rail">
-            <div className="shelf__row">
-              {shelf.books.map((book) => (
-                <button
-                  key={book.id}
-                  type="button"
-                  className="shelf__book"
-                  aria-label={book.author ? `${book.title}, ${book.author}` : book.title}
-                  onClick={() => onPick(book.id)}
-                >
-                  <BookCover src={book.thumbnail} title={book.title} />
-                </button>
-              ))}
-              {shelf.books.length === 0 && <p className="shelf__empty">Empty. Tap a book and move it here.</p>}
-            </div>
-            <span className="shelf__glass" aria-hidden="true" />
-            {shelf.books.length > 1 &&
-              ([-1, 1] as const).map((dir) => (
-                <button
-                  key={dir}
-                  type="button"
-                  className={`shelf__arrow shelf__arrow--${dir < 0 ? 'prev' : 'next'}`}
-                  aria-label={dir < 0 ? `Scroll ${shelf.name} back` : `Scroll ${shelf.name} on`}
-                  onClick={(e) => {
-                    const row = e.currentTarget.parentElement?.querySelector('.shelf__row');
-                    row?.scrollBy({ left: dir * row.clientWidth * 0.8, behavior: 'smooth' });
-                  }}
-                >
-                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d={dir < 0 ? 'm15 6-6 6 6 6' : 'm9 6 6 6-6 6'} />
-                  </svg>
-                </button>
-              ))}
-          </div>
+          <ShelfRail
+            books={shelf.books}
+            label={shelf.name}
+            onPick={onPick}
+            empty="Empty. Tap a book and move it here."
+          />
         </section>
       ))}
     </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
@@ -10,6 +10,7 @@ import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportG
 import { sortBooks } from '@/features/library/utils/sortBooks';
 import { readState, type ReadState } from '@/features/library/utils/readingStatus';
 import { DEFAULT_SHELF, deriveShelves, freeShelfName, loadShelfOrder, saveShelfOrder } from '@/features/library/utils/shelves';
+import { deriveCollections, type CollectionKind } from '@/features/library/utils/collections';
 import { CollectionsView } from './CollectionsView';
 
 import './LibraryPage.css';
@@ -23,18 +24,29 @@ const FILTERS: ReadonlyArray<[Filter, string]> = [
   ['finished', 'Finished'],
 ];
 
+const KINDS: ReadonlyArray<[CollectionKind, string]> = [
+  ['series', 'Series'],
+  ['author', 'Authors'],
+  ['genre', 'Genres'],
+];
+
+const isKind = (v: string | null): v is CollectionKind => v === 'series' || v === 'author' || v === 'genre';
+
 /**
- * Library page. Books: face-out on glass shelves the reader names and fills
- * (all on one shelf to start), filtered by reading state; a tapped book opens
- * its sheet. Collections:
- * series, authors and genres (?view=collections, so Back returns to it).
+ * Library page: a one-row header, then one scrolling row of chips. The
+ * reading-state chips show books face-out on glass shelves the reader names
+ * and fills (all on one shelf to start); a tapped book opens its sheet. The
+ * Series, Authors and Genres chips list collections (?view=series etc., so
+ * Back returns to it).
  */
 export function LibraryPage() {
   useDocumentTitle('Library');
 
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const view = params.get('view') === 'collections' ? 'collections' : 'books';
+  const viewParam = params.get('view');
+  // ?view=collections is the old link to the collections tab
+  const kind: CollectionKind | undefined = viewParam === 'collections' ? 'series' : isKind(viewParam) ? viewParam : undefined;
   const library = useLibrary();
   const { books, isLoading, isImporting, importBooks } = library;
   const [filter, setFilter] = useState<Filter>('all');
@@ -56,6 +68,17 @@ export function LibraryPage() {
   const shelves = deriveShelves(visible, shelfOrder).filter((s) => filter === 'all' || s.books.length > 0);
   const picked = books.find((b) => b.id === pickedId);
   const editing = books.find((b) => b.id === editingId);
+  const collections = useMemo(() => deriveCollections(books), [books]);
+  const chipsRef = useRef<HTMLDivElement>(null);
+
+  // Keep the selected chip in sight (Series and the rest start off-screen).
+  useEffect(() => {
+    const row = chipsRef.current;
+    const chip = row?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (row && chip) row.scrollTo({ left: chip.offsetLeft - row.clientWidth / 2 + chip.offsetWidth / 2 });
+  }, [kind, filter, books.length]);
+  const kindCounts: Record<CollectionKind, number> = { series: 0, author: 0, genre: 0 };
+  for (const c of collections) kindCounts[c.kind]++;
 
   const saveOrder = (next: string[]) => {
     setShelfOrder(next);
@@ -96,69 +119,76 @@ export function LibraryPage() {
     );
   };
 
-  const setView = (next: 'books' | 'collections') =>
-    setParams(next === 'collections' ? { view: 'collections' } : {}, { replace: true });
+  const showBooks = (next: Filter) => {
+    setFilter(next);
+    if (kind) setParams({}, { replace: true });
+  };
+  const showKind = (next: CollectionKind) => setParams({ view: next }, { replace: true });
 
   return (
     <div className="spines-page paper-page">
       <header className="library-hero">
-        <p className="library-hero__eyebrow">My favourite</p>
-        <h1 className="library-hero__title">Books</h1>
-        {!isLoading && (
-          <p className="library-hero__meta">
-            {counts.all} {counts.all === 1 ? 'book' : 'books'} · {allShelves.length} {allShelves.length === 1 ? 'shelf' : 'shelves'} · {counts.reading} reading
-          </p>
-        )}
-        <button type="button" className="pill pill--outline" onClick={importBooks} disabled={isImporting}>
-          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+        <div className="library-hero__text">
+          <h1 className="library-hero__title">Library</h1>
+          {!isLoading && (
+            <p className="library-hero__meta">
+              {counts.all} {counts.all === 1 ? 'book' : 'books'}, {counts.reading} reading
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          className="library-hero__import"
+          onClick={importBooks}
+          disabled={isImporting}
+          aria-label={isImporting ? 'Importing PDFs' : 'Import PDFs'}
+          title="Import PDFs"
+        >
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
             <path d="M12 5v14M5 12h14" />
           </svg>
-          {isImporting ? 'Importing…' : 'Import'}
         </button>
       </header>
 
       {!isLoading && books.length === 0 && (
         <div className="paper-note">
           <p className="paper-note__title">Nothing on the shelf yet</p>
-          <p>Import a PDF and it stays on this device. Your page, zoom and bookmarks are remembered for every book.</p>
+          <p>Tap + to import a PDF. It stays on this device, and your page, zoom and bookmarks are remembered for every book.</p>
         </div>
       )}
 
       {books.length > 0 && (
         <>
-          <div className="spines-page__views" role="tablist" aria-label="Library view">
-            {(['books', 'collections'] as const).map((id) => (
+          <div ref={chipsRef} className="spines-page__filters" role="group" aria-label="Show">
+            {FILTERS.map(([id, label]) => (
               <button
                 key={id}
                 type="button"
-                role="tab"
-                aria-selected={view === id}
-                className="spines-page__view"
-                onClick={() => setView(id)}
+                className="pill spines-page__chip"
+                aria-pressed={!kind && filter === id}
+                onClick={() => showBooks(id)}
               >
-                {id === 'books' ? 'Books' : 'Collections'}
+                {label} <span className="spines-page__chip-count">{counts[id]}</span>
+              </button>
+            ))}
+            <span className="spines-page__chip-divider" aria-hidden="true" />
+            {KINDS.map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className="pill spines-page__chip"
+                aria-pressed={kind === id}
+                onClick={() => showKind(id)}
+              >
+                {label} <span className="spines-page__chip-count">{kindCounts[id]}</span>
               </button>
             ))}
           </div>
 
-          {view === 'collections' ? (
-            <CollectionsView books={books} onAddFirst={() => setView('books')} />
+          {kind ? (
+            <CollectionsView books={books} collections={collections.filter((c) => c.kind === kind)} kind={kind} />
           ) : (
             <>
-              <div className="spines-page__filters" role="group" aria-label="Filter books">
-                {FILTERS.map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    className="pill spines-page__chip"
-                    aria-pressed={filter === id}
-                    onClick={() => setFilter(id)}
-                  >
-                    {label} <span className="spines-page__chip-count">{counts[id]}</span>
-                  </button>
-                ))}
-              </div>
-
               {visible.length === 0 ? (
                 <p className="spines-page__none">No books here yet.</p>
               ) : (

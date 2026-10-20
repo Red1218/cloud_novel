@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
 import { ROUTES } from '@/constants/routes';
-import { BookSpines } from '@/components/library/BookSpines/BookSpines';
+import { ShelfRail } from '@/components/library/BookShelves/ShelfRail';
 import { BookCollectionsSheet } from '@/components/library/BookCollectionsSheet/BookCollectionsSheet';
 import { findCollection, titleInSeries, type CollectionKind } from '@/features/library/utils/collections';
 import { readState, statusText } from '@/features/library/utils/readingStatus';
@@ -15,7 +15,8 @@ const isKind = (k: string | undefined): k is CollectionKind => k === 'series' ||
 type Order = 'number' | 'added';
 
 /**
- * One series, author or genre: its books on a shelf and in a list. A series
+ * One series, author or genre: its books face-out on a glass shelf and in a
+ * list; tapping either opens the book. A series
  * reads in book-number order (switchable to date added) and offers to
  * continue with the next unfinished book.
  */
@@ -25,7 +26,6 @@ export function CollectionPage() {
   const library = useLibrary();
   const { books, isLoading } = library;
   const [order, setOrder] = useState<Order>('number');
-  const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string>();
 
   const collection = useMemo(
@@ -50,11 +50,11 @@ export function CollectionPage() {
   const open = (id: string) => navigate(`${ROUTES.READER}/${id}`);
 
   const back = (
-    <Link to={`${ROUTES.LIBRARY}?view=collections`} className="collection__back" aria-label="Back to collections">
+    <Link to={`${ROUTES.LIBRARY}?view=${isKind(kind) ? kind : 'series'}`} className="collection__back" aria-label="Back to the library">
       <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M19 12H5M11 6l-6 6 6 6" />
       </svg>
-      Collections
+      Library
     </Link>
   );
 
@@ -85,7 +85,7 @@ export function CollectionPage() {
       <p className="paper-meta">{meta}</p>
 
       <div className="collection__shelf">
-        <BookSpines books={ordered} selectedId={selectedId ?? next?.id} onSelect={setSelectedId} />
+        <ShelfRail books={ordered} label={title} onPick={open} />
       </div>
 
       {isSeries && (
@@ -103,7 +103,7 @@ export function CollectionPage() {
 
       <ol className="collection__list" role="list">
         {ordered.map((book) => (
-          <li key={book.id} className="collection__item" aria-current={book.id === selectedId ? 'true' : undefined}>
+          <li key={book.id} className="collection__item">
             {isSeries && (
               <span className={`collection__number${book.id === next?.id ? ' collection__number--next' : ''}`} aria-hidden="true">
                 {book.series?.number}

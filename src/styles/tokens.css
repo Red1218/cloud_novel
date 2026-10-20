@@ -212,5 +212,6 @@
   --paper-fill: #2a4dff; --paper-on-fill: #ffffff;
   --shelf-1: #2a4dff; --shelf-2: #ff6a2a; --shelf-3: #00a87f;
   --glow: 0.7;
+  --text-glow: 0;             /* glowing text blurs on a light page */
   --font-family-display: var(--font-family-base);
 }
