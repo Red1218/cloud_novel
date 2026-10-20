@@ -26,6 +26,7 @@ import { usePdfDocument } from '@/features/reader/hooks/usePdfDocument';
 import { usePdfRenderer } from '@/features/reader/hooks/usePdfRenderer';
 import { usePdfTextLayer } from '@/features/reader/hooks/usePdfTextLayer';
 import { useReader } from '@/features/reader/hooks/useReader';
+import { useReaderSwipe } from '@/features/reader/hooks/useReaderSwipe';
 import { useReaderBookmarks } from '@/features/reader/bookmarks/hooks/useReaderBookmarks';
 import { useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
 import { useReaderSearch } from '@/features/reader/search/hooks/useReaderSearch';
@@ -130,6 +131,7 @@ export function ReaderPage() {
     initialScaleMode: book?.scaleMode,
   });
   const { touchLastOpened } = reader;
+  useReaderSwipe(containerRef, { nextPage: reader.nextPage, previousPage: reader.previousPage });
   const loadedBookId = book?.id;
   const search = useReaderSearch(pdfDocument, reader.currentPage);
 
