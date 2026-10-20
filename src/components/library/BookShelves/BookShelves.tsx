@@ -52,7 +52,7 @@ export function BookShelves({ shelves, editing, onEdit, onRename, onDelete, onPi
             <div className="shelf__head">
               <span className="shelf__dot" aria-hidden="true" />
               <h2 className="shelf__name">{shelf.name}</h2>
-              <span className="shelf__count">{String(shelf.books.length).padStart(2, '0')}</span>
+              <span className="shelf__count">{shelf.books.length}</span>
               {shelf.custom && (
                 <button type="button" className="shelf__edit" aria-label={`Rename ${shelf.name}`} onClick={() => onEdit(shelf.name)}>
                   <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

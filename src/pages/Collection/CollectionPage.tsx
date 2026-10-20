@@ -74,7 +74,7 @@ export function CollectionPage() {
 
   const authors = new Set(collection.books.map((b) => b.author).filter(Boolean));
   const count = `${collection.books.length} ${collection.books.length === 1 ? 'book' : 'books'}`;
-  const meta = isSeries && authors.size === 1 ? `${[...authors][0]} · ${count}` : count;
+  const meta = isSeries && authors.size === 1 ? `${[...authors][0]}, ${count}` : count;
 
   return (
     <div className="collection paper-page">
@@ -112,7 +112,7 @@ export function CollectionPage() {
             <button type="button" className="collection__book" onClick={() => open(book.id)}>
               <span className="collection__book-title">{isSeries ? titleInSeries(book) : book.title}</span>
               <span className="collection__book-status">
-                {isSeries || !book.author || collection.kind === 'author' ? statusText(book) : `${book.author} · ${statusText(book)}`}
+                {isSeries || !book.author || collection.kind === 'author' ? statusText(book) : `${book.author}, ${statusText(book)}`}
               </span>
             </button>
             <button
@@ -136,7 +136,7 @@ export function CollectionPage() {
 
       {next && (
         <button type="button" className="pill pill--filled collection__continue" onClick={() => open(next.id)}>
-          {readState(next) === 'reading' ? 'Continue' : 'Start'} book {next.series?.number} · {titleInSeries(next)}
+          {readState(next) === 'reading' ? 'Continue' : 'Start'} book {next.series?.number}: {titleInSeries(next)}
         </button>
       )}
 

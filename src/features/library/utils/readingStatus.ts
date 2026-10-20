@@ -7,12 +7,12 @@ export function readState(book: Book): ReadState {
   return book.progress > 0 ? 'reading' : 'new';
 }
 
-/** "Not started · 212 pages", "Page 7 of 212", "Finished · 212 pages" */
+/** "Not started, 212 pages", "Page 7 of 212", "Finished, 212 pages" */
 export function statusText(book: Book): string {
   const pages = `${book.pageCount} ${book.pageCount === 1 ? 'page' : 'pages'}`;
   const state = readState(book);
-  if (state === 'new') return `Not started · ${pages}`;
-  if (state === 'finished') return `Finished · ${pages}`;
+  if (state === 'new') return `Not started, ${pages}`;
+  if (state === 'finished') return `Finished, ${pages}`;
   return `Page ${book.currentPage ?? 1} of ${book.pageCount}`;
 }
 

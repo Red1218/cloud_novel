@@ -33,8 +33,7 @@
 }
 
 .shelf__count {
-  font-family: var(--font-family-mono);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--paper-muted);
 }
 

@@ -63,7 +63,7 @@ export function DashboardPage() {
             <h3 className="home__current-title">{selected.title}</h3>
             <p className="home__author">
               {selected.author ?? 'Unknown author'}
-              {selected.lastOpened ? ` · read ${formatRelativeTime(selected.lastOpened)}` : ' · not started'}
+              {selected.lastOpened ? `, read ${formatRelativeTime(selected.lastOpened)}` : ', not started'}
             </p>
             <div className="paper-progress home__progress">
               <div
