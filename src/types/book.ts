@@ -37,6 +37,16 @@ export interface Book {
   zoom?: number;
   /** Last scale mode used (for persistence) */
   scaleMode?: ScaleMode;
+  /** The series this book belongs to (at most one), with its place in it */
+  series?: BookSeries;
+  /** Genres the reader filed this book under (any number) */
+  genres?: string[];
+}
+
+/** A book's place in a series: books are read in `number` order. */
+export interface BookSeries {
+  name: string;
+  number: number;
 }
 
 /**

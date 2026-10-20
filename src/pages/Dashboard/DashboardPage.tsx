@@ -4,6 +4,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
 import { ROUTES } from '@/constants/routes';
 import { BookCover } from '@/components/library/BookCover/BookCover';
+import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
 import { deriveContinueReadingBooks } from '@/features/library/utils/deriveContinueReadingBooks';
 import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
 import { sortBooks } from '@/features/library/utils/sortBooks';
@@ -19,7 +20,8 @@ export function DashboardPage() {
   useDocumentTitle('Home');
 
   const navigate = useNavigate();
-  const { books, isLoading, isImporting, importBooks } = useLibrary();
+  const library = useLibrary();
+  const { books, isLoading, isImporting, importBooks } = library;
 
   const [current, ...alsoReading] = useMemo(() => deriveContinueReadingBooks(books), [books]);
   const recentlyAdded = useMemo(
@@ -129,6 +131,12 @@ export function DashboardPage() {
           </div>
         </section>
       )}
+      <ImportGroupPrompt
+        books={books}
+        lastImportedIds={library.lastImportedIds}
+        onApply={library.applyCollectionUpdates}
+        onClose={library.clearLastImported}
+      />
     </div>
   );
 }

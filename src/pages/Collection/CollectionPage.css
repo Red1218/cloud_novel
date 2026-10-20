@@ -1,0 +1,180 @@
+/* One collection on paper (shared pieces live in globals.css) */
+
+.collection__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3) calc(-1 * var(--space-1));
+  padding: 0 var(--space-1);
+  color: var(--paper-ink);
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.collection__kind {
+  margin-bottom: var(--space-2);
+}
+
+.collection__title {
+  font-size: 38px;
+  overflow-wrap: anywhere;
+}
+
+.collection__shelf {
+  margin-top: 22px;
+}
+
+/* ---- Reading order switch (series) ---- */
+
+.collection__order {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: 24px;
+}
+
+.collection__order .paper-eyebrow {
+  margin-bottom: 0;
+}
+
+.collection__order-switch {
+  display: flex;
+  padding: 3px;
+  border-radius: 22px;
+  background: #e6dfd1;
+}
+
+.collection__order-switch button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 19px;
+  background: none;
+  color: var(--paper-ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.collection__order-switch button[aria-pressed='true'] {
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+}
+
+/* ---- Book list ---- */
+
+.collection__list {
+  margin-top: var(--space-2);
+}
+
+.collection__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 60px;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.collection__item[aria-current='true'] .collection__book-title {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.collection__number {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--paper-edge);
+  border-radius: 15px;
+  font-family: var(--font-family-display);
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.collection__number--next {
+  border-color: var(--paper-ink);
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+}
+
+.collection__book {
+  flex-grow: 1;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--paper-ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.collection__book-title {
+  font-family: var(--font-family-display);
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collection__book-status {
+  font-size: 13px;
+  color: var(--paper-muted);
+}
+
+.collection__edit {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 22px;
+  background: none;
+  color: var(--paper-muted);
+  cursor: pointer;
+}
+
+.collection__edit:hover {
+  background: rgba(31, 27, 22, 0.06);
+  color: var(--paper-ink);
+}
+
+.collection__hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--paper-muted);
+}
+
+.collection__continue {
+  width: 100%;
+  margin-top: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .collection__continue {
+    width: auto;
+    padding: 0 28px;
+  }
+}
+
+.collection__back:focus-visible,
+.collection__book:focus-visible,
+.collection__edit:focus-visible {
+  outline-color: var(--paper-accent);
+}

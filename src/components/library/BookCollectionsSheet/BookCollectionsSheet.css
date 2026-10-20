@@ -1,0 +1,239 @@
+/* Shared by the book collections sheet and the import grouping sheet:
+   a bottom sheet on phones, a centred panel on wider screens. */
+.collections-sheet {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--paper-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collections-sheet:not([open]) {
+  display: none;
+}
+
+.collections-sheet::backdrop {
+  background: rgba(31, 27, 22, 0.4);
+}
+
+.collections-sheet__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 64px);
+  box-sizing: border-box;
+  padding: var(--space-5);
+  overflow-y: auto;
+  border-radius: var(--radius-2xl);
+  background: var(--paper-bg);
+  box-shadow: 0 24px 60px rgba(31, 27, 22, 0.3);
+}
+
+.collections-sheet__handle {
+  display: none;
+}
+
+/* ---- Header ---- */
+
+.collections-sheet__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.collections-sheet__heading {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.collections-sheet__title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.collections-sheet__subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--paper-muted);
+}
+
+.collections-sheet__text-btn {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: none;
+  background: none;
+  color: var(--paper-muted);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.collections-sheet__done {
+  padding: 0 20px;
+}
+
+/* ---- Groups and options ---- */
+
+.collections-sheet__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.collections-sheet__group > .paper-eyebrow {
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.collections-sheet__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  border-bottom: 1px solid var(--paper-line);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.collections-sheet__option input,
+.collections-sheet input[type='radio'] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--paper-ink);
+}
+
+.collections-sheet__option > span:nth-of-type(1) {
+  flex-grow: 1;
+}
+
+.collections-sheet__option-meta {
+  font-size: 13px;
+  color: var(--paper-muted);
+}
+
+.collections-sheet__input {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 var(--space-3);
+  border: 1.5px solid var(--paper-edge);
+  border-radius: 10px;
+  background: #faf7f0;
+  color: var(--paper-ink);
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.collections-sheet__input:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: 0;
+}
+
+.collections-sheet__hint {
+  font-size: 13px;
+  color: var(--paper-muted);
+}
+
+.collections-sheet__number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  font-size: 15px;
+}
+
+.collections-sheet__stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.collections-sheet__stepper button {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--paper-edge);
+  border-radius: 22px;
+  background: none;
+  color: var(--paper-ink);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.collections-sheet__stepper span {
+  min-width: 32px;
+  text-align: center;
+  font-family: var(--font-family-display);
+  font-size: 20px;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Genre chips ---- */
+
+.collections-sheet__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.collections-sheet__chip {
+  padding: 0 14px;
+  border: 1.5px solid var(--paper-edge);
+  background: none;
+  color: var(--paper-ink);
+  font-size: 14px;
+}
+
+.collections-sheet__chip[aria-pressed='true'] {
+  border-color: var(--paper-ink);
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+}
+
+.collections-sheet__new-genre {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Phones: a bottom sheet */
+@media (max-width: 767px) {
+  .collections-sheet {
+    align-items: flex-end;
+  }
+
+  .collections-sheet__panel {
+    width: 100%;
+    max-height: calc(100dvh - 48px - env(safe-area-inset-top));
+    padding: var(--space-2) var(--space-4) max(var(--space-5), env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .collections-sheet__handle {
+    display: block;
+    align-self: center;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--paper-edge);
+  }
+}

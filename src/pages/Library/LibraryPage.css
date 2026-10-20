@@ -2,6 +2,35 @@
    LIBRARY — spines on paper (shared pieces live in globals.css)
    ============================================================== */
 
+/* ---- Books | Collections switch ---- */
+
+.spines-page__views {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 360px;
+  margin-top: 18px;
+  padding: 3px;
+  border-radius: 24px;
+  background: #e6dfd1;
+}
+
+.spines-page__view {
+  min-height: 44px;
+  border: none;
+  border-radius: 22px;
+  background: none;
+  color: var(--paper-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.spines-page__view[aria-selected='true'] {
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+}
+
 /* ---- Filters ---- */
 
 .spines-page__filters {
@@ -69,16 +98,113 @@
   margin-top: var(--space-3);
 }
 
-.spines-page__open {
-  align-self: stretch;
+.spines-page__memberships {
+  margin-top: var(--space-1);
+  font-size: 13px;
+  color: var(--paper-accent);
+}
+
+.spines-page__actions {
+  display: flex;
+  gap: var(--space-2);
   margin-top: 14px;
+}
+
+.spines-page__open {
+  flex-grow: 1;
 }
 
 @media (min-width: 768px) {
   .spines-page__open {
-    align-self: flex-start;
+    flex-grow: 0;
     padding: 0 28px;
   }
+}
+
+/* ---- Collections tab ---- */
+
+.collections-view__missing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 52px;
+  margin-bottom: var(--space-2);
+  padding: var(--space-2) 14px;
+  border: 1.5px dashed var(--paper-edge);
+  border-radius: 12px;
+  color: var(--paper-ink);
+  font-size: 14px;
+}
+
+.collections-view__missing-action {
+  font-weight: var(--font-weight-semibold);
+  color: var(--paper-accent);
+  white-space: nowrap;
+}
+
+.collections-view__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 88px;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--paper-line);
+  color: var(--paper-ink);
+}
+
+.collections-view__row svg {
+  flex-shrink: 0;
+  color: var(--paper-muted);
+}
+
+.collections-view__shelf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 84px;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 0 4px;
+  border-bottom: 2px solid var(--paper-ink);
+}
+
+.collections-view__spine {
+  flex-shrink: 0;
+  width: 13px;
+  border-radius: 2px 2px 0 0;
+  box-shadow: inset 1.5px 0 0 rgba(255, 255, 255, 0.14), inset -1.5px 0 0 rgba(0, 0, 0, 0.18);
+}
+
+.collections-view__text {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.collections-view__name {
+  font-family: var(--font-family-display);
+  font-size: 18px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.collections-view__meta {
+  font-size: 13px;
+  color: var(--paper-muted);
+}
+
+.collections-view__first {
+  margin-top: var(--space-3);
+}
+
+.collections-view__row:focus-visible,
+.collections-view__missing:focus-visible {
+  outline-color: var(--paper-accent);
 }
 
 /* ---- Empty states ---- */

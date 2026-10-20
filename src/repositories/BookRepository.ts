@@ -1,5 +1,5 @@
 import { getDB } from '@/services/db';
-import type { Book, StoredBook } from '@/types/book';
+import type { Book, BookSeries, StoredBook } from '@/types/book';
 import type { ScaleMode } from '@/features/reader/types';
 
 /**
@@ -11,6 +11,17 @@ export interface ReadingStateUpdate {
   zoom?: number;
   scaleMode?: ScaleMode;
   lastOpened?: number;
+}
+
+/**
+ * Collection fields a reader can change on a book. Omitted fields stay as
+ * they are; `series: null` takes the book out of its series and an empty
+ * `author` clears it.
+ */
+export interface CollectionsUpdate {
+  author?: string;
+  series?: BookSeries | null;
+  genres?: string[];
 }
 
 /**
@@ -126,5 +137,31 @@ export const BookRepository = {
     if (changed) {
       await db.put('books', book);
     }
+  },
+
+  /**
+   * Sets a book's author, series and genres (the fields collections are
+   * built from). Names are trimmed; genres are de-duplicated.
+   */
+  async updateCollections(id: string, update: CollectionsUpdate): Promise<void> {
+    const db = await getDB();
+    const book = await db.get('books', id);
+    if (!book) return;
+
+    if (update.author !== undefined) {
+      book.author = update.author.trim() || undefined;
+    }
+    if (update.series !== undefined) {
+      const name = update.series?.name.trim();
+      book.series = update.series && name
+        ? { name, number: Math.max(1, Math.round(update.series.number)) }
+        : undefined;
+    }
+    if (update.genres !== undefined) {
+      const genres = [...new Set(update.genres.map((g) => g.trim()).filter(Boolean))];
+      book.genres = genres.length > 0 ? genres : undefined;
+    }
+
+    await db.put('books', book);
   },
 };

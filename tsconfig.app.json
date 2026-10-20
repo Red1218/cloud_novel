@@ -35,5 +35,9 @@
   },
   "include": [
     "src"
+  ],
+  // Node-run self-checks (node src/**/x.check.ts) are not part of the app
+  "exclude": [
+    "src/**/*.check.ts"
   ]
 }

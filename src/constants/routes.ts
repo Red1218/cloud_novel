@@ -10,6 +10,12 @@
 export const ROUTES = {
   DASHBOARD: '/',
   LIBRARY: '/library',
+  COLLECTION: '/library/collection',
   READER: '/reader',
   SETTINGS: '/settings',
 } as const;
+
+/** Path of one collection page; an empty author name is the "No author" group. */
+export function collectionPath(kind: 'series' | 'author' | 'genre', name: string): string {
+  return `${ROUTES.COLLECTION}/${kind}/${encodeURIComponent(name)}`;
+}

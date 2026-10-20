@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { Book, StoredBook } from '@/types/book';
-import { BookRepository } from '@/repositories/BookRepository';
+import { BookRepository, type CollectionsUpdate } from '@/repositories/BookRepository';
 import { extractPdfData } from '@/services/pdfService';
 import { computeSHA256 } from '@/utils/hash';
 import { selectPdfFiles } from '@/utils/filePicker';
 import { useToast } from '@/hooks/useToast';
 
 type ImportResult =
-  | { status: 'added'; title: string }
+  | { status: 'added'; title: string; id: string }
   | { status: 'duplicate'; title: string };
 
 /**
@@ -42,19 +42,21 @@ async function importFile(file: File): Promise<ImportResult> {
     pdf: file,
   };
   await BookRepository.save(newBook);
-  return { status: 'added', title: newBook.title };
+  return { status: 'added', title: newBook.title, id: newBook.id };
 }
 
 export function useLibrary() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
+  /** Ids of the books the last import added, for the grouping sheet. */
+  const [lastImportedIds, setLastImportedIds] = useState<string[]>([]);
 
   const { showToast } = useToast();
 
-  const fetchBooks = useCallback(async () => {
+  const fetchBooks = useCallback(async (quiet = false) => {
     try {
-      setIsLoading(true);
+      if (!quiet) setIsLoading(true);
       const allBooks = await BookRepository.getAll();
       // Sort by recently added
       allBooks.sort((a, b) => b.importedAt - a.importedAt);
@@ -81,7 +83,7 @@ export function useLibrary() {
     }
 
     setIsImporting(true);
-    const added: string[] = [];
+    const added: { title: string; id: string }[] = [];
     const duplicates: string[] = [];
     const failed: { name: string; reason: string }[] = [];
 
@@ -89,7 +91,8 @@ export function useLibrary() {
     for (const file of files) {
       try {
         const result = await importFile(file);
-        (result.status === 'added' ? added : duplicates).push(result.title);
+        if (result.status === 'added') added.push(result);
+        else duplicates.push(result.title);
       } catch (err) {
         console.error(`Import failed for ${file.name}:`, err);
         failed.push({
@@ -103,13 +106,14 @@ export function useLibrary() {
 
     if (added.length > 0) await fetchBooks();
     setIsImporting(false);
+    setLastImportedIds(added.map((a) => a.id));
 
     if (added.length > 0) {
       showToast({
         type: 'success',
         title: 'Import Successful',
         message: added.length === 1
-          ? `Added "${added[0]}" to your library.`
+          ? `Added "${added[0].title}" to your library.`
           : `Added ${added.length} books to your library.`,
       });
     }
@@ -133,10 +137,34 @@ export function useLibrary() {
     }
   }, [fetchBooks, showToast]);
 
+  /** Saves books' author, series and genres, then refreshes the list once. */
+  const applyCollectionUpdates = useCallback(async (updates: { id: string; update: CollectionsUpdate }[]) => {
+    try {
+      for (const { id, update } of updates) {
+        await BookRepository.updateCollections(id, update);
+      }
+      await fetchBooks(true);
+    } catch (err) {
+      console.error('Failed to update collections:', err);
+      showToast({ type: 'error', title: 'Error', message: 'Could not save the collections.' });
+    }
+  }, [fetchBooks, showToast]);
+
+  const updateCollections = useCallback(
+    (id: string, update: CollectionsUpdate) => applyCollectionUpdates([{ id, update }]),
+    [applyCollectionUpdates]
+  );
+
+  const clearLastImported = useCallback(() => setLastImportedIds([]), []);
+
   return {
     books,
     isLoading,
     isImporting,
     importBooks,
+    lastImportedIds,
+    clearLastImported,
+    updateCollections,
+    applyCollectionUpdates,
   };
 }
