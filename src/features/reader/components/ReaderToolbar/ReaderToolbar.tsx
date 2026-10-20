@@ -1,29 +1,80 @@
 import './ReaderToolbar.css';
 
 interface ReaderToolbarProps {
+  currentPage:  number;
+  totalPages:   number;
+  onPrevPage:   () => void;
+  onNextPage:   () => void;
   /** Effective zoom as a multiplier (1.0 = 100%). */
   zoom:         number;
   onZoomIn:     () => void;
   onZoomOut:    () => void;
   onResetZoom:  () => void;
-  onFitWidth:   () => void;
-  onFitPage:    () => void;
   onOpenReadingEnvironment: () => void;
 }
 
+/**
+ * Bottom reader bar: page turning with a progress line, zoom, and "Aa" for
+ * themes, brightness and fit (the reading environment sheet).
+ */
 export function ReaderToolbar({
+  currentPage,
+  totalPages,
+  onPrevPage,
+  onNextPage,
   zoom,
   onZoomIn,
   onZoomOut,
   onResetZoom,
-  onFitWidth,
-  onFitPage,
   onOpenReadingEnvironment,
 }: ReaderToolbarProps) {
   const zoomPct = Math.round(zoom * 100);
+  const progress = totalPages > 0 ? Math.round((currentPage / totalPages) * 100) : 0;
 
   return (
     <div className="reader-toolbar" role="toolbar" aria-label="Reader controls">
+      <button
+        type="button"
+        className="reader-toolbar__button"
+        onClick={onPrevPage}
+        disabled={currentPage <= 1}
+        aria-label="Previous page"
+        title="Previous page"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="m15 6-6 6 6 6" />
+        </svg>
+      </button>
+
+      <div className="reader-toolbar__progress">
+        <div className="reader-toolbar__track" aria-hidden="true">
+          <div style={{ width: `${progress}%` }} />
+        </div>
+        <span className="reader-toolbar__page">
+          <span className="reader-toolbar__page-word">Page </span>
+          {currentPage} of {totalPages}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        className="reader-toolbar__button"
+        onClick={onNextPage}
+        disabled={currentPage >= totalPages}
+        aria-label="Next page"
+        title="Next page"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="m9 6 6 6-6 6" />
+        </svg>
+      </button>
+
+      <div className="reader-toolbar__divider" aria-hidden="true" />
+
       <div className="reader-toolbar__zoom-group" aria-label="Zoom controls">
         <button
           type="button"
@@ -65,58 +116,14 @@ export function ReaderToolbar({
         </button>
       </div>
 
-      <div className="reader-toolbar__divider reader-toolbar__divider--wide" aria-hidden="true" />
-
       <button
         type="button"
-        className="reader-toolbar__button reader-toolbar__button--preset"
-        onClick={onFitWidth}
-        aria-label="Fit width"
-        title="Fit width"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2"
-          strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M4 8V5h3" />
-          <path d="M20 8V5h-3" />
-          <path d="M4 16v3h3" />
-          <path d="M20 16v3h-3" />
-          <path d="M8 12h8" />
-          <path d="m10 10-2 2 2 2" />
-          <path d="m14 10 2 2-2 2" />
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        className="reader-toolbar__button reader-toolbar__button--preset"
-        onClick={onFitPage}
-        aria-label="Fit page"
-        title="Fit page"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2"
-          strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <rect x="7" y="3" width="10" height="18" rx="1.5" />
-          <path d="M10 7h4" />
-          <path d="M10 11h4" />
-          <path d="M10 15h3" />
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        className="reader-toolbar__button"
-        aria-label="Reading environment"
-        title="Reading environment"
+        className="reader-toolbar__button reader-toolbar__aa"
+        aria-label="Themes, brightness and fit"
+        title="Themes, brightness and fit"
         onClick={onOpenReadingEnvironment}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2"
-          strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H2a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 3.6 8a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 8 3.6a1.7 1.7 0 0 0 1-.6A1.7 1.7 0 0 0 9.4 1.92V2a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 3.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 8c.38.18.72.4 1 .72.3.3.49.68.6 1.08H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z" />
-        </svg>
+        Aa
       </button>
     </div>
   );

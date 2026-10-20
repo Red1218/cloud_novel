@@ -38,7 +38,7 @@ const READING_PRESETS: ReadingPreset[] = [
   {
     id: 'night',
     label: 'Night',
-    description: 'Dark + 15% + Fit Width',
+    description: 'Night + 15% + Fit Width',
     theme: 'dark',
     brightness: 85,
     openingMode: 'fit-width',
@@ -46,7 +46,7 @@ const READING_PRESETS: ReadingPreset[] = [
   },
   {
     id: 'paper',
-    label: 'Paper',
+    label: 'Warm',
     description: 'Sepia + 10% + Fit Page',
     theme: 'sepia',
     brightness: 90,
@@ -56,7 +56,7 @@ const READING_PRESETS: ReadingPreset[] = [
   {
     id: 'daylight',
     label: 'Daylight',
-    description: 'Light + 0% + Fit Width',
+    description: 'Paper + 0% + Fit Width',
     theme: 'light',
     brightness: 100,
     openingMode: 'fit-width',
@@ -76,12 +76,12 @@ const READING_PRESETS: ReadingPreset[] = [
 const THEME_OPTIONS: ThemeOption[] = [
   {
     id: 'dark',
-    label: 'Dark',
+    label: 'Night',
     description: 'Best for night reading',
   },
   {
     id: 'light',
-    label: 'Light',
+    label: 'Paper',
     description: 'Bright daylight reading',
   },
   {
@@ -176,7 +176,7 @@ export function ReadingEnvironmentPanel({
 
       <header className="reading-environment__header">
         <h2 id="reading-environment-title" className="reading-environment__title">
-          Reading Environment
+          Reading
         </h2>
         <button
           type="button"

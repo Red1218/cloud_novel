@@ -11,8 +11,6 @@
 
   /* Background layers (darkest → lightest) */
   --color-bg-app:           #0d0f14;
-  --color-bg-sidebar:       #111318;
-  --color-bg-header:        #111318;
   --color-bg-surface:       #181b24;
   --color-bg-surface-hover: #1e2230;
   --color-bg-elevated:      #222636;
@@ -40,31 +38,32 @@
   --color-warning:          #f6ad55;
   --color-info:             #63b3ed;
 
-  /* Paper (library spines page) */
+  /* Paper: the app shell, Home, Library and Settings */
   --paper-bg:     #f2ede3;
   --paper-ink:    #1f1b16;
   --paper-muted:  #5f574b;
   --paper-line:   #d9d1c2;
+  --paper-edge:   #cfc5b3;   /* outlines of unselected pills */
   --paper-accent: #23395b;
+  --font-family-display: Georgia, 'Times New Roman', serif;
 
   /* Search highlights (drawn over the page, so translucent) */
   --color-search-highlight:          rgba(255, 214, 10, 0.35);
   --color-search-highlight-selected: rgba(255, 149, 0, 0.6);
 
   /* Reader environment */
-  --reader-bg-dark:          radial-gradient(circle at 50% 38%, rgba(108, 142, 245, 0.08), transparent 42%),
-                             linear-gradient(180deg, #090b10 0%, #0d0f14 58%, #08090d 100%);
-  --reader-bg-light:         linear-gradient(180deg, #f1f2f4 0%, #dfe3e8 100%);
-  --reader-bg-sepia:         linear-gradient(180deg, #e1cfad 0%, #c7ad82 100%);
-  --reader-bg-contrast:      linear-gradient(180deg, #000000 0%, #050505 100%);
-  --reader-chrome-text-dark: #eef1f7;
-  --reader-chrome-muted-dark: rgba(238, 241, 247, 0.68);
-  --reader-chrome-disabled-dark: rgba(238, 241, 247, 0.34);
-  --reader-chrome-text-light: #151821;
-  --reader-chrome-muted-light: rgba(21, 24, 33, 0.66);
-  --reader-chrome-disabled-light: rgba(21, 24, 33, 0.32);
-  --reader-panel-accent-dark: #d8b75c;
-  --reader-panel-accent-light: #6c8ef5;
+  --reader-bg-dark:          #0f0e0d;
+  --reader-bg-light:         #e4ddcf;
+  --reader-bg-sepia:         #cdb894;
+  --reader-bg-contrast:      #000000;
+  --reader-chrome-text-dark: #efe9df;
+  --reader-chrome-muted-dark: #a59d90;
+  --reader-chrome-disabled-dark: rgba(239, 233, 223, 0.34);
+  --reader-chrome-text-light: #1f1b16;
+  --reader-chrome-muted-light: #5f574b;
+  --reader-chrome-disabled-light: rgba(31, 27, 22, 0.32);
+  --reader-panel-accent-dark: #d4a85a;
+  --reader-panel-accent-light: #23395b;
 
   /* ----------------------------------------------------------
      SPACING SCALE (4px base unit)
@@ -110,7 +109,6 @@
      LAYOUT DIMENSIONS
      ---------------------------------------------------------- */
   --sidebar-width:  240px;
-  --header-height:  58px;
   --content-max-w:  1200px;
 
   /* ----------------------------------------------------------

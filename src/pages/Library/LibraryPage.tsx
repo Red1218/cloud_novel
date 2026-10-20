@@ -48,7 +48,7 @@ export function LibraryPage() {
   const selected = visible.find((b) => b.id === selectedId) ?? visible[0];
 
   const importButton = (
-    <button type="button" className="spines-page__import" onClick={importBook} disabled={isImporting}>
+    <button type="button" className="pill pill--outline" onClick={importBook} disabled={isImporting}>
       <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
         <path d="M12 5v14M5 12h14" />
       </svg>
@@ -57,12 +57,12 @@ export function LibraryPage() {
   );
 
   return (
-    <div className="spines-page">
-      <header className="spines-page__header">
+    <div className="spines-page paper-page">
+      <header className="paper-header">
         <div>
-          <h1 className="spines-page__title">Library</h1>
+          <h1 className="paper-title">Library</h1>
           {!isLoading && (
-            <p className="spines-page__meta">
+            <p className="paper-meta">
               {counts.all} {counts.all === 1 ? 'book' : 'books'} · {counts.reading} reading · {counts.finished} finished
             </p>
           )}
@@ -71,8 +71,8 @@ export function LibraryPage() {
       </header>
 
       {!isLoading && books.length === 0 && (
-        <div className="spines-page__empty">
-          <p className="spines-page__empty-title">Nothing on the shelf yet</p>
+        <div className="paper-note">
+          <p className="paper-note__title">Nothing on the shelf yet</p>
           <p>Import a PDF and it stays on this device. Your page, zoom and bookmarks are remembered for every book.</p>
         </div>
       )}
@@ -84,7 +84,7 @@ export function LibraryPage() {
               <button
                 key={id}
                 type="button"
-                className="spines-page__chip"
+                className="pill spines-page__chip"
                 aria-pressed={filter === id}
                 onClick={() => setFilter(id)}
               >
@@ -124,9 +124,9 @@ function BookDetail({ book, onOpen }: { book: Book; onOpen: () => void }) {
       <div className="spines-page__info">
         <h2 className="spines-page__book-title">{book.title}</h2>
         {book.author && <p className="spines-page__author">{book.author}</p>}
-        <div className="spines-page__progress">
+        <div className="paper-progress spines-page__progress">
           <div
-            className="spines-page__bar"
+            className="paper-progress__bar"
             role="progressbar"
             aria-valuenow={progress}
             aria-valuemin={0}
@@ -135,9 +135,9 @@ function BookDetail({ book, onOpen }: { book: Book; onOpen: () => void }) {
           >
             <div style={{ width: `${progress}%` }} />
           </div>
-          <span className="spines-page__status">{status}</span>
+          <span className="paper-progress__label">{status}</span>
         </div>
-        <button type="button" className="spines-page__open" onClick={onOpen}>
+        <button type="button" className="pill pill--filled spines-page__open" onClick={onOpen}>
           {action}
         </button>
       </div>

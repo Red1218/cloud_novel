@@ -1,19 +1,22 @@
 .reader-toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 2px;
+  width: min(620px, calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  box-sizing: border-box;
   min-height: 56px;
   padding: 6px;
   border: 1px solid var(--reader-chrome-border);
   border-radius: var(--radius-full);
   background: var(--reader-chrome-bg);
-  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
   backdrop-filter: var(--reader-chrome-blur);
 }
 
 .reader-toolbar__button,
 .reader-toolbar__zoom-value {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   min-width: 44px;
@@ -33,6 +36,41 @@
   cursor: default;
 }
 
+/* ---- Page progress ---- */
+
+.reader-toolbar__progress {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 var(--space-1);
+}
+
+.reader-toolbar__track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--reader-chrome-track);
+  overflow: hidden;
+}
+
+.reader-toolbar__track > div {
+  height: 100%;
+  background: var(--reader-panel-accent);
+}
+
+.reader-toolbar__page {
+  color: var(--reader-chrome-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Zoom and Aa ---- */
+
 .reader-toolbar__zoom-group {
   display: flex;
   align-items: center;
@@ -48,26 +86,25 @@
   font-variant-numeric: tabular-nums;
 }
 
+.reader-toolbar__aa {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
 .reader-toolbar__divider {
+  flex-shrink: 0;
   width: 1px;
   height: 28px;
   margin: 0 var(--space-1);
-  background-color: rgba(255, 255, 255, 0.11);
+  background-color: var(--reader-chrome-divider);
 }
 
+/* Phones: keep page turning, zoom and Aa; the zoom level shows as a toast. */
 @media (max-width: 560px) {
-  .reader-toolbar {
-    max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .reader-toolbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .reader-toolbar__button--preset,
-  .reader-toolbar__divider--wide {
+  .reader-toolbar__zoom-value,
+  .reader-toolbar__divider,
+  .reader-toolbar__page-word {
     display: none;
   }
 }

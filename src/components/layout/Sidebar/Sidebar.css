@@ -1,15 +1,11 @@
-/* ==============================================================
-   SIDEBAR — Desktop layout
-   On desktop (≥1024px): sidebar is a permanent grid column.
-   ============================================================== */
-
+/* Desktop navigation column. Hidden below 1024px, where the TabBar takes over. */
 .sidebar {
   display: flex;
   flex-direction: column;
   width: var(--sidebar-width);
   height: 100%;
-  background-color: var(--color-bg-sidebar);
-  border-right: 1px solid var(--color-border);
+  background-color: var(--paper-bg);
+  border-right: 1px solid var(--paper-line);
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
@@ -20,24 +16,22 @@
 .sidebar__brand {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-4);
-  height: var(--header-height);
-  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-5) var(--space-4);
   flex-shrink: 0;
 }
 
 .sidebar__logo {
   display: flex;
-  color: var(--color-accent);
+  color: var(--paper-ink);
   flex-shrink: 0;
 }
 
 .sidebar__title {
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  letter-spacing: 0.02em;
+  color: var(--paper-ink);
   white-space: nowrap;
 }
 
@@ -45,7 +39,7 @@
 
 .sidebar__nav {
   flex: 1;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-2) var(--space-3);
   overflow-y: auto;
 }
 
@@ -58,73 +52,19 @@
 /* ---- Footer ------------------------------------------------- */
 
 .sidebar__footer {
-  padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--paper-line);
   flex-shrink: 0;
 }
 
 .sidebar__version {
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: var(--paper-muted);
   user-select: none;
 }
 
-/* ==============================================================
-   BACKDROP — hidden on desktop, shown on tablet/mobile
-   ============================================================== */
-
-.sidebar-backdrop {
-  display: none;
-}
-
-/* ==============================================================
-   TABLET / MOBILE  (<1024px)
-   Sidebar becomes a fixed drawer overlay.
-   No animation in Phase 1 — instant show/hide.
-   ============================================================== */
-
 @media (max-width: 1023px) {
   .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    z-index: var(--z-sidebar);
-    /* Drawer is off-screen by default (no transition = no animation). */
-    transform: translateX(-100%);
-  }
-
-  /* When open: bring drawer on-screen instantly */
-  .sidebar--open {
-    transform: translateX(0);
-    box-shadow: var(--shadow-xl); /* only when open, or it bleeds onto the page edge */
-  }
-
-  /* Backdrop: hidden by default */
-  .sidebar-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.65);
-    z-index: var(--z-backdrop);
-    /* Hidden until sidebar opens */
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .sidebar-backdrop--visible {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-/* Mobile (<768px): drawer takes 80% of screen width */
-@media (max-width: 767px) {
-  .sidebar {
-    width: 80%;
+    display: none;
   }
 }

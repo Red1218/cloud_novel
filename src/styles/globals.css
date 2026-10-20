@@ -6,17 +6,17 @@
 @import './tokens.css';
 @import './reset.css';
 
-/* Force dark color scheme at OS level */
+/* The shell is paper (light); the reader sets its own colours per theme. */
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-app);
+  color: var(--paper-ink);
+  background-color: var(--paper-bg);
   line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -43,12 +43,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
+  background: var(--paper-edge);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: var(--paper-muted);
 }
 
 /* ----------------------------------------------------------
@@ -68,4 +68,126 @@ body {
 ::selection {
   background-color: var(--color-accent-subtle);
   color: var(--color-text-primary);
+}
+
+/* ----------------------------------------------------------
+   PAPER PRIMITIVES (Home, Library, Settings)
+   ---------------------------------------------------------- */
+
+.paper-page {
+  max-width: 720px;
+}
+
+.paper-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.paper-title {
+  font-family: var(--font-family-display);
+  font-size: 46px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--paper-ink);
+}
+
+.paper-meta {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  color: var(--paper-muted);
+}
+
+.paper-eyebrow {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+}
+
+/* Pill buttons and links: outlined, or filled ink */
+.pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pill--outline {
+  border: 1.5px solid var(--paper-ink);
+  background: none;
+  color: var(--paper-ink);
+}
+
+.pill--filled {
+  border: none;
+  background: var(--paper-ink);
+  color: var(--paper-bg);
+}
+
+.pill:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.pill:focus-visible {
+  outline-color: var(--paper-accent);
+}
+
+/* Reading progress: a thin line and a label */
+.paper-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.paper-progress__bar {
+  flex-grow: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--paper-line);
+  overflow: hidden;
+}
+
+.paper-progress__bar > div {
+  height: 100%;
+  background: var(--paper-accent);
+}
+
+.paper-progress__label {
+  font-size: 13px;
+  color: var(--paper-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A dashed note for empty states */
+.paper-note {
+  margin-top: var(--space-8);
+  padding: var(--space-5);
+  border: 1.5px dashed var(--paper-edge);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: var(--line-height-base);
+  color: var(--paper-muted);
+}
+
+.paper-note__title {
+  margin-bottom: var(--space-1);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  color: var(--paper-ink);
 }

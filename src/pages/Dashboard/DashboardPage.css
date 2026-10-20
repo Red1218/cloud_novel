@@ -1,132 +1,170 @@
-/* ---- Resume (latest book in progress) ---- */
+/* Home on paper (shared pieces live in globals.css) */
 
-.resume {
-  display: grid;
-  grid-template-columns: 112px 1fr;
-  gap: var(--space-6);
-  align-items: center;
-  padding: var(--space-6);
-  margin-bottom: var(--space-10);
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+.home__section {
+  margin-top: 28px;
 }
 
-.resume__cover {
+/* ---- Continue reading: the book sits on a shelf line ---- */
+
+.home__current {
+  display: flex;
+  gap: 18px;
+  padding-bottom: 22px;
+  border-bottom: 3px solid var(--paper-ink);
+  box-shadow: 0 6px 0 -3px var(--paper-line);
+}
+
+.home__current-cover {
+  flex-shrink: 0;
+  width: 104px;
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
-  border-radius: var(--radius-sm);
 }
 
-.resume__cover:focus-visible,
-.resume__action:focus-visible,
-.dashboard__link:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+.home__current-cover .book-cover,
+.home__shelf-book .book-cover {
+  border-radius: 1px 3px 3px 1px;
+  box-shadow: 0 1px 2px rgba(31, 27, 22, 0.25), 0 10px 20px rgba(31, 27, 22, 0.2);
 }
 
-.resume__body {
+.home__current-info {
+  flex-grow: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
 }
 
-.resume__eyebrow {
+.home__when {
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: var(--space-2);
+  color: var(--paper-muted);
 }
 
-.resume__title {
-  font-size: var(--font-size-2xl);
+.home__current-title {
+  margin-top: var(--space-1);
+  font-family: var(--font-family-display);
+  font-size: 24px;
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  color: var(--color-text-primary);
+  line-height: 1.1;
   overflow-wrap: anywhere;
 }
 
-.resume__author {
+.home__author {
   margin-top: var(--space-1);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  font-size: 14px;
+  color: var(--paper-muted);
 }
 
-.resume__progress {
+.home__progress {
+  margin-top: auto;
+  padding-top: var(--space-3);
+}
+
+.home__continue {
+  margin-top: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .home__continue {
+    align-self: flex-start;
+    padding: 0 28px;
+  }
+}
+
+/* ---- Also reading ---- */
+
+.home__list {
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.home__row {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 14px;
   width: 100%;
-  max-width: 360px;
-  margin: var(--space-5) 0;
-}
-
-.resume__bar {
-  flex: 1;
-  height: 4px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-bg-elevated);
-  overflow: hidden;
-}
-
-.resume__fill {
-  height: 100%;
-  background-color: var(--color-accent);
-}
-
-.resume__pages {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.resume__action {
-  padding: var(--space-2) var(--space-5);
-  background-color: var(--color-accent);
-  color: #fff;
+  min-height: 64px;
+  padding: var(--space-2) 0;
   border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  border-bottom: 1px solid var(--paper-line);
+  background: none;
+  color: var(--paper-ink);
+  font-family: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
-.resume__action:hover {
-  background-color: var(--color-accent-hover);
+.home__row-cover {
+  flex-shrink: 0;
+  width: 32px;
 }
 
-/* ---- Sections ---- */
-
-.dashboard__section {
+.home__row-text {
+  flex-grow: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  margin-bottom: var(--space-10);
+  gap: 2px;
 }
 
-.dashboard__link {
-  font-size: var(--font-size-sm);
-  color: var(--color-accent);
+.home__row-title {
+  font-family: var(--font-family-display);
+  font-size: 17px;
+  font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.dashboard__link:hover {
-  color: var(--color-accent-hover);
+.home__row-meta {
+  font-size: 13px;
+  color: var(--paper-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-@media (max-width: 767px) {
-  .resume {
-    grid-template-columns: 80px 1fr;
-    gap: var(--space-4);
-    padding: var(--space-4);
-  }
+.home__row-pct {
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
 
-  .resume__title {
-    font-size: var(--font-size-xl);
-  }
+/* ---- Recently added ---- */
+
+.home__section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.home__see-all {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--paper-accent);
+}
+
+.home__shelf {
+  display: flex;
+  gap: 14px;
+  /* room for the covers' shadows, which a scroll box would otherwise clip */
+  padding: var(--space-1) var(--space-1) var(--space-6);
+  margin: 0 calc(-1 * var(--space-1));
+  overflow-x: auto;
+}
+
+.home__shelf-book {
+  flex-shrink: 0;
+  width: 72px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.home__current-cover:focus-visible,
+.home__row:focus-visible,
+.home__shelf-book:focus-visible,
+.home__see-all:focus-visible {
+  outline-color: var(--paper-accent);
 }

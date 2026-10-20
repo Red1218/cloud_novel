@@ -3,8 +3,8 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
 
-/** Matches --color-bg-app so the status bar blends into the app shell. */
-const STATUS_BAR_COLOR = '#0d0f14';
+/** Matches --paper-bg so the status bar blends into the app shell. */
+const STATUS_BAR_COLOR = '#f2ede3';
 
 /**
  * Android integration: keeps the status bar out of the web view, and maps the
@@ -17,7 +17,7 @@ export function useNativeApp(): void {
 
     StatusBar.setOverlaysWebView({ overlay: false })
       .then(() => StatusBar.setBackgroundColor({ color: STATUS_BAR_COLOR }))
-      .then(() => StatusBar.setStyle({ style: Style.Dark }))
+      .then(() => StatusBar.setStyle({ style: Style.Light })) // dark icons on paper
       .catch((err) => console.error('StatusBar plugin error:', err));
 
     const listener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {

@@ -460,10 +460,7 @@ export function ReaderPage() {
       >
         <ReaderHeader
           title={book?.title}
-          currentPage={reader.currentPage}
           totalPages={reader.totalPages}
-          onPrevPage={reader.previousPage}
-          onNextPage={reader.nextPage}
           isBookmarked={readerBookmarks.isBookmarked(reader.currentPage)}
           onToggleBookmark={book ? handleToggleBookmark : undefined}
           onOpenBookmarks={book ? () => openPanel('bookmarks') : undefined}
@@ -517,12 +514,14 @@ export function ReaderPage() {
         onClick={(event) => event.stopPropagation()}
       >
         <ReaderToolbar
+          currentPage={reader.currentPage}
+          totalPages={reader.totalPages}
+          onPrevPage={reader.previousPage}
+          onNextPage={reader.nextPage}
           zoom={reader.effectiveZoom}
           onZoomIn={reader.zoomIn}
           onZoomOut={reader.zoomOut}
           onResetZoom={reader.resetZoom}
-          onFitWidth={reader.fitWidth}
-          onFitPage={reader.fitPage}
           onOpenReadingEnvironment={() => openPanel('environment')}
         />
       </div>

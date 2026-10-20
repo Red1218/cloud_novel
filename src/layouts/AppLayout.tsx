@@ -1,47 +1,28 @@
-import { useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Header } from '@/components/layout/Header/Header';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
+import { TabBar } from '@/components/layout/TabBar/TabBar';
 import './AppLayout.css';
 
 /**
- * The single application shell.
+ * The single application shell, on paper.
  *
- * Structure:
- * ┌──────────────────────────────────────┐
- * │ Sidebar │ Header                      │
- * │         ├─────────────────────────────┤
- * │         │ <Outlet /> (page content)   │
- * └──────────────────────────────────────┘
+ *  - Desktop (≥1024px): sidebar column + scrolling content.
+ *  - Tablet/Mobile (<1024px): scrolling content + bottom tab bar.
  *
- * Sidebar visibility:
- *  - Desktop (≥1024px): always visible, CSS grid column.
- *  - Tablet/Mobile (<1024px): hidden drawer, toggled via Header hamburger.
+ * The reader covers the whole shell (it is a fixed overlay).
  */
 export function AppLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
-
-  const toggleSidebar = useCallback(
-    () => setIsSidebarOpen((prev) => !prev),
-    [],
-  );
-
   return (
     <div className="app-layout">
-      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <Sidebar />
 
       <div className="app-main">
-        <Header
-          onMenuToggle={toggleSidebar}
-          isSidebarOpen={isSidebarOpen}
-        />
         <main id="main-content" className="app-content">
           <div className="app-content__inner">
             <Outlet />
           </div>
         </main>
+        <TabBar />
       </div>
     </div>
   );

@@ -2,21 +2,17 @@ import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
-import { PageWrapper } from '@/components/ui/PageWrapper/PageWrapper';
 import { ROUTES } from '@/constants/routes';
 import { BookCover } from '@/components/library/BookCover/BookCover';
-import { BookGrid } from '@/components/library/BookGrid/BookGrid';
-import { EmptyLibrary } from '@/components/library/EmptyLibrary/EmptyLibrary';
-import { SectionHeader } from '@/components/library/SectionHeader/SectionHeader';
 import { deriveContinueReadingBooks } from '@/features/library/utils/deriveContinueReadingBooks';
 import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
 import { sortBooks } from '@/features/library/utils/sortBooks';
 import './DashboardPage.css';
 
-const RECENTLY_ADDED_MAX = 4;
+const RECENTLY_ADDED_MAX = 6;
 
 /**
- * Home page: resume the latest book in progress and see recent imports.
+ * Home: the book you are reading, the others in progress, and recent imports.
  * Reading statistics arrive with Phase 5.6 (Reading Insights).
  */
 export function DashboardPage() {
@@ -25,10 +21,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const { books, isLoading, isImporting, importBook } = useLibrary();
 
-  const [current, ...otherInProgress] = useMemo(
-    () => deriveContinueReadingBooks(books),
-    [books]
-  );
+  const [current, ...alsoReading] = useMemo(() => deriveContinueReadingBooks(books), [books]);
   const recentlyAdded = useMemo(
     () => sortBooks(books, 'recentlyAdded').slice(0, RECENTLY_ADDED_MAX),
     [books]
@@ -36,91 +29,106 @@ export function DashboardPage() {
 
   const openBook = (bookId: string) => navigate(`${ROUTES.READER}/${bookId}`);
 
-  if (isLoading) {
-    return <PageWrapper title="Home" />;
-  }
-
-  if (books.length === 0) {
-    return (
-      <PageWrapper title="Home">
-        <EmptyLibrary
-          title="Nothing on your shelf yet"
-          description="Import a PDF and it stays in this browser: no account, no upload. Your page, zoom and bookmarks are remembered for every book."
-          buttonText={isImporting ? 'Importing…' : 'Import a PDF'}
-          onAction={importBook}
-        />
-      </PageWrapper>
-    );
-  }
-
   return (
-    <PageWrapper title="Home">
+    <div className="home paper-page">
+      <header className="paper-header">
+        <h1 className="paper-title">Home</h1>
+        <button type="button" className="pill pill--outline" onClick={importBook} disabled={isImporting}>
+          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          {isImporting ? 'Importing…' : 'Import'}
+        </button>
+      </header>
+
+      {!isLoading && books.length === 0 && (
+        <div className="paper-note">
+          <p className="paper-note__title">Nothing on your shelf yet</p>
+          <p>Import a PDF and it stays on this device: no account, no upload. Your page, zoom and bookmarks are remembered for every book.</p>
+        </div>
+      )}
+
       {current && (
-        <section className="resume" aria-labelledby="resume-heading">
-          <button
-            type="button"
-            className="resume__cover"
-            onClick={() => openBook(current.id)}
-            aria-label={`Resume ${current.title}`}
-          >
-            <BookCover src={current.thumbnail} title={current.title} />
-          </button>
-
-          <div className="resume__body">
-            <p className="resume__eyebrow">
-              Last read {formatRelativeTime(current.lastOpened)}
-            </p>
-            <h2 id="resume-heading" className="resume__title">
-              {current.title}
-            </h2>
-            {current.author && <p className="resume__author">{current.author}</p>}
-
-            <div className="resume__progress">
-              <div
-                className="resume__bar"
-                role="progressbar"
-                aria-valuenow={current.progress}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`Reading progress: ${Math.round(current.progress)}%`}
-              >
-                <div className="resume__fill" style={{ width: `${current.progress}%` }} />
-              </div>
-              <span className="resume__pages">
-                Page {current.currentPage ?? 1} of {current.pageCount}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              className="resume__action"
-              onClick={() => openBook(current.id)}
-            >
-              Continue reading
+        <section className="home__section" aria-labelledby="continue-heading">
+          <h2 id="continue-heading" className="paper-eyebrow">Continue reading</h2>
+          <div className="home__current">
+            <button type="button" className="home__current-cover" onClick={() => openBook(current.id)} aria-label={`Open ${current.title}`}>
+              <BookCover src={current.thumbnail} title={current.title} />
             </button>
+            <div className="home__current-info">
+              <p className="home__when">Last read {formatRelativeTime(current.lastOpened)}</p>
+              <h3 className="home__current-title">{current.title}</h3>
+              {current.author && <p className="home__author">{current.author}</p>}
+              <div className="paper-progress home__progress">
+                <div
+                  className="paper-progress__bar"
+                  role="progressbar"
+                  aria-valuenow={Math.round(current.progress)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Reading progress: ${Math.round(current.progress)}%`}
+                >
+                  <div style={{ width: `${current.progress}%` }} />
+                </div>
+                <span className="paper-progress__label">
+                  {current.currentPage ?? 1} / {current.pageCount}
+                </span>
+              </div>
+              <button type="button" className="pill pill--filled home__continue" onClick={() => openBook(current.id)}>
+                Continue reading
+              </button>
+            </div>
           </div>
         </section>
       )}
 
-      {otherInProgress.length > 0 && (
-        <section className="dashboard__section" aria-labelledby="in-progress-heading">
-          <SectionHeader id="in-progress-heading" title="Also reading" />
-          <BookGrid books={otherInProgress} onOpenBook={openBook} />
+      {alsoReading.length > 0 && (
+        <section className="home__section" aria-labelledby="also-heading">
+          <h2 id="also-heading" className="paper-eyebrow">Also reading</h2>
+          <ul className="home__list" role="list">
+            {alsoReading.map((book) => (
+              <li key={book.id}>
+                <button type="button" className="home__row" onClick={() => openBook(book.id)}>
+                  <span className="home__row-cover">
+                    <BookCover src={book.thumbnail} title={book.title} />
+                  </span>
+                  <span className="home__row-text">
+                    <span className="home__row-title">{book.title}</span>
+                    <span className="home__row-meta">
+                      {book.author ? `${book.author} · ` : ''}page {book.currentPage ?? 1} of {book.pageCount}
+                    </span>
+                  </span>
+                  <span className="home__row-pct">{Math.round(book.progress)}%</span>
+                </button>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
-      <section className="dashboard__section" aria-labelledby="recent-heading">
-        <SectionHeader
-          id="recent-heading"
-          title="Recently added"
-          actions={
-            <Link to={ROUTES.LIBRARY} className="dashboard__link">
-              View library ({books.length})
+      {recentlyAdded.length > 0 && (
+        <section className="home__section" aria-labelledby="added-heading">
+          <div className="home__section-head">
+            <h2 id="added-heading" className="paper-eyebrow">Recently added</h2>
+            <Link to={ROUTES.LIBRARY} className="home__see-all">
+              See all {books.length}
             </Link>
-          }
-        />
-        <BookGrid books={recentlyAdded} onOpenBook={openBook} />
-      </section>
-    </PageWrapper>
+          </div>
+          <div className="home__shelf">
+            {recentlyAdded.map((book) => (
+              <button
+                key={book.id}
+                type="button"
+                className="home__shelf-book"
+                onClick={() => openBook(book.id)}
+                aria-label={book.author ? `${book.title}, ${book.author}` : book.title}
+              >
+                <BookCover src={book.thumbnail} title={book.title} />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
-import { PageWrapper } from '@/components/ui/PageWrapper/PageWrapper';
 import './SettingsPage.css';
 
 const SHORTCUTS: ReadonlyArray<[keys: string, action: string]> = [
@@ -19,8 +18,8 @@ function formatBytes(bytes: number): string {
 }
 
 /**
- * Settings: what is stored on this device, and the reader's keyboard shortcuts.
- * Theme and zoom are set from the reader itself and remembered per book.
+ * Settings: what is stored on this device, and (with a keyboard) the
+ * reader's shortcuts. Theme, brightness and fit live under Aa in the reader.
  */
 export function SettingsPage() {
   useDocumentTitle('Settings');
@@ -33,49 +32,46 @@ export function SettingsPage() {
   }, [books.length]);
 
   const pdfBytes = books.reduce((sum, book) => sum + book.fileSize, 0);
+  const usage = estimate?.usage;
+  const quota = estimate?.quota;
 
   return (
-    <PageWrapper
-      title="Settings"
-      description="Your library lives in this browser. Nothing is uploaded."
-    >
-      <div className="settings-sections">
-        <section className="settings-section">
-          <h2 className="settings-section__heading">Storage</h2>
-          <div className="settings-row">
-            <div className="settings-row__info">
-              <span className="settings-row__label">Books</span>
-              <span className="settings-row__hint">PDFs imported into the library</span>
-            </div>
-            <span className="settings-row__value">
-              {isLoading ? '…' : `${books.length} · ${formatBytes(pdfBytes)}`}
-            </span>
-          </div>
-          {estimate?.usage !== undefined && estimate.quota !== undefined && (
-            <div className="settings-row">
-              <div className="settings-row__info">
-                <span className="settings-row__label">Browser storage</span>
-                <span className="settings-row__hint">
-                  Used by Cloud Novel, out of what this browser allows
-                </span>
-              </div>
-              <span className="settings-row__value">
-                {formatBytes(estimate.usage)} of {formatBytes(estimate.quota)}
+    <div className="settings paper-page">
+      <h1 className="paper-title">Settings</h1>
+      <p className="paper-meta">Your library lives on this device. Nothing is uploaded.</p>
+
+      <section className="settings__section" aria-labelledby="device-heading">
+        <h2 id="device-heading" className="paper-eyebrow">On this device</h2>
+        <div className="settings__row">
+          <span className="settings__label">Books</span>
+          <span className="settings__value">
+            {isLoading ? '…' : `${books.length} · ${formatBytes(pdfBytes)}`}
+          </span>
+        </div>
+        {usage !== undefined && quota !== undefined && quota > 0 && (
+          <div className="settings__row settings__row--stacked">
+            <div className="settings__row-head">
+              <span className="settings__label">Space used</span>
+              <span className="settings__value">
+                {formatBytes(usage)} of {formatBytes(quota)}
               </span>
             </div>
-          )}
-        </section>
-
-        <section className="settings-section">
-          <h2 className="settings-section__heading">Reader shortcuts</h2>
-          {SHORTCUTS.map(([keys, action]) => (
-            <div className="settings-row" key={keys}>
-              <span className="settings-row__label">{action}</span>
-              <kbd className="settings-row__kbd">{keys}</kbd>
+            <div className="paper-progress__bar" aria-hidden="true">
+              <div style={{ width: `${Math.max(1, Math.round((usage / quota) * 100))}%` }} />
             </div>
-          ))}
-        </section>
-      </div>
-    </PageWrapper>
+          </div>
+        )}
+      </section>
+
+      <section className="settings__section settings__shortcuts" aria-labelledby="shortcuts-heading">
+        <h2 id="shortcuts-heading" className="paper-eyebrow">Reader shortcuts</h2>
+        {SHORTCUTS.map(([keys, action]) => (
+          <div className="settings__row" key={keys}>
+            <span className="settings__label">{action}</span>
+            <kbd className="settings__kbd">{keys}</kbd>
+          </div>
+        ))}
+      </section>
+    </div>
   );
 }
