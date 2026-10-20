@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
 import { ROUTES } from '@/constants/routes';
-import { ShelfRail } from '@/components/library/BookShelves/ShelfRail';
+import { BookCover } from '@/components/library/BookCover/BookCover';
+import { useRecentBookmarks } from '@/features/reader/bookmarks/hooks/useRecentBookmarks';
 import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
 import { TurningShelf } from '@/components/library/TurningShelf/TurningShelf';
 import { openLabel } from '@/features/library/utils/readingStatus';
@@ -11,12 +12,12 @@ import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime'
 import { sortBooks } from '@/features/library/utils/sortBooks';
 import './DashboardPage.css';
 
-const RECENTLY_ADDED_MAX = 6;
+const BOOKMARKS_MAX = 4;
 const NOW_SHELF_MAX = 6;
 
 /**
  * Home: a shelf of what you are reading, where one book turns out to show
- * its cover and how far you are, then recent imports.
+ * its cover and how far you are, then your latest bookmarks across books.
  * Reading statistics arrive with Phase 5.6 (Reading Insights).
  */
 export function DashboardPage() {
@@ -34,12 +35,20 @@ export function DashboardPage() {
   }, [books]);
   const [openId, setOpenId] = useState<string>();
   const selected = nowShelf.find((b) => b.id === openId) ?? nowShelf[0];
-  const recentlyAdded = useMemo(
-    () => sortBooks(books, 'recentlyAdded').slice(0, RECENTLY_ADDED_MAX),
-    [books]
-  );
+  const allBookmarks = useRecentBookmarks();
+  // Newest first, skipping bookmarks whose book has been removed.
+  const bookmarks = useMemo(() => {
+    const byId = new Map(books.map((b) => [b.id, b]));
+    return allBookmarks
+      .flatMap((bookmark) => {
+        const book = byId.get(bookmark.bookId);
+        return book ? [{ bookmark, book }] : [];
+      })
+      .slice(0, BOOKMARKS_MAX);
+  }, [allBookmarks, books]);
 
-  const openBook = (bookId: string) => navigate(`${ROUTES.READER}/${bookId}`);
+  const openBook = (bookId: string, page?: number) =>
+    navigate(`${ROUTES.READER}/${bookId}${page ? `?page=${page}` : ''}`);
 
   return (
     <div className="home paper-page">
@@ -87,15 +96,36 @@ export function DashboardPage() {
         </section>
       )}
 
-      {recentlyAdded.length > 0 && (
-        <section className="home__section" aria-labelledby="added-heading">
-          <div className="home__section-head">
-            <h2 id="added-heading" className="paper-eyebrow">Recently added</h2>
-            <Link to={ROUTES.LIBRARY} className="home__see-all">
-              See all {books.length}
-            </Link>
-          </div>
-          <ShelfRail books={recentlyAdded} label="Recently added" onPick={openBook} />
+      {books.length > 0 && (
+        <section className="home__section" aria-labelledby="bookmarks-heading">
+          <h2 id="bookmarks-heading" className="paper-eyebrow">Your bookmarks</h2>
+          {bookmarks.length === 0 ? (
+            <p className="home__bookmarks-empty">Bookmarks you add while reading show up here.</p>
+          ) : (
+            <ul className="home__bookmarks" role="list">
+              {bookmarks.map(({ bookmark, book }) => {
+                const when = formatRelativeTime(bookmark.createdAt);
+                return (
+                  <li key={bookmark.id}>
+                    <button type="button" className="home__bookmark" onClick={() => openBook(book.id, bookmark.page)}>
+                      <span className="home__bookmark-cover">
+                        <BookCover src={book.thumbnail} title={book.title} />
+                      </span>
+                      <span className="home__bookmark-text">
+                        <span className="home__bookmark-title">{bookmark.label ?? `Page ${bookmark.page}`}</span>
+                        <span className="home__bookmark-meta">
+                          {bookmark.label ? `${book.title}, page ${bookmark.page}, ${when}` : `${book.title}, ${when}`}
+                        </span>
+                      </span>
+                      <svg className="home__bookmark-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
+                        <path d="M6 3h12v18l-6-4-6 4z" />
+                      </svg>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
       )}
       <ImportGroupPrompt

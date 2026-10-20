@@ -9,7 +9,7 @@ import {
   type PointerEvent,
   type ReactNode,
 } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { TextLayer } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useToast } from '@/hooks/useToast';
@@ -89,6 +89,13 @@ function ReaderSheet({ labelledBy, onClose, onPointerDown, children }: ReaderShe
  */
 export function ReaderPage() {
   const { bookId } = useParams<{ bookId: string }>();
+  // ?page=N (from a bookmark on Home) opens at that page once; the saved
+  // page only changes when the reader moves on from there.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [startPage] = useState(() => Number(searchParams.get('page')) || undefined);
+  useEffect(() => {
+    if (searchParams.has('page')) setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,7 +125,7 @@ export function ReaderPage() {
   const { showToast } = useToast();
 
   const reader = useReader(pdfDocument, containerRef, bookId, {
-    initialPage: book?.currentPage ?? 1,
+    initialPage: startPage ?? book?.currentPage ?? 1,
     initialZoom: book?.zoom,
     initialScaleMode: book?.scaleMode,
   });

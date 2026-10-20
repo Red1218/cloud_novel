@@ -43,21 +43,81 @@
   }
 }
 
-/* ---- Recently added (on the shared glass shelf) ---- */
+/* ---- Your bookmarks: rows split by rules, no cards ---- */
 
-.home__section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+.home__bookmarks-empty {
+  font-size: 14px;
+  color: var(--paper-muted);
 }
 
-.home__see-all {
-  font-size: 14px;
+.home__bookmarks li + li {
+  border-top: 1px solid var(--paper-line);
+}
+
+.home__bookmark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-3) 0;
+  color: var(--paper-ink);
+  text-align: left;
+}
+
+.home__bookmark-cover {
+  flex-shrink: 0;
+  width: 40px;
+}
+
+.home__bookmark-cover .book-cover {
+  height: 60px;
+  border-radius: 2px;
+}
+
+.home__bookmark-cover .book-cover__placeholder-text {
+  font-size: 7px;
+}
+
+.home__bookmark-cover .book-cover--placeholder {
+  padding: 3px;
+}
+
+.home__bookmark-text {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home__bookmark-title {
+  font-size: 16px;
   font-weight: var(--font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home__bookmark-meta {
+  font-size: 14px;
+  color: var(--paper-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home__bookmark-icon {
+  flex-shrink: 0;
   color: var(--paper-accent);
 }
 
-.home__see-all:focus-visible {
+.home__bookmark:hover .home__bookmark-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home__bookmark:focus-visible {
   outline-color: var(--paper-accent);
 }
 

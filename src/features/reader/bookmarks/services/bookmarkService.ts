@@ -22,6 +22,16 @@ export const bookmarkService = {
   },
 
   /**
+   * Returns bookmarks across all books, newest first; `limit` caps how many.
+   */
+  async getRecentBookmarks(limit?: number): Promise<Bookmark[]> {
+    const db = await getDB();
+    const bookmarks = await db.getAll('bookmarks');
+    bookmarks.sort((a, b) => b.createdAt - a.createdAt);
+    return limit === undefined ? bookmarks : bookmarks.slice(0, limit);
+  },
+
+  /**
    * Persists a new bookmark, generating its id and createdAt timestamp.
    *
    * Idempotent: if the page is already bookmarked, the existing
