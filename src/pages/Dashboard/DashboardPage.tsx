@@ -1,19 +1,22 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
 import { ROUTES } from '@/constants/routes';
 import { BookCover } from '@/components/library/BookCover/BookCover';
 import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
-import { deriveContinueReadingBooks } from '@/features/library/utils/deriveContinueReadingBooks';
+import { TurningShelf } from '@/components/library/TurningShelf/TurningShelf';
+import { openLabel } from '@/features/library/utils/readingStatus';
 import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
 import { sortBooks } from '@/features/library/utils/sortBooks';
 import './DashboardPage.css';
 
 const RECENTLY_ADDED_MAX = 6;
+const NOW_SHELF_MAX = 6;
 
 /**
- * Home: the book you are reading, the others in progress, and recent imports.
+ * Home: a shelf of what you are reading, where one book turns out to show
+ * its cover and how far you are, then recent imports.
  * Reading statistics arrive with Phase 5.6 (Reading Insights).
  */
 export function DashboardPage() {
@@ -23,7 +26,14 @@ export function DashboardPage() {
   const library = useLibrary();
   const { books, isLoading, isImporting, importBooks } = library;
 
-  const [current, ...alsoReading] = useMemo(() => deriveContinueReadingBooks(books), [books]);
+  // Books in progress (last read first), topped up with unread recent imports.
+  const nowShelf = useMemo(() => {
+    const reading = sortBooks(books.filter((b) => b.progress > 0 && b.progress < 100), 'lastOpened');
+    const unread = sortBooks(books.filter((b) => b.progress === 0), 'recentlyAdded');
+    return [...reading, ...unread].slice(0, NOW_SHELF_MAX);
+  }, [books]);
+  const [openId, setOpenId] = useState<string>();
+  const selected = nowShelf.find((b) => b.id === openId) ?? nowShelf[0];
   const recentlyAdded = useMemo(
     () => sortBooks(books, 'recentlyAdded').slice(0, RECENTLY_ADDED_MAX),
     [books]
@@ -50,61 +60,35 @@ export function DashboardPage() {
         </div>
       )}
 
-      {current && (
-        <section className="home__section" aria-labelledby="continue-heading">
-          <h2 id="continue-heading" className="paper-eyebrow">Continue reading</h2>
-          <div className="home__current">
-            <button type="button" className="home__current-cover" onClick={() => openBook(current.id)} aria-label={`Open ${current.title}`}>
-              <BookCover src={current.thumbnail} title={current.title} />
-            </button>
-            <div className="home__current-info">
-              <p className="home__when">Last read {formatRelativeTime(current.lastOpened)}</p>
-              <h3 className="home__current-title">{current.title}</h3>
-              {current.author && <p className="home__author">{current.author}</p>}
-              <div className="paper-progress home__progress">
-                <div
-                  className="paper-progress__bar"
-                  role="progressbar"
-                  aria-valuenow={Math.round(current.progress)}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={`Reading progress: ${Math.round(current.progress)}%`}
-                >
-                  <div style={{ width: `${current.progress}%` }} />
-                </div>
-                <span className="paper-progress__label">
-                  {current.currentPage ?? 1} / {current.pageCount}
-                </span>
+      {selected && (
+        <section className="home__section" aria-labelledby="now-heading">
+          <h2 id="now-heading" className="paper-eyebrow">Reading now</h2>
+          <TurningShelf books={nowShelf} openId={selected.id} onOpen={setOpenId} />
+          <div className="home__now" aria-live="polite">
+            <h3 className="home__current-title">{selected.title}</h3>
+            <p className="home__author">
+              {selected.author ?? 'Unknown author'}
+              {selected.lastOpened ? ` · read ${formatRelativeTime(selected.lastOpened)}` : ' · not started'}
+            </p>
+            <div className="paper-progress home__progress">
+              <div
+                className="paper-progress__bar"
+                role="progressbar"
+                aria-valuenow={Math.round(selected.progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Reading progress: ${Math.round(selected.progress)}%`}
+              >
+                <div style={{ width: `${selected.progress}%` }} />
               </div>
-              <button type="button" className="pill pill--filled home__continue" onClick={() => openBook(current.id)}>
-                Continue reading
-              </button>
+              <span className="paper-progress__label">
+                {selected.progress > 0 ? `${selected.currentPage ?? 1} / ${selected.pageCount}` : `${selected.pageCount} pages`}
+              </span>
             </div>
+            <button type="button" className="pill pill--filled home__continue" onClick={() => openBook(selected.id)}>
+              {openLabel(selected)}
+            </button>
           </div>
-        </section>
-      )}
-
-      {alsoReading.length > 0 && (
-        <section className="home__section" aria-labelledby="also-heading">
-          <h2 id="also-heading" className="paper-eyebrow">Also reading</h2>
-          <ul className="home__list" role="list">
-            {alsoReading.map((book) => (
-              <li key={book.id}>
-                <button type="button" className="home__row" onClick={() => openBook(book.id)}>
-                  <span className="home__row-cover">
-                    <BookCover src={book.thumbnail} title={book.title} />
-                  </span>
-                  <span className="home__row-text">
-                    <span className="home__row-title">{book.title}</span>
-                    <span className="home__row-meta">
-                      {book.author ? `${book.author} · ` : ''}page {book.currentPage ?? 1} of {book.pageCount}
-                    </span>
-                  </span>
-                  <span className="home__row-pct">{Math.round(book.progress)}%</span>
-                </button>
-              </li>
-            ))}
-          </ul>
         </section>
       )}
 

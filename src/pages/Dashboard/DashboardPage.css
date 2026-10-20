@@ -4,41 +4,17 @@
   margin-top: 28px;
 }
 
-/* ---- Continue reading: the book sits on a shelf line ---- */
+/* ---- Reading now: details of the book turned out on the shelf ---- */
 
-.home__current {
+.home__now {
   display: flex;
-  gap: 18px;
-  padding-bottom: 22px;
-  border-bottom: 3px solid var(--paper-ink);
-  box-shadow: 0 6px 0 -3px var(--paper-line);
+  flex-direction: column;
+  margin-top: 22px;
 }
 
-.home__current-cover {
-  flex-shrink: 0;
-  width: 104px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.home__current-cover .book-cover,
 .home__shelf-book .book-cover {
   border-radius: 1px 3px 3px 1px;
   box-shadow: 0 1px 2px rgba(31, 27, 22, 0.25), 0 10px 20px rgba(31, 27, 22, 0.2);
-}
-
-.home__current-info {
-  flex-grow: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.home__when {
-  font-size: var(--font-size-xs);
-  color: var(--paper-muted);
 }
 
 .home__current-title {
@@ -70,64 +46,6 @@
     align-self: flex-start;
     padding: 0 28px;
   }
-}
-
-/* ---- Also reading ---- */
-
-.home__list {
-  margin-top: calc(-1 * var(--space-2));
-}
-
-.home__row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  min-height: 64px;
-  padding: var(--space-2) 0;
-  border: none;
-  border-bottom: 1px solid var(--paper-line);
-  background: none;
-  color: var(--paper-ink);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.home__row-cover {
-  flex-shrink: 0;
-  width: 32px;
-}
-
-.home__row-text {
-  flex-grow: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.home__row-title {
-  font-family: var(--font-family-display);
-  font-size: 17px;
-  font-weight: var(--font-weight-semibold);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.home__row-meta {
-  font-size: 13px;
-  color: var(--paper-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.home__row-pct {
-  font-size: 13px;
-  font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
 }
 
 /* ---- Recently added ---- */
@@ -162,8 +80,6 @@
   cursor: pointer;
 }
 
-.home__current-cover:focus-visible,
-.home__row:focus-visible,
 .home__shelf-book:focus-visible,
 .home__see-all:focus-visible {
   outline-color: var(--paper-accent);

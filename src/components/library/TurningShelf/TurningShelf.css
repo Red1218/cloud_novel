@@ -1,0 +1,171 @@
+/* ==============================================================
+   TURNING SHELF
+   Each book is a 3D box: spine at the front, cover hinged on the
+   spine's right edge, pages opposite the spine. Opening turns the
+   box -90° about that edge so the cover faces you, lifts it a
+   little, and widens its slot from spine to cover width.
+   ============================================================== */
+
+.turning-shelf {
+  --turn: 650ms cubic-bezier(0.22, 0.8, 0.24, 1);
+  --lift: 26px;   /* how far the open book comes toward you */
+  --lean: 12deg;  /* closed spines lean toward the open book */
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  min-height: 214px;
+  padding-bottom: 2px;
+  border-bottom: 3px solid var(--paper-ink);
+  box-shadow: 0 8px 0 -4px var(--paper-line);
+}
+
+.turning-shelf__slot {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--spine);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: width var(--turn);
+}
+
+.turning-shelf__slot[data-open='true'] {
+  width: var(--cover);
+}
+
+.turning-shelf__slot:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: 4px;
+}
+
+.turning-shelf__stage {
+  position: absolute;
+  inset: 0;
+  perspective: 480px;
+  perspective-origin: 50% 40%;
+}
+
+.turning-shelf__box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--spine);
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: var(--spine) 50%;
+  transition: transform var(--turn);
+}
+
+.turning-shelf__slot[data-side='left'] .turning-shelf__box {
+  transform: rotateY(var(--lean));
+}
+
+.turning-shelf__slot[data-side='right'] .turning-shelf__box {
+  transform: rotateY(calc(-1 * var(--lean)));
+}
+
+.turning-shelf__slot[data-open='true'] .turning-shelf__box {
+  transform: translateX(calc(-1 * var(--spine))) translateZ(var(--lift)) rotateY(-90deg);
+}
+
+/* No filter on the box: a filter flattens 3D and the cover would stay edge-on. */
+.turning-shelf__slot[data-open='true'] .turning-shelf__cover {
+  box-shadow: 8px 14px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- Faces ---- */
+
+.turning-shelf__spine {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  padding: 24px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 2px 2px 0 0;
+  backface-visibility: hidden;
+  box-shadow:
+    inset 2px 0 0 rgba(255, 255, 255, 0.12),
+    inset -2px 0 0 rgba(0, 0, 0, 0.22);
+}
+
+.turning-shelf__band {
+  position: absolute;
+  top: 12px;
+  left: 6px;
+  right: 6px;
+  height: 5px;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.55;
+}
+
+.turning-shelf__spine-title,
+.turning-shelf__spine-author {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.turning-shelf__spine-title {
+  max-height: 128px;
+  font-family: var(--font-family-display);
+  font-size: 13px;
+}
+
+.turning-shelf__spine-author {
+  margin-top: auto;
+  max-height: 40px;
+  font-size: 8px;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.turning-shelf__cover {
+  position: absolute;
+  top: 0;
+  left: var(--spine);
+  width: var(--cover);
+  height: 100%;
+  overflow: hidden;
+  border-radius: 2px 4px 4px 2px;
+  transform-origin: left center;
+  transform: rotateY(90deg);
+  backface-visibility: hidden;
+  transition: box-shadow var(--turn);
+}
+
+.turning-shelf__cover .book-cover {
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: inset 4px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+/* The block of pages opposite the spine, seen while the book turns */
+.turning-shelf__pages {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: var(--spine);
+  transform: translateZ(calc(4px - var(--cover))) rotateY(180deg);
+  /* Faces away on a closed book; without this it shows between the spines */
+  backface-visibility: hidden;
+  background: repeating-linear-gradient(90deg, #f4ede0 0 1px, #ddd2bd 1px 2px);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turning-shelf__slot,
+  .turning-shelf__box {
+    transition: none;
+  }
+}
