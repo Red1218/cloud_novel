@@ -3,8 +3,47 @@ import type { Book, StoredBook } from '@/types/book';
 import { BookRepository } from '@/repositories/BookRepository';
 import { extractPdfData } from '@/services/pdfService';
 import { computeSHA256 } from '@/utils/hash';
-import { selectPdfFile } from '@/utils/filePicker';
+import { selectPdfFiles } from '@/utils/filePicker';
 import { useToast } from '@/hooks/useToast';
+
+type ImportResult =
+  | { status: 'added'; title: string }
+  | { status: 'duplicate'; title: string };
+
+/**
+ * Imports one PDF into the library. Throws when the file is not a PDF or
+ * cannot be read; resolves 'duplicate' when the same file is already stored.
+ */
+async function importFile(file: File): Promise<ImportResult> {
+  if (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) {
+    throw new Error('Not a PDF file.');
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  const hash = await computeSHA256(arrayBuffer);
+
+  const existingBook = await BookRepository.getByHash(hash);
+  if (existingBook) {
+    return { status: 'duplicate', title: existingBook.title };
+  }
+
+  const metadata = await extractPdfData(arrayBuffer, file.name);
+  const newBook: StoredBook = {
+    id: crypto.randomUUID(),
+    hash, // SHA-256 hash for duplicate check
+    title: metadata.title,
+    author: metadata.author,
+    fileName: file.name,
+    fileSize: file.size,
+    pageCount: metadata.pageCount,
+    importedAt: Date.now(),
+    progress: 0,
+    thumbnail: metadata.thumbnail,
+    pdf: file,
+  };
+  await BookRepository.save(newBook);
+  return { status: 'added', title: newBook.title };
+}
 
 export function useLibrary() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -33,71 +72,64 @@ export function useLibrary() {
     fetchBooks();
   }, [fetchBooks]);
 
-  const importBook = useCallback(async () => {
+  const importBooks = useCallback(async () => {
+    let files: File[];
     try {
-      // 1. File Picker
-      const file = await selectPdfFile();
-      setIsImporting(true);
+      files = await selectPdfFiles();
+    } catch {
+      return; // Picker cancelled
+    }
 
-      // 2. Read as ArrayBuffer for hashing and processing
-      const arrayBuffer = await file.arrayBuffer();
+    setIsImporting(true);
+    const added: string[] = [];
+    const duplicates: string[] = [];
+    const failed: { name: string; reason: string }[] = [];
 
-      // 3. Compute SHA-256 Hash
-      const hash = await computeSHA256(arrayBuffer);
-
-      // 4. Duplicate Check
-      const existingBook = await BookRepository.getByHash(hash);
-      if (existingBook) {
-        showToast({
-          type: 'warning',
-          title: 'Duplicate Book',
-          message: `The book "${existingBook.title}" is already in your library.`
+    // One at a time: each PDF is parsed and rendered for its thumbnail.
+    for (const file of files) {
+      try {
+        const result = await importFile(file);
+        (result.status === 'added' ? added : duplicates).push(result.title);
+      } catch (err) {
+        console.error(`Import failed for ${file.name}:`, err);
+        failed.push({
+          name: file.name,
+          reason: err instanceof Error && err.message
+            ? err.message
+            : 'The PDF might be corrupted or unsupported.',
         });
-        return;
       }
+    }
 
-      // 5. Extract Metadata and Thumbnail
-      const metadata = await extractPdfData(arrayBuffer, file.name);
+    if (added.length > 0) await fetchBooks();
+    setIsImporting(false);
 
-      // 6. Construct StoredBook Entity
-      const newBook: StoredBook = {
-        id: crypto.randomUUID(), // UUID v4 as requested
-        hash,                    // SHA-256 hash for duplicate check
-        title: metadata.title,
-        author: metadata.author,
-        fileName: file.name,
-        fileSize: file.size,
-        pageCount: metadata.pageCount,
-        importedAt: Date.now(),
-        progress: 0,
-        thumbnail: metadata.thumbnail,
-        pdf: file,               // Blob
-      };
-
-      // 7. Save to Repository
-      await BookRepository.save(newBook);
-
-      // 8. Refresh Library
-      await fetchBooks();
-
-      // Success
+    if (added.length > 0) {
       showToast({
         type: 'success',
         title: 'Import Successful',
-        message: `Added "${newBook.title}" to your library.`
+        message: added.length === 1
+          ? `Added "${added[0]}" to your library.`
+          : `Added ${added.length} books to your library.`,
       });
-
-    } catch (err: any) {
-      if (err.message !== 'File selection cancelled') {
-        console.error('Import failed:', err);
-        showToast({
-          type: 'error',
-          title: 'Import Error',
-          message: err.message || 'Failed to import book. The PDF might be corrupted or unsupported.'
-        });
-      }
-    } finally {
-      setIsImporting(false);
+    }
+    if (duplicates.length > 0) {
+      showToast({
+        type: 'warning',
+        title: duplicates.length === 1 ? 'Duplicate Book' : 'Duplicate Books',
+        message: duplicates.length === 1
+          ? `The book "${duplicates[0]}" is already in your library.`
+          : `${duplicates.length} books were already in your library.`,
+      });
+    }
+    if (failed.length > 0) {
+      showToast({
+        type: 'error',
+        title: 'Import Error',
+        message: failed.length === 1
+          ? `Couldn't import "${failed[0].name}": ${failed[0].reason}`
+          : `Couldn't import ${failed.length} files: ${failed.map((f) => f.name).join(', ')}.`,
+      });
     }
   }, [fetchBooks, showToast]);
 
@@ -105,6 +137,6 @@ export function useLibrary() {
     books,
     isLoading,
     isImporting,
-    importBook,
+    importBooks,
   };
 }

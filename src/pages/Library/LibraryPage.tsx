@@ -33,7 +33,7 @@ export function LibraryPage() {
   useDocumentTitle('Library');
 
   const navigate = useNavigate();
-  const { books, isLoading, isImporting, importBook } = useLibrary();
+  const { books, isLoading, isImporting, importBooks } = useLibrary();
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedId, setSelectedId] = useState<string>();
 
@@ -48,7 +48,7 @@ export function LibraryPage() {
   const selected = visible.find((b) => b.id === selectedId) ?? visible[0];
 
   const importButton = (
-    <button type="button" className="pill pill--outline" onClick={importBook} disabled={isImporting}>
+    <button type="button" className="pill pill--outline" onClick={importBooks} disabled={isImporting}>
       <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
         <path d="M12 5v14M5 12h14" />
       </svg>

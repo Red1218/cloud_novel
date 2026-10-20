@@ -19,7 +19,7 @@ export function DashboardPage() {
   useDocumentTitle('Home');
 
   const navigate = useNavigate();
-  const { books, isLoading, isImporting, importBook } = useLibrary();
+  const { books, isLoading, isImporting, importBooks } = useLibrary();
 
   const [current, ...alsoReading] = useMemo(() => deriveContinueReadingBooks(books), [books]);
   const recentlyAdded = useMemo(
@@ -33,7 +33,7 @@ export function DashboardPage() {
     <div className="home paper-page">
       <header className="paper-header">
         <h1 className="paper-title">Home</h1>
-        <button type="button" className="pill pill--outline" onClick={importBook} disabled={isImporting}>
+        <button type="button" className="pill pill--outline" onClick={importBooks} disabled={isImporting}>
           <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
             <path d="M12 5v14M5 12h14" />
           </svg>
