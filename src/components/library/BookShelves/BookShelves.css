@@ -1,0 +1,196 @@
+/* Books face-out on glass shelves; --shelf-color is set per shelf,
+   --glow by the palette (0 flat paper, 1 neon). */
+
+.shelves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.shelf__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+}
+
+.shelf__dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--shelf-color);
+  box-shadow: 0 0 calc(12px * var(--glow)) var(--shelf-color);
+}
+
+.shelf__name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shelf__count {
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  color: var(--paper-muted);
+}
+
+.shelf__edit {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  border-radius: var(--radius-md);
+  color: var(--paper-muted);
+}
+
+.shelf__edit:hover {
+  background: var(--paper-hover);
+}
+
+.shelf__input {
+  flex-grow: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--space-3);
+  border: 1.5px solid var(--paper-accent);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  color: var(--paper-ink);
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.shelf__text-btn {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  color: var(--paper-muted);
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.shelf__done {
+  height: 40px;
+}
+
+/* ---- The row: covers scroll sideways, the glass sits in front ---- */
+
+.shelf__rail {
+  position: relative;
+}
+
+.shelf__row {
+  display: flex;
+  gap: var(--space-4);
+  min-height: 156px;
+  padding: var(--space-2) var(--space-2) 28px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.shelf__row::-webkit-scrollbar {
+  display: none;
+}
+
+.shelf__book {
+  flex-shrink: 0;
+  width: 84px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  scroll-snap-align: start;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+.shelf__book:focus-visible {
+  outline-color: var(--paper-accent);
+}
+
+.shelf__empty {
+  align-self: center;
+  padding: 0 var(--space-2) var(--space-6);
+  font-size: 14px;
+  color: var(--paper-muted);
+}
+
+.shelf__glass {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 56px;
+  border: 1px solid color-mix(in srgb, var(--shelf-color) 75%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--shelf-color) 22%, transparent);
+  box-shadow:
+    0 0 calc(36px * var(--glow)) color-mix(in srgb, var(--shelf-color) 50%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  pointer-events: none; /* taps and swipes reach the covers */
+}
+
+@media (min-width: 768px) {
+  .shelf__book {
+    width: 104px;
+  }
+}
+
+/* ---- Mouse and trackpad: the wheel scrolls the page, so give the row
+   arrows and a thin scrollbar. Touch keeps plain swiping. ---- */
+
+.shelf__arrow {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shelf__row {
+    scrollbar-width: thin;
+    scrollbar-color: var(--paper-edge) transparent;
+  }
+
+  .shelf__row::-webkit-scrollbar {
+    display: block;
+    height: 6px;
+  }
+
+  .shelf__arrow {
+    position: absolute;
+    top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--paper-line);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--paper-raised) 88%, transparent);
+    color: var(--paper-ink);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .shelf__arrow--prev {
+    left: -6px;
+  }
+
+  .shelf__arrow--next {
+    right: -6px;
+  }
+
+  .shelf__arrow:hover {
+    border-color: var(--paper-accent);
+  }
+
+  .shelf__arrow:focus-visible {
+    outline-color: var(--paper-accent);
+  }
+}

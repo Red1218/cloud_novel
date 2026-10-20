@@ -13,7 +13,7 @@
   padding: var(--space-4);
   border: 1px solid var(--paper-line);
   border-radius: 14px;
-  background: #faf7f0;
+  background: var(--paper-raised);
 }
 
 .import-group__card-title {

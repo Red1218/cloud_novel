@@ -43,7 +43,7 @@
   display: flex;
   padding: 3px;
   border-radius: 22px;
-  background: #e6dfd1;
+  background: var(--paper-tint);
 }
 
 .collection__order-switch button {
@@ -61,8 +61,8 @@
 }
 
 .collection__order-switch button[aria-pressed='true'] {
-  background: var(--paper-ink);
-  color: var(--paper-bg);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
 }
 
 /* ---- Book list ---- */
@@ -100,9 +100,9 @@
 }
 
 .collection__number--next {
-  border-color: var(--paper-ink);
-  background: var(--paper-ink);
-  color: var(--paper-bg);
+  border-color: var(--paper-fill);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
 }
 
 .collection__book {
@@ -151,7 +151,7 @@
 }
 
 .collection__edit:hover {
-  background: rgba(31, 27, 22, 0.06);
+  background: var(--paper-hover);
   color: var(--paper-ink);
 }
 

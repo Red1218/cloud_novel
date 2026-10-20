@@ -38,15 +38,6 @@
   --color-warning:          #f6ad55;
   --color-info:             #63b3ed;
 
-  /* Paper: the app shell, Home, Library and Settings */
-  --paper-bg:     #f2ede3;
-  --paper-ink:    #1f1b16;
-  --paper-muted:  #5f574b;
-  --paper-line:   #d9d1c2;
-  --paper-edge:   #cfc5b3;   /* outlines of unselected pills */
-  --paper-accent: #23395b;
-  --font-family-display: Georgia, 'Times New Roman', serif;
-
   /* Search highlights (drawn over the page, so translucent) */
   --color-search-highlight:          rgba(255, 214, 10, 0.35);
   --color-search-highlight-selected: rgba(255, 149, 0, 0.6);
@@ -148,4 +139,78 @@
   --z-header:   90;
   --z-modal:    200;
   --z-toast:    300;
+}
+
+/* ------------------------------------------------------------
+   PALETTES: the app shell, Home, Library and Settings.
+   Paper is the default; Settings sets data-palette on <html>.
+   The reader keeps paper for its light themes whatever the palette.
+   ------------------------------------------------------------ */
+:root,
+.reader-page,
+[data-palette='paper'] {
+  --paper-bg:      #f2ede3;
+  --paper-ink:     #1f1b16;
+  --paper-muted:   #5f574b;
+  --paper-line:    #d9d1c2;
+  --paper-edge:    #cfc5b3;   /* outlines of unselected pills */
+  --paper-accent:  #23395b;
+  --paper-tint:    #e6dfd1;   /* segmented controls, quiet panels */
+  --paper-raised:  #faf7f0;   /* inputs and sheets above the page */
+  --paper-hover:   rgba(31, 27, 22, 0.06);
+  --paper-scrim:   rgba(31, 27, 22, 0.4);
+  --paper-fill:    #1f1b16;   /* filled buttons and selected chips */
+  --paper-on-fill: #f2ede3;
+  --shelf-1: #23395b;
+  --shelf-2: #b4531a;
+  --shelf-3: #0f5c5c;
+  --glow: 0;                  /* 0 = flat, 1 = neon */
+  --font-family-display: Georgia, 'Times New Roman', serif;
+}
+
+[data-palette='teal'] {
+  color-scheme: dark;
+  --paper-bg: #161a19;  --paper-ink: #eeeae0;  --paper-muted: #a9a79d;
+  --paper-line: #34403e; --paper-edge: #4a5754; --paper-accent: #5fc2b8;
+  --paper-tint: #1f3532; --paper-raised: #1c2221;
+  --paper-hover: rgba(238, 234, 224, 0.08); --paper-scrim: rgba(0, 0, 0, 0.6);
+  --paper-fill: #5fc2b8; --paper-on-fill: #0d1b1a;
+  --shelf-1: #5fc2b8; --shelf-2: #e58a4f; --shelf-3: #c9b8ff;
+  --glow: 1;
+  --font-family-display: var(--font-family-base);
+}
+
+[data-palette='neon'] {
+  color-scheme: dark;
+  --paper-bg: #07080a;  --paper-ink: #f2f4f0;  --paper-muted: #9ea3a0;
+  --paper-line: #23262a; --paper-edge: #3a3f45; --paper-accent: #c6ff3d;
+  --paper-tint: #12151a; --paper-raised: #101215;
+  --paper-hover: rgba(242, 244, 240, 0.08); --paper-scrim: rgba(0, 0, 0, 0.6);
+  --paper-fill: #c6ff3d; --paper-on-fill: #0b0d05;
+  --shelf-1: #c6ff3d; --shelf-2: #ff4fd8; --shelf-3: #3de0ff;
+  --glow: 1;
+  --font-family-display: var(--font-family-base);
+}
+
+[data-palette='ultraviolet'] {
+  color-scheme: dark;
+  --paper-bg: #0d0a1f;  --paper-ink: #efeaff;  --paper-muted: #a99fcf;
+  --paper-line: #2c2650; --paper-edge: #433a74; --paper-accent: #8b7bff;
+  --paper-tint: #1a1538; --paper-raised: #15112d;
+  --paper-hover: rgba(239, 234, 255, 0.08); --paper-scrim: rgba(0, 0, 0, 0.6);
+  --paper-fill: #8b7bff; --paper-on-fill: #0d0a1f;
+  --shelf-1: #8b7bff; --shelf-2: #3de0ff; --shelf-3: #ff7ab8;
+  --glow: 1;
+  --font-family-display: var(--font-family-base);
+}
+
+[data-palette='chrome'] {
+  --paper-bg: #eef1f4;  --paper-ink: #0c1116;  --paper-muted: #4f5a66;
+  --paper-line: #cfd6de; --paper-edge: #b4bec9; --paper-accent: #2a4dff;
+  --paper-tint: #dfe5ec; --paper-raised: #f8fafc;
+  --paper-hover: rgba(12, 17, 22, 0.06); --paper-scrim: rgba(12, 17, 22, 0.4);
+  --paper-fill: #2a4dff; --paper-on-fill: #ffffff;
+  --shelf-1: #2a4dff; --shelf-2: #ff6a2a; --shelf-3: #00a87f;
+  --glow: 0.7;
+  --font-family-display: var(--font-family-base);
 }

@@ -134,8 +134,8 @@ body {
 
 .pill--filled {
   border: none;
-  background: var(--paper-ink);
-  color: var(--paper-bg);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
 }
 
 .pill:disabled {

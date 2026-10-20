@@ -12,14 +12,14 @@
 }
 
 .nav-item:hover {
-  background-color: rgba(31, 27, 22, 0.06);
+  background-color: var(--paper-hover);
   color: var(--paper-ink);
 }
 
 .nav-item--active,
 .nav-item--active:hover {
-  background-color: var(--paper-ink);
-  color: var(--paper-bg);
+  background-color: var(--paper-fill);
+  color: var(--paper-on-fill);
   font-weight: var(--font-weight-semibold);
 }
 

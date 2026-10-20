@@ -15,13 +15,14 @@ export interface ReadingStateUpdate {
 
 /**
  * Collection fields a reader can change on a book. Omitted fields stay as
- * they are; `series: null` takes the book out of its series and an empty
- * `author` clears it.
+ * they are; `series: null` takes the book out of its series, `shelf: null`
+ * puts it back on the default shelf and an empty `author` clears it.
  */
 export interface CollectionsUpdate {
   author?: string;
   series?: BookSeries | null;
   genres?: string[];
+  shelf?: string | null;
 }
 
 /**
@@ -140,7 +141,7 @@ export const BookRepository = {
   },
 
   /**
-   * Sets a book's author, series and genres (the fields collections are
+   * Sets a book's author, series, genres and shelf (the fields collections are
    * built from). Names are trimmed; genres are de-duplicated.
    */
   async updateCollections(id: string, update: CollectionsUpdate): Promise<void> {
@@ -160,6 +161,9 @@ export const BookRepository = {
     if (update.genres !== undefined) {
       const genres = [...new Set(update.genres.map((g) => g.trim()).filter(Boolean))];
       book.genres = genres.length > 0 ? genres : undefined;
+    }
+    if (update.shelf !== undefined) {
+      book.shelf = update.shelf?.trim() || undefined;
     }
 
     await db.put('books', book);

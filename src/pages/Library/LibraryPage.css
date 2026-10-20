@@ -1,5 +1,5 @@
 /* ==============================================================
-   LIBRARY — spines on paper (shared pieces live in globals.css)
+   LIBRARY — glass shelves (shared pieces live in globals.css)
    ============================================================== */
 
 /* ---- Books | Collections switch ---- */
@@ -11,7 +11,7 @@
   margin-top: 18px;
   padding: 3px;
   border-radius: 24px;
-  background: #e6dfd1;
+  background: var(--paper-tint);
 }
 
 .spines-page__view {
@@ -27,8 +27,8 @@
 }
 
 .spines-page__view[aria-selected='true'] {
-  background: var(--paper-ink);
-  color: var(--paper-bg);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
 }
 
 /* ---- Filters ---- */
@@ -49,9 +49,9 @@
 }
 
 .spines-page__chip[aria-pressed='true'] {
-  border-color: var(--paper-ink);
-  background: var(--paper-ink);
-  color: var(--paper-bg);
+  border-color: var(--paper-fill);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
 }
 
 .spines-page__chip-count {
@@ -59,66 +59,49 @@
   opacity: 0.7;
 }
 
-/* ---- Selected book ---- */
+/* ---- Header: "My favourite BOOKS" ---- */
 
-.spines-page__detail {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
-  margin-top: 28px;
-}
-
-.spines-page__cover {
-  flex-shrink: 0;
-  width: 72px;
-}
-
-.spines-page__info {
-  flex-grow: 1;
-  min-width: 0;
+.library-hero {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
 }
 
-.spines-page__book-title {
-  font-family: var(--font-family-display);
-  font-size: 22px;
-  font-weight: var(--font-weight-semibold);
-  line-height: 1.15;
-  overflow-wrap: anywhere;
-}
-
-.spines-page__author {
-  margin-top: var(--space-1);
-  font-size: 14px;
+.library-hero__eyebrow {
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
   color: var(--paper-muted);
 }
 
-.spines-page__progress {
-  margin-top: var(--space-3);
+.library-hero__title {
+  padding-left: 0.14em; /* balances the trailing letter-spacing */
+  font-family: var(--font-family-display);
+  font-size: 64px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-ink);
+  text-shadow: 0 0 calc(24px * var(--glow)) color-mix(in srgb, var(--paper-accent) 45%, transparent);
 }
 
-.spines-page__memberships {
-  margin-top: var(--space-1);
-  font-size: 13px;
+.library-hero__meta {
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--paper-accent);
 }
 
-.spines-page__actions {
-  display: flex;
-  gap: var(--space-2);
-  margin-top: 14px;
-}
-
-.spines-page__open {
-  flex-grow: 1;
-}
-
-@media (min-width: 768px) {
-  .spines-page__open {
-    flex-grow: 0;
-    padding: 0 28px;
-  }
+.library-hero__new-shelf {
+  margin-top: var(--space-4);
+  border: 1.5px dashed var(--paper-edge);
+  background: none;
+  color: var(--paper-ink);
 }
 
 /* ---- Collections tab ---- */

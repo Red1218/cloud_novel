@@ -1,10 +1,8 @@
 import { useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
-import { StatusBar, Style } from '@capacitor/status-bar';
+import { StatusBar } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
-
-/** Matches --paper-bg so the status bar blends into the app shell. */
-const STATUS_BAR_COLOR = '#f2ede3';
+import { syncStatusBar } from '@/features/appearance/palette';
 
 /**
  * Android integration: keeps the status bar out of the web view, and maps the
@@ -16,8 +14,7 @@ export function useNativeApp(): void {
     if (!Capacitor.isNativePlatform()) return;
 
     StatusBar.setOverlaysWebView({ overlay: false })
-      .then(() => StatusBar.setBackgroundColor({ color: STATUS_BAR_COLOR }))
-      .then(() => StatusBar.setStyle({ style: Style.Light })) // dark icons on paper
+      .then(syncStatusBar) // the palette's background, icons that read on it
       .catch((err) => console.error('StatusBar plugin error:', err));
 
     const listener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {

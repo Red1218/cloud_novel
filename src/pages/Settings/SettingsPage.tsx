@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
+import { PALETTES, getPalette, setPalette, type PaletteId } from '@/features/appearance/palette';
 import './SettingsPage.css';
 
 const SHORTCUTS: ReadonlyArray<[keys: string, action: string]> = [
@@ -18,14 +19,15 @@ function formatBytes(bytes: number): string {
 }
 
 /**
- * Settings: what is stored on this device, and (with a keyboard) the
- * reader's shortcuts. Theme, brightness and fit live under Aa in the reader.
+ * Settings: the shell's palette, what is stored on this device, and (with a
+ * keyboard) the reader's shortcuts. Theme, brightness and fit live under Aa in the reader.
  */
 export function SettingsPage() {
   useDocumentTitle('Settings');
 
   const { books, isLoading } = useLibrary();
   const [estimate, setEstimate] = useState<StorageEstimate | null>(null);
+  const [palette, choosePalette] = useState<PaletteId>(getPalette);
 
   useEffect(() => {
     navigator.storage?.estimate().then(setEstimate).catch(() => setEstimate(null));
@@ -39,6 +41,31 @@ export function SettingsPage() {
     <div className="settings paper-page">
       <h1 className="paper-title">Settings</h1>
       <p className="paper-meta">Your library lives on this device. Nothing is uploaded.</p>
+
+      <fieldset className="settings__section settings__palettes">
+        <legend className="paper-eyebrow">Palette</legend>
+        {PALETTES.map(({ id, name }) => (
+          <label key={id} className="settings__palette">
+            <input
+              type="radio"
+              name="palette"
+              checked={palette === id}
+              onChange={() => {
+                choosePalette(id);
+                setPalette(id);
+              }}
+            />
+            {/* Each swatch set reads its own palette's tokens */}
+            <span className="settings__swatches" data-palette={id} aria-hidden="true">
+              <span style={{ background: 'var(--paper-bg)' }} />
+              <span style={{ background: 'var(--shelf-1)' }} />
+              <span style={{ background: 'var(--shelf-2)' }} />
+              <span style={{ background: 'var(--shelf-3)' }} />
+            </span>
+            <span className="settings__label">{name}</span>
+          </label>
+        ))}
+      </fieldset>
 
       <section className="settings__section" aria-labelledby="device-heading">
         <h2 id="device-heading" className="paper-eyebrow">On this device</h2>

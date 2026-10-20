@@ -22,7 +22,7 @@
 }
 
 .collections-sheet::backdrop {
-  background: rgba(31, 27, 22, 0.4);
+  background: var(--paper-scrim);
 }
 
 .collections-sheet__panel {
@@ -138,7 +138,7 @@
   padding: 0 var(--space-3);
   border: 1.5px solid var(--paper-edge);
   border-radius: 10px;
-  background: #faf7f0;
+  background: var(--paper-raised);
   color: var(--paper-ink);
   font-family: inherit;
   font-size: 15px;
@@ -205,9 +205,9 @@
 }
 
 .collections-sheet__chip[aria-pressed='true'] {
-  border-color: var(--paper-ink);
-  background: var(--paper-ink);
-  color: var(--paper-bg);
+  border-color: var(--paper-fill);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
 }
 
 .collections-sheet__new-genre {

@@ -41,6 +41,8 @@ export interface Book {
   series?: BookSeries;
   /** Genres the reader filed this book under (any number) */
   genres?: string[];
+  /** The reader's own shelf in the Library; none = the default shelf */
+  shelf?: string;
 }
 
 /** A book's place in a series: books are read in `number` order. */
