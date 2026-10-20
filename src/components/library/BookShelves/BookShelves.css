@@ -81,15 +81,18 @@
 
 /* ---- The row: covers scroll sideways, the glass sits in front ---- */
 
+/* Full length: the rail steps out over the page padding to the screen edges */
 .shelf__rail {
   position: relative;
+  margin-inline: calc(-1 * var(--page-gutter, 0px));
 }
 
 .shelf__row {
   display: flex;
   gap: var(--space-4);
   min-height: 156px;
-  padding: var(--space-2) var(--space-2) 28px;
+  padding: var(--space-2) var(--page-gutter, var(--space-2)) 28px;
+  scroll-padding-inline: var(--page-gutter, 0px);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
@@ -126,8 +129,7 @@
   right: 0;
   bottom: 4px;
   height: 56px;
-  border: 1px solid color-mix(in srgb, var(--shelf-color) 75%, transparent);
-  border-radius: var(--radius-md);
+  border-block: 1px solid color-mix(in srgb, var(--shelf-color) 75%, transparent);
   background: color-mix(in srgb, var(--shelf-color) 22%, transparent);
   box-shadow:
     0 0 calc(36px * var(--glow)) color-mix(in srgb, var(--shelf-color) 50%, transparent),
@@ -179,11 +181,11 @@
   }
 
   .shelf__arrow--prev {
-    left: -6px;
+    left: var(--space-2);
   }
 
   .shelf__arrow--next {
-    right: -6px;
+    right: var(--space-2);
   }
 
   .shelf__arrow:hover {
