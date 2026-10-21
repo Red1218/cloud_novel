@@ -161,6 +161,8 @@
   --paper-scrim:   rgba(31, 27, 22, 0.4);
   --paper-fill:    #1f1b16;   /* filled buttons and selected chips */
   --paper-on-fill: #f2ede3;
+  --paper-danger:  #b42318;
+  --paper-ok:      #0f5c5c;
   --shelf-1: #23395b;
   --shelf-2: #b4531a;
   --shelf-3: #0f5c5c;
@@ -175,6 +177,7 @@
   --paper-tint: #1f3532; --paper-raised: #1c2221;
   --paper-hover: rgba(238, 234, 224, 0.08); --paper-scrim: rgba(0, 0, 0, 0.6);
   --paper-fill: #5fc2b8; --paper-on-fill: #0d1b1a;
+  --paper-danger: #ff7a6b; --paper-ok: #5fc2b8;
   --shelf-1: #5fc2b8; --shelf-2: #e58a4f; --shelf-3: #c9b8ff;
   --glow: 1;
   --font-family-display: var(--font-family-base);
@@ -187,6 +190,7 @@
   --paper-tint: #12151a; --paper-raised: #101215;
   --paper-hover: rgba(242, 244, 240, 0.08); --paper-scrim: rgba(0, 0, 0, 0.6);
   --paper-fill: #c6ff3d; --paper-on-fill: #0b0d05;
+  --paper-danger: #ff6b6b; --paper-ok: #c6ff3d;
   --shelf-1: #c6ff3d; --shelf-2: #ff4fd8; --shelf-3: #3de0ff;
   --glow: 1;
   --font-family-display: var(--font-family-base);
@@ -199,6 +203,7 @@
   --paper-tint: #1a1538; --paper-raised: #15112d;
   --paper-hover: rgba(239, 234, 255, 0.08); --paper-scrim: rgba(0, 0, 0, 0.6);
   --paper-fill: #8b7bff; --paper-on-fill: #0d0a1f;
+  --paper-danger: #ff7a8a; --paper-ok: #3de0ff;
   --shelf-1: #8b7bff; --shelf-2: #3de0ff; --shelf-3: #ff7ab8;
   --glow: 1;
   --font-family-display: var(--font-family-base);
@@ -210,6 +215,7 @@
   --paper-tint: #dfe5ec; --paper-raised: #f8fafc;
   --paper-hover: rgba(12, 17, 22, 0.06); --paper-scrim: rgba(12, 17, 22, 0.4);
   --paper-fill: #2a4dff; --paper-on-fill: #ffffff;
+  --paper-danger: #c4141c; --paper-ok: #00875f;
   --shelf-1: #2a4dff; --shelf-2: #ff6a2a; --shelf-3: #00a87f;
   --glow: 0.7;
   --text-glow: 0;             /* glowing text blurs on a light page */

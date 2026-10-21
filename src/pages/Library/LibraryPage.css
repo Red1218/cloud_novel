@@ -76,6 +76,12 @@
   color: var(--paper-muted);
 }
 
+.library-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .library-hero__import {
   flex-shrink: 0;
   display: flex;

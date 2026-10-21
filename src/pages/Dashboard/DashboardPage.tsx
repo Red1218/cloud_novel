@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants/routes';
 import { BookCover } from '@/components/library/BookCover/BookCover';
 import { useRecentBookmarks } from '@/features/reader/bookmarks/hooks/useRecentBookmarks';
 import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
+import { ProfileButton } from '@/components/layout/ProfileButton/ProfileButton';
 import { TurningShelf } from '@/components/library/TurningShelf/TurningShelf';
 import { openLabel } from '@/features/library/utils/readingStatus';
 import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
@@ -54,6 +55,7 @@ export function DashboardPage() {
     <div className="home paper-page">
       <header className="paper-header">
         <h1 className="paper-title">Home</h1>
+        <ProfileButton />
       </header>
 
       {!isLoading && books.length === 0 && (

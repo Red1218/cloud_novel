@@ -13,6 +13,8 @@ export const ROUTES = {
   COLLECTION: '/library/collection',
   READER: '/reader',
   SETTINGS: '/settings',
+  PROFILE: '/profile',
+  PROFILE_RESTORE: '/profile/restore',
 } as const;
 
 /** Path of one collection page; an empty author name is the "No author" group. */

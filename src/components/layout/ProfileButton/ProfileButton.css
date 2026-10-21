@@ -1,0 +1,62 @@
+.profile-button {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  color: var(--paper-ink);
+}
+
+.profile-button--signed-out {
+  border: 1.5px solid var(--paper-line);
+}
+
+/* A 2px gap, then an accent ring that glows on the dark palettes */
+.profile-button--signed-in {
+  outline: 1.5px solid var(--paper-accent);
+  outline-offset: -1.5px;
+  box-shadow: 0 0 calc(14px * var(--glow)) color-mix(in srgb, var(--paper-accent) 50%, transparent);
+}
+
+.profile-button:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: 2px;
+}
+
+.profile-button__dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--paper-bg);
+  border-radius: var(--radius-full);
+  background: var(--paper-ok);
+}
+
+.profile-button--syncing .profile-button__dot {
+  background: var(--paper-accent);
+}
+
+.profile-button--error .profile-button__dot {
+  background: var(--paper-danger);
+}
+
+.avatar {
+  display: block;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
+  font-weight: var(--font-weight-semibold);
+}

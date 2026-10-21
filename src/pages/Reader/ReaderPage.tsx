@@ -28,7 +28,7 @@ import { usePdfTextLayer } from '@/features/reader/hooks/usePdfTextLayer';
 import { useReader } from '@/features/reader/hooks/useReader';
 import { useReaderSwipe } from '@/features/reader/hooks/useReaderSwipe';
 import { useReaderBookmarks } from '@/features/reader/bookmarks/hooks/useReaderBookmarks';
-import { useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
+import { getDefaultFit, useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
 import { useReaderSearch } from '@/features/reader/search/hooks/useReaderSearch';
 import type { ReaderOpeningMode } from '@/features/reader/types';
 import { type TextLayerHighlight } from '@/features/reader/search/types';
@@ -128,7 +128,7 @@ export function ReaderPage() {
   const reader = useReader(pdfDocument, containerRef, bookId, {
     initialPage: startPage ?? book?.currentPage ?? 1,
     initialZoom: book?.zoom,
-    initialScaleMode: book?.scaleMode,
+    initialScaleMode: book?.scaleMode ?? getDefaultFit(),
   });
   const { touchLastOpened } = reader;
   useReaderSwipe(containerRef, { nextPage: reader.nextPage, previousPage: reader.previousPage });

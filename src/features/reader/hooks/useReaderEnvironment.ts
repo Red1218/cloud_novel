@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   ReaderEnvironmentSettings,
+  ReaderOpeningMode,
   ReaderTheme,
 } from '../types';
 
 const STORAGE_KEY_PREFIX = 'cloud-novel:reader-environment';
+/** Settings' "New books open with": books with no saved settings start from these. */
+const DEFAULTS_KEY = `${STORAGE_KEY_PREFIX}:global`;
+const DEFAULT_FIT_KEY = 'cloud-novel:reader-default-fit';
 const BRIGHTNESS_MIN = 0;
 const BRIGHTNESS_MAX = 100;
 
@@ -45,7 +49,7 @@ function getStorageKey(bookId: string | undefined): string {
 function readSettings(storageKey: string): ReaderEnvironmentSettings {
   const raw = window.localStorage.getItem(storageKey);
   if (!raw) {
-    return DEFAULT_READER_ENVIRONMENT;
+    return storageKey === DEFAULTS_KEY ? DEFAULT_READER_ENVIRONMENT : readSettings(DEFAULTS_KEY);
   }
 
   try {
@@ -68,6 +72,22 @@ function readSettings(storageKey: string): ReaderEnvironmentSettings {
 
 function writeSettings(storageKey: string, settings: ReaderEnvironmentSettings): void {
   window.localStorage.setItem(storageKey, JSON.stringify(settings));
+}
+
+export function getReaderDefaults(): ReaderEnvironmentSettings {
+  return readSettings(DEFAULTS_KEY);
+}
+
+export function setReaderDefaults(update: ReaderEnvironmentUpdate): void {
+  writeSettings(DEFAULTS_KEY, { ...getReaderDefaults(), ...update });
+}
+
+export function getDefaultFit(): ReaderOpeningMode {
+  return window.localStorage.getItem(DEFAULT_FIT_KEY) === 'fit-page' ? 'fit-page' : 'fit-width';
+}
+
+export function setDefaultFit(mode: ReaderOpeningMode): void {
+  window.localStorage.setItem(DEFAULT_FIT_KEY, mode);
 }
 
 /**

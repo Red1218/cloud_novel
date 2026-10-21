@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants/routes';
 import { BookShelves } from '@/components/library/BookShelves/BookShelves';
 import { BookSheet } from '@/components/library/BookSheet/BookSheet';
 import { BookCollectionsSheet } from '@/components/library/BookCollectionsSheet/BookCollectionsSheet';
+import { ProfileButton } from '@/components/layout/ProfileButton/ProfileButton';
 import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
 import { sortBooks } from '@/features/library/utils/sortBooks';
 import { readState, type ReadState } from '@/features/library/utils/readingStatus';
@@ -136,18 +137,21 @@ export function LibraryPage() {
             </p>
           )}
         </div>
-        <button
-          type="button"
-          className="library-hero__import"
-          onClick={importBooks}
-          disabled={isImporting}
-          aria-label={isImporting ? 'Importing PDFs' : 'Import PDFs'}
-          title="Import PDFs"
-        >
-          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
+        <div className="library-hero__actions">
+          <ProfileButton />
+          <button
+            type="button"
+            className="library-hero__import"
+            onClick={importBooks}
+            disabled={isImporting}
+            aria-label={isImporting ? 'Importing PDFs' : 'Import PDFs'}
+            title="Import PDFs"
+          >
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
       </header>
 
       {!isLoading && books.length === 0 && (

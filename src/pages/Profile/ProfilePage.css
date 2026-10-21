@@ -1,0 +1,320 @@
+/* Profile and "Get books from Drive" (rows and values come from SettingsPage.css) */
+
+.profile__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: -10px;
+}
+
+.profile__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  color: var(--paper-ink);
+}
+
+.profile__back:hover {
+  background: var(--paper-hover);
+}
+
+.profile__bar-title {
+  font-family: var(--font-family-display);
+  font-size: 24px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--paper-ink);
+}
+
+.profile__muted {
+  font-size: 14px;
+  line-height: var(--line-height-base);
+  color: var(--paper-muted);
+}
+
+.profile__section {
+  margin-top: 30px;
+}
+
+.profile__section .paper-eyebrow {
+  margin-bottom: var(--space-1);
+}
+
+/* ---- Signed out ---- */
+
+.profile__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  text-align: center;
+}
+
+.profile__person {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border: 1.5px solid var(--paper-line);
+  border-radius: var(--radius-full);
+  color: var(--paper-muted);
+}
+
+.profile__intro-title {
+  margin-top: var(--space-2);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  color: var(--paper-ink);
+}
+
+.profile__intro-body {
+  max-width: 34ch;
+  font-size: 15px;
+  line-height: var(--line-height-base);
+  color: var(--paper-ink);
+}
+
+/* Google's branded button: light by default, their dark variant on dark palettes */
+.google-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  margin-block: var(--space-2);
+  padding: 0 16px 0 12px;
+  border: 1px solid #747775;
+  border-radius: 22px;
+  background: #ffffff;
+  color: #1f1f1f;
+  font-family: Roboto, var(--font-family-base);
+  font-size: 15px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+[data-palette='teal'] .google-button,
+[data-palette='neon'] .google-button,
+[data-palette='ultraviolet'] .google-button {
+  border-color: #8e918f;
+  background: #131314;
+  color: #e3e3e3;
+}
+
+/* ---- Signed in ---- */
+
+.profile__account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.profile__who {
+  min-width: 0;
+}
+
+.profile__name {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--paper-ink);
+}
+
+.profile__email {
+  font-size: 14px;
+  color: var(--paper-muted);
+  overflow-wrap: anywhere;
+}
+
+.profile__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--paper-accent) 45%, transparent);
+  border-radius: var(--radius-xl);
+  background: var(--paper-tint);
+  color: var(--paper-ink);
+  text-align: left;
+}
+
+.profile__card-title {
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.profile__card-meta {
+  display: block;
+  font-size: 14px;
+  color: var(--paper-muted);
+}
+
+.profile__sync-now {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.profile__status--error {
+  width: 100%;
+  border-color: color-mix(in srgb, var(--paper-danger) 60%, transparent);
+  background: color-mix(in srgb, var(--paper-danger) 12%, var(--paper-tint));
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.profile__status--error .profile__card-title {
+  color: var(--paper-danger);
+}
+
+.profile__backed-up {
+  margin-top: var(--space-3);
+}
+
+.profile__covers {
+  display: flex;
+  gap: var(--space-2);
+  margin-block: var(--space-1);
+}
+
+.profile__cover {
+  flex-shrink: 0;
+  width: 44px;
+}
+
+.profile__cover-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  font-family: var(--font-family-display);
+  font-size: 18px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--paper-muted);
+}
+
+.profile__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.profile__actions .pill {
+  flex: 1;
+}
+
+.profile__switch-row {
+  cursor: pointer;
+}
+
+.profile__row-button {
+  width: 100%;
+  background: none;
+  color: var(--paper-ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile__danger {
+  color: var(--paper-danger);
+}
+
+.profile__note {
+  margin-top: var(--space-2);
+}
+
+/* ---- Dialogs ---- */
+
+.profile__dialog-body {
+  margin-top: var(--space-2);
+  font-size: 15px;
+  line-height: var(--line-height-base);
+  color: var(--paper-muted);
+}
+
+.profile__type-to-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+}
+
+.pill.profile__danger-fill {
+  background: var(--paper-danger);
+  color: #ffffff;
+}
+
+.profile__choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-md);
+  background: var(--paper-tint);
+  cursor: pointer;
+}
+
+.profile__choice:has(input:checked) {
+  border-color: var(--paper-accent);
+}
+
+.profile__choice-title {
+  display: block;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--paper-ink);
+}
+
+.profile__pick-title {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+/* ---- Get books from Drive ---- */
+
+.restore__list {
+  margin-top: var(--space-4);
+}
+
+.restore__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--paper-line);
+  cursor: pointer;
+}
+
+.restore__item input,
+.collections-sheet__option input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--paper-accent);
+}
+
+.restore__text {
+  min-width: 0;
+}
+
+.restore__footer {
+  position: sticky;
+  bottom: 0;
+  padding: var(--space-4) 0;
+  background: var(--paper-bg);
+}
+
+.restore__download {
+  width: 100%;
+}
