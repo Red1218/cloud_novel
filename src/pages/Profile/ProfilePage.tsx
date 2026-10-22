@@ -95,7 +95,7 @@ export function ProfilePage() {
         </section>
       )}
 
-      <section className="profile__section" aria-labelledby="storage-heading">
+      <section className="profile__section profile__storage" aria-labelledby="storage-heading">
         <h2 id="storage-heading" className="paper-eyebrow">Storage</h2>
         <div className="settings__row">
           <span className="settings__label">On this phone</span>

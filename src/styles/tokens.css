@@ -221,3 +221,31 @@
   --text-glow: 0;             /* glowing text blurs on a light page */
   --font-family-display: var(--font-family-base);
 }
+
+/* Stillwater: quiet trays, cards, square-ish buttons and mono numbers (stillwater.css) */
+[data-palette='stillwater'] {
+  --paper-bg: #f6f8f6;  --paper-ink: #14201b;  --paper-muted: #475850;
+  --paper-line: #c4ccc7; --paper-edge: #76847c; --paper-accent: #0f6b54;
+  --paper-tint: #ebefec; --paper-raised: #ffffff;
+  --paper-hover: rgba(20, 32, 27, 0.06); --paper-scrim: rgba(20, 32, 27, 0.4);
+  --paper-fill: #0f6b54; --paper-on-fill: #ffffff;
+  --paper-danger: #b42318; --paper-ok: #0a6577;
+  --shelf-1: #0f6b54; --shelf-2: #e0a030; --shelf-3: #2a5a8c;
+  --glow: 0;
+  --card-shadow: 0 1px 2px rgba(20, 32, 27, 0.08);
+  --font-family-display: var(--font-family-base);
+}
+
+[data-palette='stillwater-dark'] {
+  color-scheme: dark;
+  --paper-bg: #0e1512;  --paper-ink: #eef3ef;  --paper-muted: #a3b2aa;
+  --paper-line: #2c3a33; --paper-edge: #6f8077; --paper-accent: #5fc9a6;
+  --paper-tint: #151e1a; --paper-raised: #1a2520;
+  --paper-hover: rgba(238, 243, 239, 0.08); --paper-scrim: rgba(0, 0, 0, 0.6);
+  --paper-fill: #5fc9a6; --paper-on-fill: #08130f;
+  --paper-danger: #ff8f85; --paper-ok: #5cc8dc;
+  --shelf-1: #5fc9a6; --shelf-2: #e8a94a; --shelf-3: #8db8ec;
+  --glow: 0;
+  --card-shadow: none;
+  --font-family-display: var(--font-family-base);
+}
