@@ -53,6 +53,18 @@
   cursor: default;
 }
 
+/* Touch screens pan with a finger; a zoomed page's scrollbars would only show
+   as light strips along the edges (Android draws them in the page's colours). */
+@media (pointer: coarse) {
+  .reader-viewport-scroll {
+    scrollbar-width: none;
+  }
+
+  .reader-viewport-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* ─── Page stacking context ─────────────────────────────────────────────────── */
 
 /*
