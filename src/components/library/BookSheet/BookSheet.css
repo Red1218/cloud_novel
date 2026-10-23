@@ -34,3 +34,61 @@
 .book-sheet__open {
   flex-grow: 1;
 }
+
+.book-sheet__badge {
+  margin-top: var(--space-2);
+}
+
+/* ---- Plan: Up next / Not now ---- */
+
+.book-sheet__plans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.book-sheet__plan {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 10px 14px;
+  border: 1px solid var(--paper-edge);
+  border-radius: 16px;
+  background: var(--paper-raised);
+  color: var(--paper-ink);
+  text-align: left;
+}
+
+.book-sheet__plan[aria-pressed='true'] {
+  border-color: var(--paper-fill);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
+}
+
+.book-sheet__plan svg {
+  flex-shrink: 0;
+}
+
+.book-sheet__plan-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.book-sheet__plan-hint {
+  display: block;
+  font-size: 13px;
+  color: var(--paper-muted);
+}
+
+.book-sheet__plan[aria-pressed='true'] .book-sheet__plan-hint {
+  color: var(--paper-edge);
+}
+
+.book-sheet__announce {
+  min-height: 1.5em;
+  margin-top: var(--space-2);
+  font-size: 14px;
+  color: var(--paper-muted);
+}

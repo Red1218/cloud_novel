@@ -26,10 +26,11 @@ export function ShelfRail({ books, label, onPick, empty }: ShelfRailProps) {
             key={book.id}
             type="button"
             className="shelf__book"
-            aria-label={book.author ? `${book.title}, ${book.author}` : book.title}
+            aria-label={[book.title, book.author, book.intent === 'next' && 'up next'].filter(Boolean).join(', ')}
             onClick={() => onPick(book.id)}
           >
             <BookCover src={book.thumbnail} title={book.title} />
+            {book.intent === 'next' && <span className="shelf__tag">Up next</span>}
           </button>
         ))}
         {books.length === 0 && empty && <p className="shelf__empty">{empty}</p>}

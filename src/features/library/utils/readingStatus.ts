@@ -21,3 +21,8 @@ export function openLabel(book: Book): string {
   const state = readState(book);
   return state === 'new' ? 'Start reading' : state === 'finished' ? 'Read again' : 'Continue reading';
 }
+
+/** Up next books, oldest mark first. */
+export function upNext(books: readonly Book[]): Book[] {
+  return books.filter((b) => b.intent === 'next').sort((a, b) => (a.intentAt ?? 0) - (b.intentAt ?? 0));
+}

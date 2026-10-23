@@ -8,7 +8,7 @@ import { useRecentBookmarks } from '@/features/reader/bookmarks/hooks/useRecentB
 import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
 import { ProfileButton } from '@/components/layout/ProfileButton/ProfileButton';
 import { TurningShelf } from '@/components/library/TurningShelf/TurningShelf';
-import { openLabel } from '@/features/library/utils/readingStatus';
+import { openLabel, upNext } from '@/features/library/utils/readingStatus';
 import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
 import { sortBooks } from '@/features/library/utils/sortBooks';
 import './DashboardPage.css';
@@ -28,11 +28,14 @@ export function DashboardPage() {
   const library = useLibrary();
   const { books, isLoading } = library;
 
-  // Books in progress (last read first), topped up with unread recent imports.
+  // Books in progress (last read first), then Up next in queue order, topped
+  // up with unread recent imports. Set-aside (Not now) books never show.
   const nowShelf = useMemo(() => {
-    const reading = sortBooks(books.filter((b) => b.progress > 0 && b.progress < 100), 'lastOpened');
-    const unread = sortBooks(books.filter((b) => b.progress === 0), 'recentlyAdded');
-    return [...reading, ...unread].slice(0, NOW_SHELF_MAX);
+    const kept = books.filter((b) => b.intent !== 'later');
+    const reading = sortBooks(kept.filter((b) => b.progress > 0 && b.progress < 100), 'lastOpened');
+    const queued = upNext(kept).filter((b) => !reading.includes(b));
+    const unread = sortBooks(kept.filter((b) => b.progress === 0 && b.intent !== 'next'), 'recentlyAdded');
+    return [...reading, ...queued, ...unread].slice(0, NOW_SHELF_MAX);
   }, [books]);
   const [openId, setOpenId] = useState<string>();
   const selected = nowShelf.find((b) => b.id === openId) ?? nowShelf[0];
@@ -69,7 +72,7 @@ export function DashboardPage() {
       {selected && (
         <section className="home__hero" aria-labelledby="now-heading">
           <span className="orb" aria-hidden="true" />
-          <h2 id="now-heading" className="badge">Reading now</h2>
+          <h2 id="now-heading" className="badge">{selected.intent === 'next' ? 'Up next' : 'Reading now'}</h2>
           <TurningShelf books={nowShelf} openId={selected.id} onOpen={setOpenId} />
           <div className="home__now" aria-live="polite">
             <h3 className="home__current-title">{selected.title}</h3>

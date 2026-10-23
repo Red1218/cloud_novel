@@ -43,7 +43,13 @@ export interface Book {
   genres?: string[];
   /** The reader's own shelf in the Library; none = the default shelf */
   shelf?: string;
+  /** The reader's plan: read it soon ('next') or set it aside ('later') */
+  intent?: BookIntent;
+  /** When the plan was set; Up next is read oldest first */
+  intentAt?: number;
 }
+
+export type BookIntent = 'next' | 'later';
 
 /** A book's place in a series: books are read in `number` order. */
 export interface BookSeries {

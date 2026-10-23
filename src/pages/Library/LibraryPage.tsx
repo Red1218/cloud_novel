@@ -9,20 +9,25 @@ import { BookCollectionsSheet } from '@/components/library/BookCollectionsSheet/
 import { ProfileButton } from '@/components/layout/ProfileButton/ProfileButton';
 import { ImportGroupPrompt } from '@/components/library/ImportGroupSheet/ImportGroupSheet';
 import { sortBooks } from '@/features/library/utils/sortBooks';
-import { readState, type ReadState } from '@/features/library/utils/readingStatus';
+import { readState, statusText, upNext, type ReadState } from '@/features/library/utils/readingStatus';
+import { BookCover } from '@/components/library/BookCover/BookCover';
+import type { Book } from '@/types/book';
 import { DEFAULT_SHELF, deriveShelves, freeShelfName, loadShelfOrder, saveShelfOrder } from '@/features/library/utils/shelves';
 import { deriveCollections, type CollectionKind } from '@/features/library/utils/collections';
 import { CollectionsView } from './CollectionsView';
 
 import './LibraryPage.css';
 
-type Filter = 'all' | ReadState;
+/** Reading states, plus the reader's plans: Up next and Not now. */
+type Filter = 'all' | ReadState | 'next' | 'later';
 
 const FILTERS: ReadonlyArray<[Filter, string]> = [
   ['all', 'All'],
+  ['next', 'Up next'],
   ['reading', 'Reading'],
   ['new', 'New'],
   ['finished', 'Finished'],
+  ['later', 'Not now'],
 ];
 
 const KINDS: ReadonlyArray<[CollectionKind, string]> = [
@@ -50,7 +55,7 @@ export function LibraryPage() {
   const kind: CollectionKind | undefined = viewParam === 'collections' ? 'series' : isKind(viewParam) ? viewParam : undefined;
   const library = useLibrary();
   const { books, isLoading, isImporting, importBooks } = library;
-  const [filter, setFilter] = useState<Filter>('all');
+  const [chosenFilter, setFilter] = useState<Filter>('all');
   // Home's Details opens a book's sheet here (?book=id); closing it goes back.
   const fromHome = params.get('book') ?? undefined;
   const [pickedId, setPickedId] = useState(fromHome);
@@ -59,13 +64,20 @@ export function LibraryPage() {
   const [editingShelf, setEditingShelf] = useState<string>();
 
   const ordered = useMemo(() => sortBooks(books, 'lastOpened'), [books]);
+  // Set-aside books leave the shelves and every count but their own.
+  const onShelves = useMemo(() => ordered.filter((b) => b.intent !== 'later'), [ordered]);
+  const setAside = useMemo(() => ordered.filter((b) => b.intent === 'later'), [ordered]);
+  const queue = useMemo(() => upNext(books), [books]);
   const counts = useMemo(() => {
-    const c: Record<Filter, number> = { all: books.length, new: 0, reading: 0, finished: 0 };
-    for (const book of books) c[readState(book)]++;
+    const c: Record<Filter, number> = { all: onShelves.length, new: 0, reading: 0, finished: 0, next: queue.length, later: setAside.length };
+    for (const book of onShelves) c[readState(book)]++;
     return c;
-  }, [books]);
+  }, [onShelves, queue, setAside]);
+  // Up next and Not now chips only exist while they hold books.
+  const shown = (id: Filter) => (id !== 'next' && id !== 'later') || counts[id] > 0;
+  const filter = shown(chosenFilter) ? chosenFilter : 'all';
 
-  const visible = filter === 'all' ? ordered : ordered.filter((b) => readState(b) === filter);
+  const visible = filter === 'all' ? onShelves : onShelves.filter((b) => readState(b) === filter);
   const allShelves = useMemo(() => deriveShelves(books, shelfOrder), [books, shelfOrder]);
   const customNames = allShelves.filter((s) => s.custom).map((s) => s.name);
   const shelves = deriveShelves(visible, shelfOrder).filter((s) => filter === 'all' || s.books.length > 0);
@@ -163,7 +175,7 @@ export function LibraryPage() {
       {books.length > 0 && (
         <>
           <div ref={chipsRef} className="spines-page__filters" role="group" aria-label="Show">
-            {FILTERS.map(([id, label]) => (
+            {FILTERS.filter(([id]) => shown(id)).map(([id, label]) => (
               <button
                 key={id}
                 type="button"
@@ -190,6 +202,20 @@ export function LibraryPage() {
 
           {kind ? (
             <CollectionsView books={books} collections={collections.filter((c) => c.kind === kind)} kind={kind} />
+          ) : filter === 'next' ? (
+            <PlanList
+              books={queue}
+              numbered
+              note="These also fill Home's Reading now shelf after the books you're in the middle of."
+              onPick={setPickedId}
+            />
+          ) : filter === 'later' ? (
+            <PlanList
+              books={setAside}
+              intro="Set aside for now. Opening one brings it back."
+              onPick={setPickedId}
+              onBringBack={(id) => library.updateCollections(id, { intent: null })}
+            />
           ) : (
             <>
               {visible.length === 0 ? (
@@ -203,6 +229,12 @@ export function LibraryPage() {
                   onDelete={deleteShelf}
                   onPick={setPickedId}
                 />
+              )}
+              {filter === 'all' && setAside.length > 0 && (
+                <p className="plan-aside">
+                  {setAside.length === 1 ? '1 book' : `${setAside.length} books`} set aside for now
+                  <button type="button" className="plan-aside__show" onClick={() => showBooks('later')}>Show</button>
+                </p>
               )}
               {filter === 'all' && (
                 <button type="button" className="pill pill--outline library-hero__new-shelf" onClick={addShelf}>
@@ -225,6 +257,7 @@ export function LibraryPage() {
           onOpen={() => navigate(`${ROUTES.READER}/${picked.id}`)}
           onEditCollections={() => setEditingId(picked.id)}
           onMove={(shelf) => moveBook(picked.id, shelf)}
+          onIntent={(intent) => library.updateCollections(picked.id, { intent })}
           onClose={() => (picked.id === fromHome ? navigate(-1) : setPickedId(undefined))}
         />
       )}
@@ -246,5 +279,49 @@ export function LibraryPage() {
         onClose={library.clearLastImported}
       />
     </div>
+  );
+}
+
+interface PlanListProps {
+  books: readonly Book[];
+  /** Up next shows each book's place in the queue. */
+  numbered?: boolean;
+  intro?: string;
+  note?: string;
+  onPick: (id: string) => void;
+  /** Not now: clears the mark so the book returns to the shelves. */
+  onBringBack?: (id: string) => void;
+}
+
+/** The Up next queue or the set-aside books, as rows of cards. */
+function PlanList({ books, numbered, intro, note, onPick, onBringBack }: PlanListProps) {
+  return (
+    <>
+      {intro && <p className="plan-list__text">{intro}</p>}
+      <ol className="plan-list" role="list">
+        {books.map((book, i) => (
+          <li key={book.id} className="plan-row">
+            <button type="button" className="plan-row__open" onClick={() => onPick(book.id)}>
+              {numbered && <span className="plan-row__number">{i + 1}</span>}
+              <span className="plan-row__cover">
+                <BookCover src={book.thumbnail} title={book.title} />
+              </span>
+              <span className="plan-row__text">
+                <span className="plan-row__title">{book.title}</span>
+                <span className="plan-row__meta">
+                  {[book.author, readState(book) === 'new' ? 'not started' : statusText(book).toLowerCase()].filter(Boolean).join(', ')}
+                </span>
+              </span>
+            </button>
+            {onBringBack && (
+              <button type="button" className="pill pill--outline plan-row__back" onClick={() => onBringBack(book.id)}>
+                Bring back
+              </button>
+            )}
+          </li>
+        ))}
+      </ol>
+      {note && <p className="plan-list__text">{note}</p>}
+    </>
   );
 }

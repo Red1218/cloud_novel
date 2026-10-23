@@ -103,6 +103,7 @@
 }
 
 .shelf__book {
+  position: relative;
   flex-shrink: 0;
   width: 84px;
   padding: 0;
@@ -178,4 +179,21 @@
   .shelf__arrow:focus-visible {
     outline-color: var(--paper-accent);
   }
+}
+
+/* "UP NEXT" on a cover in the reader's queue */
+.shelf__tag {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+  color: var(--paper-ink);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  pointer-events: none;
 }

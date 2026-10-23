@@ -1,5 +1,5 @@
 import { getDB } from '@/services/db';
-import type { Book, BookSeries, StoredBook } from '@/types/book';
+import type { Book, BookIntent, BookSeries, StoredBook } from '@/types/book';
 import type { ScaleMode } from '@/features/reader/types';
 
 /**
@@ -23,6 +23,8 @@ export interface CollectionsUpdate {
   series?: BookSeries | null;
   genres?: string[];
   shelf?: string | null;
+  /** Up next or Not now; null clears the plan. */
+  intent?: BookIntent | null;
 }
 
 /**
@@ -116,6 +118,11 @@ export const BookRepository = {
         const rawProgress = (clampedPage / safePageCount) * 100;
         book.progress = Math.min(100, Math.max(0, rawProgress));
         changed = true;
+        // A finished book is no longer up next.
+        if (book.progress >= 100 && book.intent === 'next') {
+          book.intent = undefined;
+          book.intentAt = undefined;
+        }
       }
     }
 
@@ -132,6 +139,11 @@ export const BookRepository = {
     if (update.lastOpened !== undefined && book.lastOpened !== update.lastOpened) {
       book.lastOpened = update.lastOpened;
       changed = true;
+      // Opening a set-aside book brings it back.
+      if (book.intent === 'later') {
+        book.intent = undefined;
+        book.intentAt = undefined;
+      }
     }
 
     // Only write to IndexedDB if something actually changed
@@ -164,6 +176,10 @@ export const BookRepository = {
     }
     if (update.shelf !== undefined) {
       book.shelf = update.shelf?.trim() || undefined;
+    }
+    if (update.intent !== undefined && update.intent !== (book.intent ?? null)) {
+      book.intent = update.intent ?? undefined;
+      book.intentAt = update.intent ? Date.now() : undefined;
     }
 
     await db.put('books', book);

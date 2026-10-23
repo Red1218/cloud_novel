@@ -215,3 +215,111 @@
   font-size: 14px;
   color: var(--paper-muted);
 }
+
+/* ---- Plans: Up next and Not now ---- */
+
+.plan-aside {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 48px;
+  margin-top: var(--space-2);
+  font-size: 15px;
+  color: var(--paper-muted);
+}
+
+.plan-aside__show {
+  min-height: 44px;
+  color: var(--paper-ink);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.plan-list__text {
+  margin-block: var(--space-3);
+  font-size: 15px;
+  line-height: 1.47;
+  color: var(--paper-muted);
+}
+
+.plan-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 16px;
+  border: 1px solid var(--paper-line);
+  border-radius: 16px;
+  background: var(--paper-raised);
+}
+
+.plan-row__open {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  color: var(--paper-ink);
+  text-align: left;
+}
+
+.plan-row__number {
+  flex-shrink: 0;
+  min-width: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--paper-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-row__cover {
+  flex-shrink: 0;
+  width: 36px;
+}
+
+.plan-row__cover .book-cover {
+  height: 54px;
+  border-radius: 4px;
+}
+
+.plan-row__cover .book-cover--placeholder {
+  padding: 3px;
+}
+
+.plan-row__cover .book-cover__placeholder-text {
+  font-size: 7px;
+}
+
+.plan-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.plan-row__title {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-row__meta {
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--paper-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pill.plan-row__back {
+  height: 36px;
+  padding: 0 14px;
+}

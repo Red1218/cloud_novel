@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Book } from '@/types/book';
+import type { Book, BookIntent } from '@/types/book';
 import { BookCover } from '@/components/library/BookCover/BookCover';
 import { DEFAULT_SHELF } from '@/features/library/utils/shelves';
 import { openLabel, statusText } from '@/features/library/utils/readingStatus';
@@ -14,16 +14,39 @@ export interface BookSheetProps {
   onEditCollections: () => void;
   /** Moves the book; `null` is the default shelf. A name not yet a shelf makes one. */
   onMove: (shelf: string | null) => void;
+  /** Sets the plan for this book; null clears it. */
+  onIntent: (intent: BookIntent | null) => void;
   onClose: () => void;
 }
 
+const PLANS: ReadonlyArray<{ id: BookIntent; label: string; hint: string; badge: string; done: string; icon: string }> = [
+  {
+    id: 'next',
+    label: 'Up next',
+    hint: 'Read it soon',
+    badge: 'Up next',
+    done: "Added to Up next. It joins Home's Reading now shelf.",
+    icon: 'M4 6h11M4 12h11M4 18h7M17 15v6M14 18h6',
+  },
+  {
+    id: 'later',
+    label: 'Not now',
+    hint: 'Set it aside',
+    badge: 'Not now',
+    done: 'Set aside. It leaves your shelves until you open it.',
+    icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+  },
+];
+
 /**
  * A tapped book: its progress, Open and Collections, and the shelf it sits on.
- * Choosing a shelf moves the book at once.
+ * Choosing a shelf moves the book at once, and so does a plan (Up next or Not now).
  */
-export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove, onClose }: BookSheetProps) {
+export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove, onIntent, onClose }: BookSheetProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [newShelf, setNewShelf] = useState('');
+  const [announced, setAnnounced] = useState('');
+  const plan = PLANS.find((p) => p.id === book.intent);
   const progress = Math.round(book.progress);
   const current = book.shelf && shelfNames.includes(book.shelf) ? book.shelf : DEFAULT_SHELF;
   const memberships = [book.series && `${book.series.name} #${book.series.number}`, ...(book.genres ?? [])].filter(Boolean);
@@ -69,6 +92,7 @@ export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove,
               </div>
               <span className="paper-progress__label">{statusText(book)}</span>
             </div>
+            {plan && <p className="badge book-sheet__badge">{plan.badge}</p>}
           </div>
         </div>
 
@@ -79,6 +103,35 @@ export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove,
           <button type="button" className="pill pill--outline" onClick={onEditCollections}>
             Collections
           </button>
+        </div>
+
+        <div>
+          <div className="book-sheet__plans" role="group" aria-label="Plan for this book">
+            {PLANS.map((p) => {
+              const on = book.intent === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  className="book-sheet__plan"
+                  aria-pressed={on}
+                  onClick={() => {
+                    onIntent(on ? null : p.id);
+                    setAnnounced(on ? '' : p.done);
+                  }}
+                >
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d={p.icon} />
+                  </svg>
+                  <span>
+                    <span className="book-sheet__plan-label">{p.label}</span>
+                    <span className="book-sheet__plan-hint">{p.hint}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="book-sheet__announce" aria-live="polite">{announced}</p>
         </div>
 
         <fieldset className="collections-sheet__group">
