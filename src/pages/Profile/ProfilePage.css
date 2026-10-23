@@ -80,7 +80,7 @@
   color: var(--paper-ink);
 }
 
-/* Google's branded button: light by default, their dark variant on dark palettes */
+/* Google's branded button: light by default, their dark variant in Stillwater Dark */
 .google-button {
   display: inline-flex;
   align-items: center;
@@ -98,9 +98,7 @@
   cursor: pointer;
 }
 
-[data-palette='teal'] .google-button,
-[data-palette='neon'] .google-button,
-[data-palette='ultraviolet'] .google-button {
+[data-palette='stillwater-dark'] .google-button {
   border-color: #8e918f;
   background: #131314;
   color: #e3e3e3;
