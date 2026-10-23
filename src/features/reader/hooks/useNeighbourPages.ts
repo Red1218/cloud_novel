@@ -3,6 +3,9 @@ import type { RefObject } from 'react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { isCancelled, renderPage, type PageRender } from '../utils/renderPage';
 
+/** Long enough for the current page to draw first, short enough to be ready for a turn. */
+const NEIGHBOUR_DELAY_MS = 300;
+
 /**
  * Keeps the previous and next pages drawn, at the current page's scale, on
  * the canvases that sit beside it during a page turn. Each canvas is first
@@ -31,7 +34,11 @@ export function useNeighbourPages(
       canvas.hidden = pageNumber < 1 || pageNumber > pdfDocument.numPages;
       if (canvas.hidden) continue;
       canvas.width = 1; // drop the old image at once: a blank sheet until this page lands
+    }
 
+    // Draw the neighbours just after the page itself, so they don't slow it down.
+    const timer = setTimeout(() => neighbours.forEach(([canvas, pageNumber]) => {
+      if (!canvas || canvas.hidden) return;
       pdfDocument.getPage(pageNumber).then((page) => {
         if (!live) return;
         const viewport = page.getViewport({ scale });
@@ -43,10 +50,11 @@ export function useNeighbourPages(
           if (!isCancelled(err)) console.error('Error rendering neighbour page:', err);
         });
       }).catch((err: unknown) => console.error('Failed to load neighbour page:', err));
-    }
+    }), NEIGHBOUR_DELAY_MS);
 
     return () => {
       live = false;
+      clearTimeout(timer);
       renders.forEach((r) => r.cancel());
     };
   }, [pdfDocument, currentPage, scale, prevRef, nextRef]);

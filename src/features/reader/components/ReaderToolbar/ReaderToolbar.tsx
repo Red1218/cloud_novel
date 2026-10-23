@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './ReaderToolbar.css';
 
 interface ReaderToolbarProps {
@@ -5,6 +6,8 @@ interface ReaderToolbarProps {
   totalPages:   number;
   onPrevPage:   () => void;
   onNextPage:   () => void;
+  /** Jumps straight to a page (the scrubber, on release). */
+  onGoToPage:   (page: number) => void;
   /** Effective zoom as a multiplier (1.0 = 100%). */
   zoom:         number;
   onZoomIn:     () => void;
@@ -22,6 +25,7 @@ export function ReaderToolbar({
   totalPages,
   onPrevPage,
   onNextPage,
+  onGoToPage,
   zoom,
   onZoomIn,
   onZoomOut,
@@ -29,7 +33,14 @@ export function ReaderToolbar({
   onOpenReadingEnvironment,
 }: ReaderToolbarProps) {
   const zoomPct = Math.round(zoom * 100);
-  const progress = totalPages > 0 ? Math.round((currentPage / totalPages) * 100) : 0;
+  /** The page under the finger while scrubbing; null when not scrubbing. */
+  const [scrub, setScrub] = useState<number | null>(null);
+  const shown = scrub ?? currentPage;
+  const progress = totalPages > 0 ? Math.round((shown / totalPages) * 100) : 0;
+  const commit = () => {
+    if (scrub !== null && scrub !== currentPage) onGoToPage(scrub);
+    setScrub(null);
+  };
 
   return (
     <div className="reader-toolbar" role="toolbar" aria-label="Reader controls">
@@ -48,13 +59,30 @@ export function ReaderToolbar({
         </svg>
       </button>
 
-      <div className="reader-toolbar__progress">
+      <div className={`reader-toolbar__progress${scrub !== null ? ' reader-toolbar__progress--scrubbing' : ''}`}>
         <div className="reader-toolbar__track" aria-hidden="true">
           <div style={{ width: `${progress}%` }} />
         </div>
+        {/* Drag along the line to move through many pages; the page opens on release */}
+        <input
+          type="range"
+          className="reader-toolbar__scrub"
+          min={1}
+          max={Math.max(1, totalPages)}
+          step={1}
+          value={shown}
+          disabled={totalPages < 2}
+          aria-label="Go to page"
+          aria-valuetext={`Page ${shown} of ${totalPages}`}
+          onChange={(e) => setScrub(Number(e.target.value))}
+          onPointerUp={commit}
+          onPointerCancel={commit}
+          onKeyUp={commit}
+          onBlur={commit}
+        />
         <span className="reader-toolbar__page">
           <span className="reader-toolbar__page-word">Page </span>
-          {currentPage} of {totalPages}
+          {shown} of {totalPages}
         </span>
       </div>
 

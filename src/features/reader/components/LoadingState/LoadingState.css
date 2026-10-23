@@ -27,3 +27,13 @@
     transform: rotate(360deg);
   }
 }
+
+/* Most books open in well under a second: show the spinner only if it takes longer */
+.reader-loading {
+  animation: reader-loading-in 200ms ease 800ms both;
+}
+
+@keyframes reader-loading-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

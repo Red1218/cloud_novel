@@ -561,6 +561,7 @@ export function ReaderPage() {
           totalPages={reader.totalPages}
           onPrevPage={turnPrevious}
           onNextPage={turnNext}
+          onGoToPage={reader.goToPage}
           zoom={reader.effectiveZoom}
           onZoomIn={reader.zoomIn}
           onZoomOut={reader.zoomOut}

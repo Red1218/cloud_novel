@@ -11,6 +11,9 @@ interface UsePdfDocumentResult {
   error: string | null;
 }
 
+/** One PDF.js worker for every book opened, so opening a book skips its start-up. */
+let sharedWorker: pdfjsLib.PDFWorker | null = null;
+
 /**
  * Hook to manage the loading lifecycle of a PDF document.
  */
@@ -43,7 +46,8 @@ export function usePdfDocument(bookId: string | undefined): UsePdfDocumentResult
         const data = new Uint8Array(await storedBook.pdf.arrayBuffer());
         if (!isMounted) return;
 
-        const loadingTask = pdfjsLib.getDocument({ data });
+        sharedWorker ??= new pdfjsLib.PDFWorker();
+        const loadingTask = pdfjsLib.getDocument({ data, worker: sharedWorker });
         currentTask = loadingTask;
         
         const doc = await loadingTask.promise;
