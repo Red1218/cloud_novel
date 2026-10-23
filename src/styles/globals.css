@@ -5,7 +5,6 @@
 
 @import './tokens.css';
 @import './reset.css';
-@import './stillwater.css';
 
 /* The shell is paper (light); the reader sets its own colours per theme. */
 html {

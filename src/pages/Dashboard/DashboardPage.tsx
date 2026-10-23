@@ -67,33 +67,26 @@ export function DashboardPage() {
       )}
 
       {selected && (
-        <section className="home__section" aria-labelledby="now-heading">
-          <h2 id="now-heading" className="paper-eyebrow">Reading now</h2>
+        <section className="home__hero" aria-labelledby="now-heading">
+          <span className="orb" aria-hidden="true" />
+          <h2 id="now-heading" className="badge">Reading now</h2>
           <TurningShelf books={nowShelf} openId={selected.id} onOpen={setOpenId} />
           <div className="home__now" aria-live="polite">
             <h3 className="home__current-title">{selected.title}</h3>
             <p className="home__author">
-              {selected.author ?? 'Unknown author'}
-              {selected.lastOpened ? `, read ${formatRelativeTime(selected.lastOpened)}` : ', not started'}
+              {[
+                selected.author,
+                selected.progress > 0
+                  ? `page ${selected.currentPage ?? 1} of ${selected.pageCount}`
+                  : `${selected.pageCount} pages`,
+              ].filter(Boolean).join(', ')}
             </p>
-            <div className="paper-progress home__progress">
-              <div
-                className="paper-progress__bar"
-                role="progressbar"
-                aria-valuenow={Math.round(selected.progress)}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`Reading progress: ${Math.round(selected.progress)}%`}
-              >
-                <div style={{ width: `${selected.progress}%` }} />
-              </div>
-              <span className="paper-progress__label">
-                {selected.progress > 0 ? `${selected.currentPage ?? 1} / ${selected.pageCount}` : `${selected.pageCount} pages`}
-              </span>
+            <div className="home__actions">
+              <button type="button" className="pill pill--filled home__continue" onClick={() => openBook(selected.id)}>
+                {openLabel(selected)}
+              </button>
+              <Link to={`${ROUTES.LIBRARY}?book=${selected.id}`} className="pill pill--outline">Details</Link>
             </div>
-            <button type="button" className="pill pill--filled home__continue" onClick={() => openBook(selected.id)}>
-              {openLabel(selected)}
-            </button>
           </div>
         </section>
       )}

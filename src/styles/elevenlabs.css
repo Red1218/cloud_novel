@@ -1,0 +1,547 @@
+/* ============================================================
+   ELEVENLABS: the app's look. Loaded after every component's own
+   styles (main.tsx), so these rules win at equal specificity.
+   Type is Inter; no shadows; white cards on #f5f5f5; ink pills.
+   ============================================================ */
+
+body {
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.16px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--paper-pressed);
+  outline-offset: 2px;
+}
+
+/* ---- Type ---- */
+
+.paper-title,
+.library-hero__title {
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1.17;
+  letter-spacing: -0.36px;
+  text-shadow: none;
+}
+
+.paper-eyebrow {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.paper-meta,
+.library-hero__meta {
+  font-size: 15px;
+  line-height: 1.47;
+  letter-spacing: 0.15px;
+}
+
+/* Uppercase badges: NOW READING, 9 BOOKS */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--paper-tint);
+  color: var(--paper-ink);
+  font-family: var(--font-family-base);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 1;
+}
+
+/* ---- Pills: ink filled, or outlined ---- */
+
+.pill {
+  height: 40px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+.pill--filled {
+  border-color: var(--paper-fill);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
+}
+
+.pill--filled:active {
+  border-color: var(--paper-pressed);
+  background: var(--paper-pressed);
+}
+
+.pill--outline {
+  border: 1px solid var(--paper-edge);
+  background: transparent;
+  color: var(--paper-ink);
+}
+
+.pill:hover:not(:disabled) {
+  border-color: var(--paper-pressed);
+}
+
+.pill:disabled {
+  opacity: 1;
+  border-color: var(--paper-line);
+  background: var(--paper-tint);
+  color: var(--paper-disabled);
+}
+
+/* Chips: 40px pills, selected in ink */
+.spines-page__chip,
+.collections-sheet__chip {
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--paper-edge);
+  background: transparent;
+  color: var(--paper-ink);
+  font-size: 15px;
+}
+
+.spines-page__chip[aria-pressed='true'],
+.collections-sheet__chip[aria-pressed='true'] {
+  border-color: var(--paper-fill);
+  background: var(--paper-fill);
+  color: var(--paper-on-fill);
+}
+
+.spines-page__chip-count {
+  opacity: 0.7;
+}
+
+/* Two-way switches become pill groups: a quiet well, the choice in white */
+.settings__segmented,
+.collection__order-switch {
+  padding: 4px;
+  border-radius: var(--radius-full);
+  background: var(--paper-tint);
+}
+
+.settings__segmented button,
+.collection__order-switch button {
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  color: var(--paper-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.settings__segmented button[aria-pressed='true'],
+.collection__order-switch button[aria-pressed='true'] {
+  border-color: var(--paper-line);
+  background: var(--paper-raised);
+  color: var(--paper-ink);
+}
+
+/* ---- Inputs ---- */
+
+.collections-sheet__input,
+.shelf__input {
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--paper-edge);
+  border-radius: 8px;
+  background: var(--paper-raised);
+  font-size: 16px;
+}
+
+/* ---- Cards: white, a hairline, no shadow ---- */
+
+.home__hero,
+.home__bookmarks li,
+.shelf,
+.collections-view__row,
+.collection__shelf,
+.profile__card,
+.profile__storage,
+.profile__intro,
+.settings__card {
+  position: relative;
+  border: 1px solid var(--paper-line);
+  border-radius: 16px;
+  background: var(--paper-raised);
+  box-shadow: none;
+}
+
+/* The orb: one soft pastel circle peeking in from a card's top right */
+.home__hero,
+.profile__intro {
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.orb {
+  position: absolute;
+  top: -90px;
+  right: -90px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 60%, #f4c5a8 0%, #c8b8e0 40%, #a8c8e8 62%, transparent 72%);
+  filter: blur(6px);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.home__hero > :not(.orb),
+.profile__intro > :not(.orb) {
+  position: relative;
+}
+
+/* ---- Shell ---- */
+
+.app-layout,
+.app-main {
+  background-color: var(--paper-bg);
+}
+
+.tab-bar {
+  background: var(--paper-bg);
+  border-top-color: var(--paper-line);
+}
+
+.tab-bar__item {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tab-bar__item--active {
+  color: var(--paper-ink);
+  font-weight: 500;
+}
+
+.tab-bar__item svg,
+.nav-item svg {
+  stroke-width: 1.5;
+}
+
+.profile-button {
+  border: 1px solid var(--paper-line);
+  background: var(--paper-raised);
+}
+
+.profile-button--signed-in {
+  outline: none;
+  box-shadow: none;
+}
+
+.avatar--initials {
+  background: var(--paper-tint);
+  color: var(--paper-ink);
+}
+
+/* ---- Sheets and dialogs ---- */
+
+.collections-sheet__panel {
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--paper-raised);
+  box-shadow: none;
+}
+
+@media (max-width: 767px) {
+  .collections-sheet__panel {
+    padding: var(--space-2) 24px max(24px, env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+  }
+}
+
+.collections-sheet__title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.profile__choice {
+  border-color: var(--paper-edge);
+  border-radius: 12px;
+  background: var(--paper-raised);
+}
+
+.profile__choice:has(input:checked) {
+  border-color: var(--paper-pressed);
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+
+/* ---- Home ---- */
+
+.home .paper-header {
+  align-items: center;
+}
+
+.home__hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding: 24px;
+}
+
+.home__now {
+  margin-top: 0;
+}
+
+.home__current-title {
+  margin-top: 0;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.13;
+  letter-spacing: -0.32px;
+}
+
+.home__author {
+  margin-top: var(--space-2);
+  font-size: 15px;
+  line-height: 1.47;
+  letter-spacing: 0.15px;
+}
+
+.home__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.home__actions .pill {
+  height: 48px;
+}
+
+.home__continue {
+  flex-grow: 1;
+  margin-top: 0;
+}
+
+/* Wider screens: content-width pills, left-aligned */
+@media (min-width: 768px) {
+  .home__continue {
+    flex-grow: 0;
+  }
+
+  .home__actions .pill {
+    padding: 10px 24px;
+  }
+}
+
+.home__section {
+  margin-top: var(--space-8);
+}
+
+.home__bookmarks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.home__bookmarks li + li {
+  border-top: 1px solid var(--paper-line);
+}
+
+.home__bookmark {
+  min-height: 0;
+  padding: 14px 16px;
+}
+
+.home__bookmark-cover {
+  width: 36px;
+}
+
+.home__bookmark-cover .book-cover {
+  height: 54px;
+}
+
+.home__bookmark-title {
+  font-weight: 500;
+}
+
+.home__bookmark-icon {
+  color: var(--paper-ink);
+}
+
+/* ---- Library ---- */
+
+.library-hero {
+  flex-wrap: wrap;
+}
+
+.library-hero__import {
+  width: auto;
+  height: 40px;
+  padding: 0 20px;
+}
+
+.library-hero__new-shelf {
+  border-style: solid;
+}
+
+.shelves {
+  gap: var(--space-4);
+}
+
+.shelf {
+  padding: 24px;
+  overflow: hidden;
+}
+
+.shelf__head {
+  gap: var(--space-3);
+  min-height: 40px;
+  margin-bottom: var(--space-4);
+}
+
+.shelf__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.shelf__name {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+/* Covers scroll to the card's edges, clipped by its corners */
+.shelf__rail {
+  margin-inline: -24px;
+}
+
+.shelf__row {
+  min-height: 0;
+  padding: 0 24px;
+  scroll-padding-inline: 24px;
+}
+
+/* No glass bands: the cards hold the covers */
+.glass-shelf {
+  display: none;
+}
+
+.shelf__book,
+.shelf__book .book-cover {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.shelf__arrow {
+  top: calc(50% - 22px);
+  border-color: var(--paper-line);
+  background: var(--paper-raised);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Collections rows and pages */
+.collections-view__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.collections-view__row {
+  min-height: 0;
+  padding: 16px;
+}
+
+.collections-view__cover {
+  box-shadow: none;
+}
+
+.collections-view__name {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.44;
+  letter-spacing: 0.18px;
+}
+
+.collections-view__missing {
+  border: 1px solid var(--paper-line);
+  border-radius: 16px;
+  background: var(--paper-raised);
+}
+
+.collection__shelf {
+  padding: 24px 0;
+  overflow: hidden;
+}
+
+.collection__shelf .shelf__rail {
+  margin-inline: 0;
+}
+
+.collection__order .paper-eyebrow {
+  font-size: 18px;
+  line-height: 1.44;
+  letter-spacing: 0.18px;
+}
+
+/* ---- Profile ---- */
+
+.profile__bar-title {
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+.profile__intro {
+  margin-top: var(--space-4);
+  padding: 32px 24px 24px;
+}
+
+.profile__intro-title {
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+.profile__person {
+  background: var(--paper-raised);
+  border-color: var(--paper-line);
+}
+
+.profile__card,
+.profile__storage {
+  padding: 24px;
+}
+
+.profile__status--error {
+  border-color: var(--paper-danger);
+  background: var(--paper-raised);
+}
+
+.profile__name {
+  font-weight: 500;
+}
+
+.pill.profile__danger-fill {
+  border-color: var(--paper-danger);
+  background: var(--paper-danger);
+}
+
+/* ---- Settings ---- */
+
+.settings__card {
+  padding: 24px;
+}
+
+.settings__card .settings__row:last-child {
+  border-bottom: none;
+}

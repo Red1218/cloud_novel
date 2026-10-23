@@ -80,7 +80,7 @@
   color: var(--paper-ink);
 }
 
-/* Google's branded button: light by default, their dark variant in Stillwater Dark */
+/* Google's branded button, light variant */
 .google-button {
   display: inline-flex;
   align-items: center;
@@ -98,11 +98,6 @@
   cursor: pointer;
 }
 
-[data-palette='stillwater-dark'] .google-button {
-  border-color: #8e918f;
-  background: #131314;
-  color: #e3e3e3;
-}
 
 /* ---- Signed in ---- */
 

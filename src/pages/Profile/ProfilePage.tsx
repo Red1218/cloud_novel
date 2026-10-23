@@ -82,6 +82,7 @@ export function ProfilePage() {
         </>
       ) : (
         <section className="profile__intro" aria-labelledby="intro-heading">
+          <span className="orb" aria-hidden="true" />
           <span className="profile__person" aria-hidden="true">
             <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
               <circle cx="12" cy="8.5" r="3.5" />

@@ -80,8 +80,9 @@ export function SettingsPage() {
   return (
     <div className="settings paper-page">
       <h1 className="paper-title">Settings</h1>
-      <p className="paper-meta">How the app and your books look.</p>
+      <p className="paper-meta">How new books open.</p>
 
+      {PALETTES.length > 1 && (
       <details className="settings__section settings__palette-group">
         <summary className="settings__summary">
           <span className="settings__summary-text">
@@ -111,8 +112,9 @@ export function SettingsPage() {
           ))}
         </fieldset>
       </details>
+      )}
 
-      <section className="settings__section" aria-labelledby="defaults-heading">
+      <section className="settings__section settings__card" aria-labelledby="defaults-heading">
         <h2 id="defaults-heading" className="paper-eyebrow">New books open with</h2>
         <p className="settings__hint">Each book remembers its own Aa changes after that.</p>
         <Segmented label="Theme" options={THEMES} value={defaults.theme} onChange={(theme) => updateDefaults({ theme })} />

@@ -3,8 +3,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 
 /** The shell's palettes; their colours live in tokens.css under [data-palette]. */
 export const PALETTES = [
-  { id: 'stillwater', name: 'Stillwater' },
-  { id: 'stillwater-dark', name: 'Stillwater Dark' },
+  { id: 'elevenlabs', name: 'ElevenLabs' },
 ] as const;
 
 export type PaletteId = (typeof PALETTES)[number]['id'];
@@ -14,9 +13,9 @@ const STORAGE_KEY = 'cloud-novel:palette';
 export function getPalette(): PaletteId {
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY);
-    return PALETTES.find((p) => p.id === saved)?.id ?? 'stillwater';
+    return PALETTES.find((p) => p.id === saved)?.id ?? 'elevenlabs';
   } catch {
-    return 'stillwater';
+    return 'elevenlabs';
   }
 }
 

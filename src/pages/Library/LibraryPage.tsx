@@ -51,7 +51,9 @@ export function LibraryPage() {
   const library = useLibrary();
   const { books, isLoading, isImporting, importBooks } = library;
   const [filter, setFilter] = useState<Filter>('all');
-  const [pickedId, setPickedId] = useState<string>();
+  // Home's Details opens a book's sheet here (?book=id); closing it goes back.
+  const fromHome = params.get('book') ?? undefined;
+  const [pickedId, setPickedId] = useState(fromHome);
   const [editingId, setEditingId] = useState<string>();
   const [shelfOrder, setShelfOrder] = useState(loadShelfOrder);
   const [editingShelf, setEditingShelf] = useState<string>();
@@ -141,15 +143,12 @@ export function LibraryPage() {
           <ProfileButton />
           <button
             type="button"
-            className="library-hero__import"
+            className="pill pill--filled library-hero__import"
             onClick={importBooks}
             disabled={isImporting}
-            aria-label={isImporting ? 'Importing PDFs' : 'Import PDFs'}
-            title="Import PDFs"
+              title="Import PDFs"
           >
-            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
+            {isImporting ? 'Importing…' : 'Import'}
           </button>
         </div>
       </header>
@@ -206,7 +205,7 @@ export function LibraryPage() {
                 />
               )}
               {filter === 'all' && (
-                <button type="button" className="pill library-hero__new-shelf" onClick={addShelf}>
+                <button type="button" className="pill pill--outline library-hero__new-shelf" onClick={addShelf}>
                   <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
                     <path d="M12 5v14M5 12h14" />
                   </svg>
@@ -226,7 +225,7 @@ export function LibraryPage() {
           onOpen={() => navigate(`${ROUTES.READER}/${picked.id}`)}
           onEditCollections={() => setEditingId(picked.id)}
           onMove={(shelf) => moveBook(picked.id, shelf)}
-          onClose={() => setPickedId(undefined)}
+          onClose={() => (picked.id === fromHome ? navigate(-1) : setPickedId(undefined))}
         />
       )}
 
