@@ -19,6 +19,8 @@ export interface ReadingStateUpdate {
  * puts it back on the default shelf and an empty `author` clears it.
  */
 export interface CollectionsUpdate {
+  /** A new title; trimmed, at most 200 characters, ignored when empty. */
+  title?: string;
   author?: string;
   series?: BookSeries | null;
   genres?: string[];
@@ -173,6 +175,11 @@ export const BookRepository = {
     const book = await db.get('books', id);
     if (!book) return;
 
+    const title = update.title?.trim().slice(0, 200);
+    if (title && title !== book.title) {
+      book.fileTitle ??= book.title;
+      book.title = title;
+    }
     if (update.author !== undefined) {
       book.author = update.author.trim() || undefined;
     }

@@ -258,6 +258,7 @@ export function LibraryPage() {
           onEditCollections={() => setEditingId(picked.id)}
           onMove={(shelf) => moveBook(picked.id, shelf)}
           onIntent={(intent) => library.updateCollections(picked.id, { intent })}
+          onRename={(title) => library.updateCollections(picked.id, { title })}
           onRemove={() => {
             void library.removeBook(picked.id);
             setPickedId(undefined);

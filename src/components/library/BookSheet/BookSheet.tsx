@@ -18,6 +18,8 @@ export interface BookSheetProps {
   onIntent: (intent: BookIntent | null) => void;
   /** Deletes the book (after the sheet's own confirm). */
   onRemove: () => void;
+  /** Saves a new title (already trimmed and non-empty). */
+  onRename: (title: string) => void;
   onClose: () => void;
 }
 
@@ -44,11 +46,31 @@ const PLANS: ReadonlyArray<{ id: BookIntent; label: string; hint: string; badge:
  * A tapped book: its progress, Open and Collections, and the shelf it sits on.
  * Choosing a shelf moves the book at once, and so does a plan (Up next or Not now).
  */
-export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove, onIntent, onRemove, onClose }: BookSheetProps) {
+export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove, onIntent, onRemove, onRename, onClose }: BookSheetProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [newShelf, setNewShelf] = useState('');
   const [announced, setAnnounced] = useState('');
   const [confirmRemove, setConfirmRemove] = useState(false);
+  /** The title being edited; null when not renaming. */
+  const [draft, setDraft] = useState<string | null>(null);
+  const [renamed, setRenamed] = useState(false);
+
+  // "Renamed." clears after a few seconds.
+  useEffect(() => {
+    if (!renamed) return;
+    const timer = setTimeout(() => setRenamed(false), 3000);
+    return () => clearTimeout(timer);
+  }, [renamed]);
+
+  const saveTitle = () => {
+    const title = draft?.trim() ?? '';
+    if (!title) return;
+    if (title !== book.title) {
+      onRename(title);
+      setRenamed(true);
+    }
+    setDraft(null);
+  };
   const plan = PLANS.find((p) => p.id === book.intent);
   const progress = Math.round(book.progress);
   const current = book.shelf && shelfNames.includes(book.shelf) ? book.shelf : DEFAULT_SHELF;
@@ -79,7 +101,48 @@ export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove,
             <BookCover src={book.thumbnail} title={book.title} />
           </div>
           <div className="book-sheet__info">
-            <h2 id="book-sheet-title" className="collections-sheet__title">{book.title}</h2>
+            {draft === null ? (
+              <div className="book-sheet__title-row">
+                <h2 id="book-sheet-title" className="collections-sheet__title">{book.title}</h2>
+                <button type="button" className="book-sheet__rename" aria-label={`Rename ${book.title}`} onClick={() => setDraft(book.title)}>
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 20h4L19 9l-4-4L4 16z" />
+                    <path d="M13 7l4 4" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <form
+                className="book-sheet__rename-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  saveTitle();
+                }}
+              >
+                <h2 id="book-sheet-title" className="visually-hidden">{book.title}</h2>
+                <label className="visually-hidden" htmlFor="book-title-input">Book title</label>
+                <input
+                  id="book-title-input"
+                  className="collections-sheet__input"
+                  value={draft}
+                  maxLength={200}
+                  autoFocus
+                  onFocus={(e) => e.currentTarget.select()}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Escape') return;
+                    e.preventDefault(); // keep the sheet open: Escape only cancels the rename
+                    e.stopPropagation();
+                    setDraft(null);
+                  }}
+                />
+                <div className="book-sheet__rename-actions">
+                  <button type="submit" className="pill pill--filled" disabled={!draft.trim()}>Save</button>
+                  <button type="button" className="pill pill--outline" onClick={() => setDraft(null)}>Cancel</button>
+                </div>
+              </form>
+            )}
+            <p className="book-sheet__renamed" aria-live="polite">{renamed ? 'Renamed.' : ''}</p>
             {book.author && <p className="collections-sheet__subtitle">{book.author}</p>}
             {memberships.length > 0 && <p className="book-sheet__memberships">{memberships.join(' · ')}</p>}
             <div className="paper-progress book-sheet__progress">

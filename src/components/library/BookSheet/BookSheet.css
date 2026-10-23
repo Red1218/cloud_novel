@@ -126,3 +126,50 @@
   background: var(--paper-danger);
   color: #ffffff;
 }
+
+/* ---- Rename ---- */
+
+.book-sheet__title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.book-sheet__title-row .collections-sheet__title {
+  flex-grow: 1;
+  min-width: 0;
+  padding-top: 10px; /* first line level with the pencil's middle */
+}
+
+.book-sheet__rename {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 -10px 0 0;
+  border-radius: var(--radius-full);
+  color: var(--paper-muted);
+}
+
+.book-sheet__rename:hover {
+  background: var(--paper-hover);
+}
+
+.book-sheet__rename-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.book-sheet__rename-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Kept in the page while empty (and so zero height) so the live region announces */
+.book-sheet__renamed {
+  font-size: 14px;
+  color: var(--paper-muted);
+}

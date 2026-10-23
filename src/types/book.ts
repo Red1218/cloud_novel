@@ -9,8 +9,10 @@ export interface Book {
   id: string;
   /** The SHA-256 hash of the PDF file, used for duplicate detection */
   hash: string;
-  /** Extracted or default title */
+  /** Extracted or default title; the reader can rename it */
   title: string;
+  /** The PDF's own title, kept the first time the book is renamed */
+  fileTitle?: string;
   /** Extracted or default author */
   author?: string;
   /** Original file name */

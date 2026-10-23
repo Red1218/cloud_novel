@@ -136,7 +136,7 @@
 
 .reader-page--chrome-visible {
   --reader-chrome-top-inset:    78px;
-  --reader-chrome-bottom-inset: 84px;
+  --reader-chrome-bottom-inset: 122px; /* the 3-row bar (130px) less the page padding, plus a gap */
 }
 
 .reader-page__content {
@@ -191,10 +191,11 @@
   transform: translateX(-50%);
 }
 
+/* The bottom bar is a full-width sheet along the screen's foot */
 .reader-page__bottom-chrome {
-  left: 50%;
-  bottom: max(var(--space-5), calc(var(--space-5) + env(safe-area-inset-bottom)));
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .reader-page--chrome-visible .reader-page__bottom-chrome {
@@ -261,9 +262,6 @@
     top: max(var(--space-2), calc(var(--space-2) + env(safe-area-inset-top)));
   }
 
-  .reader-page__bottom-chrome {
-    bottom: max(var(--space-3), calc(var(--space-3) + env(safe-area-inset-bottom)));
-  }
 
   .reader-page__search-chrome {
     top: calc(max(var(--space-2), calc(var(--space-2) + env(safe-area-inset-top))) + 58px + var(--space-2));
@@ -274,7 +272,7 @@
      bottom: toolbar (56px) + bottom offset (12px) + gap (8px) = 76px  */
   .reader-page--chrome-visible {
     --reader-chrome-top-inset:    74px;
-    --reader-chrome-bottom-inset: 76px;
+    --reader-chrome-bottom-inset: 122px;
   }
 }
 

@@ -1,16 +1,149 @@
+/* Bottom reader bar: a full-width sheet along the screen's foot, in three
+   rows: page labels, the page scrubber, then the buttons. */
 .reader-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100vw;
+  box-sizing: border-box;
+  padding: 10px max(16px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  border-top: 1px solid var(--reader-chrome-border);
+  background: var(--reader-chrome-bg);
+  backdrop-filter: var(--reader-chrome-blur);
+}
+
+/* Keep the rows to a comfortable length on wide screens */
+.reader-toolbar > * {
+  width: 100%;
+  max-width: 620px;
+  margin-inline: auto;
+}
+
+/* ---- Row 1: where you are ---- */
+
+.reader-toolbar__labels {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--reader-chrome-text-muted);
+  font-size: 13px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- Row 2: the scrubber ---- */
+
+.reader-toolbar__scrubber {
+  position: relative;
+  height: 44px;
+}
+
+/* The visible line; the range input sits over it to take the touches */
+.reader-toolbar__track {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--reader-chrome-track);
+  overflow: hidden;
+}
+
+.reader-toolbar__track > div {
+  height: 100%;
+  background: var(--reader-panel-accent);
+}
+
+.reader-toolbar__scrub {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.reader-toolbar__scrub::-webkit-slider-runnable-track {
+  height: 44px;
+  background: transparent;
+}
+
+.reader-toolbar__scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: var(--reader-panel-accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.reader-toolbar__scrub::-moz-range-track {
+  background: transparent;
+}
+
+.reader-toolbar__scrub::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: var(--reader-panel-accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.reader-toolbar__scrub:disabled {
+  cursor: default;
+}
+
+.reader-toolbar__scrub:disabled::-webkit-slider-thumb {
+  visibility: hidden;
+}
+
+.reader-toolbar__scrub:focus-visible {
+  outline: 2px solid var(--reader-chrome-text);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* "Page n" over the thumb while dragging; it follows the thumb and stays
+   inside the bar at the ends. */
+.reader-toolbar__bubble {
+  position: absolute;
+  bottom: 34px; /* 40px above the line (the line sits 20px down a 44px row) */
+  left: clamp(36px, calc(10px + var(--pos) * (100% - 20px)), calc(100% - 36px));
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  background: var(--reader-panel-accent);
+  color: var(--reader-panel-active-text, #ffffff);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Row 3: buttons ---- */
+
+.reader-toolbar__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reader-toolbar__group {
   display: flex;
   align-items: center;
   gap: 2px;
-  width: min(620px, calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)));
-  box-sizing: border-box;
-  min-height: 56px;
-  padding: 6px;
-  border: 1px solid var(--reader-chrome-border);
-  border-radius: var(--radius-full);
-  background: var(--reader-chrome-bg);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
-  backdrop-filter: var(--reader-chrome-blur);
 }
 
 .reader-toolbar__button,
@@ -36,108 +169,6 @@
   cursor: default;
 }
 
-/* ---- Page progress ---- */
-
-.reader-toolbar__progress {
-  position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 0 var(--space-1);
-}
-
-.reader-toolbar__track {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--reader-chrome-track);
-  overflow: hidden;
-}
-
-.reader-toolbar__track > div {
-  height: 100%;
-  background: var(--reader-panel-accent);
-}
-
-/* The scrubber: an invisible range input over the line, 44px tall to grab,
-   with a round thumb on the line itself. */
-.reader-toolbar__scrub {
-  position: absolute;
-  inset: -12px 0 auto;
-  width: 100%;
-  height: 32px;
-  margin: 0;
-  background: transparent;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  touch-action: none;
-}
-
-.reader-toolbar__scrub::-webkit-slider-runnable-track {
-  height: 32px;
-  background: transparent;
-}
-
-.reader-toolbar__scrub::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  margin-top: 8px;
-  border-radius: 50%;
-  background: var(--reader-panel-accent);
-  box-shadow: 0 0 0 3px var(--reader-chrome-bg);
-}
-
-.reader-toolbar__scrub::-moz-range-track {
-  background: transparent;
-}
-
-.reader-toolbar__scrub::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border: none;
-  border-radius: 50%;
-  background: var(--reader-panel-accent);
-}
-
-.reader-toolbar__scrub:disabled {
-  cursor: default;
-}
-
-.reader-toolbar__scrub:disabled::-webkit-slider-thumb {
-  visibility: hidden;
-}
-
-.reader-toolbar__scrub:focus-visible {
-  outline: 2px solid var(--reader-panel-accent);
-  outline-offset: 2px;
-}
-
-/* While dragging, the page number brightens to show where you will land */
-.reader-toolbar__progress--scrubbing .reader-toolbar__page {
-  color: var(--reader-chrome-text);
-}
-
-.reader-toolbar__page {
-  color: var(--reader-chrome-text-muted);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ---- Zoom and Aa ---- */
-
-.reader-toolbar__zoom-group {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
 .reader-toolbar__zoom-value {
   min-width: 58px;
   padding: 0 var(--space-2);
@@ -147,25 +178,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Aa: an outlined circle */
 .reader-toolbar__aa {
+  width: 44px;
+  margin-left: var(--space-1);
+  border: 1px solid var(--reader-chrome-divider);
   font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
 }
 
-.reader-toolbar__divider {
-  flex-shrink: 0;
-  width: 1px;
-  height: 28px;
-  margin: 0 var(--space-1);
-  background-color: var(--reader-chrome-divider);
-}
-
-/* Phones: keep page turning, zoom and Aa; the zoom level shows as a toast. */
+/* Phones: the zoom level shows as a toast instead */
 @media (max-width: 560px) {
-  .reader-toolbar__zoom-value,
-  .reader-toolbar__divider,
-  .reader-toolbar__page-word {
+  .reader-toolbar__zoom-value {
     display: none;
   }
 }
