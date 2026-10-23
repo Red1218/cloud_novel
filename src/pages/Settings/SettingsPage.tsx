@@ -3,11 +3,14 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { PALETTES, getPalette, setPalette, type PaletteId } from '@/features/appearance/palette';
 import {
   getDefaultFit,
+  getDefaultZoom,
   getReaderDefaults,
   setDefaultFit,
+  setDefaultZoom,
+  type DefaultFit,
   setReaderDefaults,
 } from '@/features/reader/hooks/useReaderEnvironment';
-import type { ReaderOpeningMode, ReaderTheme } from '@/features/reader/types';
+import type { ReaderTheme } from '@/features/reader/types';
 import './SettingsPage.css';
 
 const SHORTCUTS: ReadonlyArray<[keys: string, action: string]> = [
@@ -25,9 +28,10 @@ const THEMES: ReadonlyArray<[ReaderTheme, string]> = [
   ['contrast', 'Contrast'],
 ];
 
-const FITS: ReadonlyArray<[ReaderOpeningMode, string]> = [
+const FITS: ReadonlyArray<[DefaultFit, string]> = [
   ['fit-width', 'Fit width'],
-  ['fit-page', 'Whole page'],
+  ['fit-page', 'Fit screen'],
+  ['custom', 'Zoom'],
 ];
 
 function Swatches({ palette }: { palette: PaletteId }) {
@@ -63,8 +67,9 @@ function Segmented<T extends string>({ label, options, value, onChange }: {
 }
 
 /**
- * Settings: how the app and books look. The palette, what new books open
- * with (each book keeps its own Aa changes after that), and keyboard shortcuts.
+ * Settings: how books look. The page fit every book opens with, the theme
+ * and controls new books open with (each keeps its own Aa changes after
+ * that), and keyboard shortcuts.
  */
 export function SettingsPage() {
   useDocumentTitle('Settings');
@@ -72,6 +77,7 @@ export function SettingsPage() {
   const [palette, choosePalette] = useState<PaletteId>(getPalette);
   const [defaults, setDefaults] = useState(getReaderDefaults);
   const [fit, setFit] = useState(getDefaultFit);
+  const [zoom, setZoom] = useState(getDefaultZoom);
   const updateDefaults = (update: Partial<typeof defaults>) => {
     setReaderDefaults(update);
     setDefaults((current) => ({ ...current, ...update }));
@@ -80,7 +86,7 @@ export function SettingsPage() {
   return (
     <div className="settings paper-page">
       <h1 className="paper-title">Settings</h1>
-      <p className="paper-meta">How new books open.</p>
+      <p className="paper-meta">How your books open.</p>
 
       {PALETTES.length > 1 && (
       <details className="settings__section settings__palette-group">
@@ -114,19 +120,50 @@ export function SettingsPage() {
       </details>
       )}
 
+      <section className="settings__section settings__card" aria-labelledby="fit-heading">
+        <h2 id="fit-heading" className="paper-eyebrow">Page fit</h2>
+        <p className="settings__hint">Every book opens this way. Fit screen shows the whole page with nothing cut off; Zoom opens at your zoom, centred. + and − still zoom while you read.</p>
+        <div className="settings__segmented" role="group" aria-labelledby="fit-heading">
+          {FITS.map(([id, name]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={fit === id}
+              onClick={() => {
+                setDefaultFit(id);
+                setFit(id);
+              }}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+        {fit === 'custom' && (
+          <label className="settings__row settings__zoom">
+            <span className="settings__label">Zoom level</span>
+            <span className="settings__zoom-input">
+              <input
+                type="number"
+                inputMode="numeric"
+                min={25}
+                max={500}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                onBlur={() => {
+                  setDefaultZoom(zoom);
+                  setZoom(getDefaultZoom());
+                }}
+              />
+              %
+            </span>
+          </label>
+        )}
+      </section>
+
       <section className="settings__section settings__card" aria-labelledby="defaults-heading">
         <h2 id="defaults-heading" className="paper-eyebrow">New books open with</h2>
         <p className="settings__hint">Each book remembers its own Aa changes after that.</p>
         <Segmented label="Theme" options={THEMES} value={defaults.theme} onChange={(theme) => updateDefaults({ theme })} />
-        <Segmented
-          label="Page fit"
-          options={FITS}
-          value={fit}
-          onChange={(mode) => {
-            setDefaultFit(mode);
-            setFit(mode);
-          }}
-        />
         <label className="settings__row settings__switch-row">
           <span className="settings__label">Hide controls while reading</span>
           <input

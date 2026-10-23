@@ -10,6 +10,9 @@ const TURN_SPEED = 0.3;
 /** Movement before a touch counts as a drag, and how sideways it must be. */
 const LOCK_DISTANCE = 10;
 const LOCK_RATIO = 1.5;
+/** Zoomed in by less than this past an edge still counts as at that edge, so a
+    page a few pixels wider than the screen turns on the first swipe. */
+const EDGE_SLACK = 24;
 /** Pull past the first or last page moves the page this much of the finger's distance. */
 const EDGE_RESISTANCE = 0.25;
 const SETTLE_MS = 240;
@@ -33,6 +36,9 @@ interface PageTurnOptions extends PageTurnRefs {
   page: PDFPageProxy | null;
   nextPage: () => void;
   previousPage: () => void;
+  /** The page rests centred (the default zoom): it lands there after a turn,
+   *  stays there when it resizes, and a swipe from there turns the page. */
+  centred?: boolean;
 }
 
 interface Gesture {
@@ -60,13 +66,25 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
  */
 export function usePageTurn({
   containerRef, trackRef, canvasRef, prevRef, nextRef,
-  currentPage, totalPages, page, nextPage, previousPage,
+  currentPage, totalPages, page, nextPage, previousPage, centred = false,
 }: PageTurnOptions) {
   // The latest values, for listeners and callbacks that outlive a render.
-  const latest = useRef({ currentPage, totalPages, nextPage, previousPage });
-  latest.current = { currentPage, totalPages, nextPage, previousPage };
+  const latest = useRef({ currentPage, totalPages, nextPage, previousPage, centred });
+  latest.current = { currentPage, totalPages, nextPage, previousPage, centred };
   /** Finishes a running settle or spring at once; null when nothing runs. */
   const runningRef = useRef<(() => void) | null>(null);
+
+  /** Where a turned-to page rests: centred, or (zoomed in) next at its left
+   *  edge and previous at its right edge. Measured from the page alone, since
+   *  visible neighbours widen scrollWidth while turning. */
+  const landing = useCallback((container: HTMLElement, dir: 1 | -1) => {
+    const track = trackRef.current;
+    const style = getComputedStyle(container);
+    const width = track?.offsetWidth ?? 0;
+    const max = Math.max(0, width + parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) - container.clientWidth);
+    if (latest.current.centred) return max / 2;
+    return dir > 0 ? 0 : max;
+  }, [trackRef]);
 
   const canTurn = useCallback((dir: 1 | -1) => {
     const { currentPage: p, totalPages: n } = latest.current;
@@ -126,10 +144,10 @@ export function usePageTurn({
     if (trackRef.current) trackRef.current.dataset.stale = 'true'; // hide the old text layer
     end();
     const container = containerRef.current;
-    if (container) container.scrollLeft = dir > 0 ? 0 : container.scrollWidth;
+    if (container) container.scrollLeft = landing(container, dir);
     const { nextPage: next, previousPage: prev } = latest.current;
     if (dir > 0) next(); else prev();
-  }, [canvasRef, containerRef, end, nextRef, prevRef, trackRef]);
+  }, [canvasRef, containerRef, end, landing, nextRef, prevRef, trackRef]);
 
   /** Slides the rest of the way so the neighbour takes the page's place, then commits. */
   const settle = useCallback((dir: 1 | -1) => {
@@ -137,16 +155,14 @@ export function usePageTurn({
     const track = trackRef.current;
     if (!container || !track) return;
     const width = track.offsetWidth;
-    // From the page alone: the visible neighbours widen scrollWidth while turning.
-    const style = getComputedStyle(container);
-    const maxScroll = Math.max(0, width + parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) - container.clientWidth);
-    // Next lands at its left edge, previous at its right edge (they match when not zoomed).
+    // Slide so the neighbour ends exactly where the page will sit once it lands.
+    const land = landing(container, dir);
     const target = dir > 0
-      ? -(width + GAP - container.scrollLeft)
-      : width + GAP - maxScroll + container.scrollLeft;
+      ? -(width + GAP) + container.scrollLeft - land
+      : width + GAP + container.scrollLeft - land;
     move(target, SETTLE_MS);
     after(SETTLE_MS, () => commit(dir));
-  }, [after, commit, containerRef, move, trackRef]);
+  }, [after, commit, containerRef, landing, move, trackRef]);
 
   const springBack = useCallback(() => {
     move(0, SPRING_MS);
@@ -166,6 +182,20 @@ export function usePageTurn({
     settle(dir);
   }, [begin, canTurn, settle]);
 
+  // Keep a centred page centred as it opens, zooms or resizes (not mid-turn).
+  useEffect(() => {
+    const container = containerRef.current;
+    const track = trackRef.current;
+    if (!centred || !container || !track) return;
+    const centre = () => {
+      if (!track.dataset.turning) container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+    };
+    centre();
+    const observer = new ResizeObserver(centre);
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, [centred, containerRef, trackRef]);
+
   // The turned-to page has arrived: its text layer can show again.
   useEffect(() => {
     if (trackRef.current) delete trackRef.current.dataset.stale;
@@ -175,6 +205,9 @@ export function usePageTurn({
     const el = containerRef.current;
     if (!el) return;
     let g: Gesture | null = null;
+    /** Resting centred (the default zoom): a swipe turns instead of panning. */
+    const atRest = (box: HTMLElement) =>
+      latest.current.centred && Math.abs(box.scrollLeft - (box.scrollWidth - box.clientWidth) / 2) <= EDGE_SLACK;
 
     const cancelDrag = () => {
       if (g?.lock === 'x') springBack();
@@ -191,8 +224,8 @@ export function usePageTurn({
       g = {
         x: t.clientX,
         y: t.clientY,
-        atLeft: el.scrollLeft <= 1,
-        atRight: el.scrollLeft + el.clientWidth >= el.scrollWidth - 1,
+        atLeft: el.scrollLeft <= EDGE_SLACK || atRest(el),
+        atRight: el.scrollLeft + el.clientWidth >= el.scrollWidth - EDGE_SLACK || atRest(el),
         lock: null,
         base: 0,
         offset: 0,

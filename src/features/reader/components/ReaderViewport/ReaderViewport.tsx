@@ -26,6 +26,9 @@ interface ReaderViewportProps {
   /** Attached to the scroll container so useReaderViewport can measure
    *  available dimensions for fit-width / fit-page calculations. */
   containerRef: RefObject<HTMLDivElement | null>;
+  /** Fit screen: the whole page shows, and the bars float over it instead of
+   *  taking room, so showing them never resizes or scrolls the page. */
+  fitScreen?:   boolean;
   /** The page and its neighbours; usePageTurn moves it during a turn. */
   trackRef:     RefObject<HTMLDivElement | null>;
   /** The previous and next pages, drawn by useNeighbourPages, shown while turning. */
@@ -52,12 +55,13 @@ export function ReaderViewport({
   error,
   canvasRef,
   containerRef,
+  fitScreen,
   trackRef,
   prevRef,
   nextRef,
 }: ReaderViewportProps) {
   return (
-    <div className="reader-viewport-scroll" ref={containerRef}>
+    <div className="reader-viewport-scroll" ref={containerRef} data-fit={fitScreen ? 'screen' : undefined}>
       <div className="reader-turn" ref={trackRef}>
         <canvas ref={prevRef} className="reader-turn__neighbour reader-turn__neighbour--prev" aria-hidden="true" hidden />
         <div className="reader-viewport-page">

@@ -30,7 +30,7 @@ import { usePageTurn } from '@/features/reader/hooks/usePageTurn';
 import { useNeighbourPages } from '@/features/reader/hooks/useNeighbourPages';
 import { useReaderKeyboard } from '@/features/reader/hooks/useReaderKeyboard';
 import { useReaderBookmarks } from '@/features/reader/bookmarks/hooks/useReaderBookmarks';
-import { getDefaultFit, useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
+import { getDefaultFit, getDefaultZoom, useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
 import { useReaderSearch } from '@/features/reader/search/hooks/useReaderSearch';
 import type { ReaderOpeningMode } from '@/features/reader/types';
 import { type TextLayerHighlight } from '@/features/reader/search/types';
@@ -130,10 +130,13 @@ export function ReaderPage() {
   const readerBookmarks = useReaderBookmarks(bookId ?? '');
   const { showToast } = useToast();
 
+  const [defaultFit] = useState(getDefaultFit);
+  const [defaultZoom] = useState(() => getDefaultZoom() / 100);
   const reader = useReader(pdfDocument, containerRef, bookId, {
     initialPage: startPage ?? book?.currentPage ?? 1,
-    initialZoom: book?.zoom,
-    initialScaleMode: book?.scaleMode ?? getDefaultFit(),
+    // Every book opens with the page fit chosen in Settings; zoom is for the session.
+    initialScaleMode: defaultFit,
+    initialZoom: defaultFit === 'custom' ? defaultZoom : undefined,
   });
   const { touchLastOpened } = reader;
   const { turnNext, turnPrevious } = usePageTurn({
@@ -147,6 +150,9 @@ export function ReaderPage() {
     page: reader.page,
     nextPage: reader.nextPage,
     previousPage: reader.previousPage,
+    // At the default zoom the page rests centred: it opens and lands there,
+    // and a swipe from there turns the page.
+    centred: reader.scaleMode === 'custom' && Math.abs(reader.zoom - defaultZoom) < 0.005,
   });
   useNeighbourPages(pdfDocument, reader.currentPage, reader.viewport?.scale, prevPageRef, nextPageRef);
   useReaderKeyboard({
@@ -538,6 +544,7 @@ export function ReaderPage() {
           error={error}
           canvasRef={canvasRef}
           containerRef={containerRef}
+          fitScreen={reader.scaleMode === 'fit-page'}
           trackRef={trackRef}
           prevRef={prevPageRef}
           nextRef={nextPageRef}

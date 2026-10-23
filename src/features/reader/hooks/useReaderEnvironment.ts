@@ -9,6 +9,7 @@ const STORAGE_KEY_PREFIX = 'cloud-novel:reader-environment';
 /** Settings' "New books open with": books with no saved settings start from these. */
 const DEFAULTS_KEY = `${STORAGE_KEY_PREFIX}:global`;
 const DEFAULT_FIT_KEY = 'cloud-novel:reader-default-fit';
+const DEFAULT_ZOOM_KEY = 'cloud-novel:reader-default-zoom';
 const BRIGHTNESS_MIN = 0;
 const BRIGHTNESS_MAX = 100;
 
@@ -82,12 +83,26 @@ export function setReaderDefaults(update: ReaderEnvironmentUpdate): void {
   writeSettings(DEFAULTS_KEY, { ...getReaderDefaults(), ...update });
 }
 
-export function getDefaultFit(): ReaderOpeningMode {
-  return window.localStorage.getItem(DEFAULT_FIT_KEY) === 'fit-page' ? 'fit-page' : 'fit-width';
+/** How every book opens: fitted, or at the default zoom ('custom'). */
+export type DefaultFit = ReaderOpeningMode | 'custom';
+
+export function getDefaultFit(): DefaultFit {
+  const saved = window.localStorage.getItem(DEFAULT_FIT_KEY);
+  return saved === 'fit-page' || saved === 'custom' ? saved : 'fit-width';
 }
 
-export function setDefaultFit(mode: ReaderOpeningMode): void {
+export function setDefaultFit(mode: DefaultFit): void {
   window.localStorage.setItem(DEFAULT_FIT_KEY, mode);
+}
+
+/** The default zoom, in percent, used when the default fit is 'custom'. */
+export function getDefaultZoom(): number {
+  const saved = Number(window.localStorage.getItem(DEFAULT_ZOOM_KEY));
+  return saved >= 25 && saved <= 500 ? Math.round(saved) : 100;
+}
+
+export function setDefaultZoom(percent: number): void {
+  window.localStorage.setItem(DEFAULT_ZOOM_KEY, String(Math.min(500, Math.max(25, Math.round(percent)))));
 }
 
 /**

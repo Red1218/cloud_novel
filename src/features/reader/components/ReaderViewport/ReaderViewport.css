@@ -172,3 +172,12 @@
 .pdf-canvas--hidden {
   display: none;
 }
+
+/* Fit screen: the page is sized to the screen alone. The bars float over it
+   (they hide while reading), so the chrome insets add no room here and the
+   page never resizes or scrolls when they show. */
+.reader-viewport-scroll[data-fit='screen'] {
+  padding-top:    max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-top)));
+  padding-bottom: max(var(--space-4), calc(var(--space-4) + env(safe-area-inset-bottom)));
+  overflow: hidden;
+}

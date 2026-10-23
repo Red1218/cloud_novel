@@ -47,7 +47,7 @@ const READING_PRESETS: ReadingPreset[] = [
   {
     id: 'paper',
     label: 'Warm',
-    description: 'Sepia + 10% + Fit Page',
+    description: 'Sepia + 10% + Fit Screen',
     theme: 'sepia',
     brightness: 90,
     openingMode: 'fit-page',
@@ -65,7 +65,7 @@ const READING_PRESETS: ReadingPreset[] = [
   {
     id: 'focus',
     label: 'Focus',
-    description: 'Contrast + 20% + Fit Page',
+    description: 'Contrast + 20% + Fit Screen',
     theme: 'contrast',
     brightness: 80,
     openingMode: 'fit-page',
@@ -305,7 +305,7 @@ export function ReadingEnvironmentPanel({
               onClick={() => onOpeningModeChange('fit-page')}
               aria-pressed={openingMode === 'fit-page'}
             >
-              Fit Page
+              Fit Screen
             </button>
           </div>
         </div>
