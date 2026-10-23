@@ -5,17 +5,19 @@ export interface BookCoverProps {
   src?: string;
   /** Title used for alt text or placeholder text */
   title: string;
+  /** 'eager' for covers that must be ready the moment they show. */
+  loading?: 'lazy' | 'eager';
 }
 
 /**
  * Reusable BookCover component.
  * Renders an image if src is provided, otherwise falls back to a styled placeholder.
  */
-export function BookCover({ src, title }: BookCoverProps) {
+export function BookCover({ src, title, loading = 'lazy' }: BookCoverProps) {
   if (src) {
     return (
       <div className="book-cover book-cover--image">
-        <img src={src} alt={`Cover for ${title}`} className="book-cover__img" loading="lazy" />
+        <img src={src} alt={`Cover for ${title}`} className="book-cover__img" loading={loading} />
       </div>
     );
   }

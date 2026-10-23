@@ -178,9 +178,10 @@ body {
 }
 
 /* The orb: one soft pastel circle peeking in from a card's top right */
+/* clip, not hidden: hidden would make a scroll container that focus can scroll sideways */
 .home__hero,
 .profile__intro {
-  overflow: hidden;
+  overflow: clip;
   border-radius: 24px;
 }
 
