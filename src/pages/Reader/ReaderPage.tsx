@@ -26,7 +26,9 @@ import { usePdfDocument } from '@/features/reader/hooks/usePdfDocument';
 import { usePdfRenderer } from '@/features/reader/hooks/usePdfRenderer';
 import { usePdfTextLayer } from '@/features/reader/hooks/usePdfTextLayer';
 import { useReader } from '@/features/reader/hooks/useReader';
-import { useReaderSwipe } from '@/features/reader/hooks/useReaderSwipe';
+import { usePageTurn } from '@/features/reader/hooks/usePageTurn';
+import { useNeighbourPages } from '@/features/reader/hooks/useNeighbourPages';
+import { useReaderKeyboard } from '@/features/reader/hooks/useReaderKeyboard';
 import { useReaderBookmarks } from '@/features/reader/bookmarks/hooks/useReaderBookmarks';
 import { getDefaultFit, useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
 import { useReaderSearch } from '@/features/reader/search/hooks/useReaderSearch';
@@ -99,6 +101,9 @@ export function ReaderPage() {
   }, [searchParams, setSearchParams]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const prevPageRef = useRef<HTMLCanvasElement>(null);
+  const nextPageRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const chromeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const zoomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -131,7 +136,26 @@ export function ReaderPage() {
     initialScaleMode: book?.scaleMode ?? getDefaultFit(),
   });
   const { touchLastOpened } = reader;
-  useReaderSwipe(containerRef, { nextPage: reader.nextPage, previousPage: reader.previousPage });
+  const { turnNext, turnPrevious } = usePageTurn({
+    containerRef,
+    trackRef,
+    canvasRef,
+    prevRef: prevPageRef,
+    nextRef: nextPageRef,
+    currentPage: reader.currentPage,
+    totalPages: reader.totalPages,
+    page: reader.page,
+    nextPage: reader.nextPage,
+    previousPage: reader.previousPage,
+  });
+  useNeighbourPages(pdfDocument, reader.currentPage, reader.viewport?.scale, prevPageRef, nextPageRef);
+  useReaderKeyboard({
+    previousPage: turnPrevious,
+    nextPage: turnNext,
+    zoomIn: reader.zoomIn,
+    zoomOut: reader.zoomOut,
+    resetZoom: reader.resetZoom,
+  });
   const loadedBookId = book?.id;
   const search = useReaderSearch(pdfDocument, reader.currentPage);
 
@@ -514,6 +538,9 @@ export function ReaderPage() {
           error={error}
           canvasRef={canvasRef}
           containerRef={containerRef}
+          trackRef={trackRef}
+          prevRef={prevPageRef}
+          nextRef={nextPageRef}
         />
       </main>
 
@@ -525,8 +552,8 @@ export function ReaderPage() {
         <ReaderToolbar
           currentPage={reader.currentPage}
           totalPages={reader.totalPages}
-          onPrevPage={reader.previousPage}
-          onNextPage={reader.nextPage}
+          onPrevPage={turnPrevious}
+          onNextPage={turnNext}
           zoom={reader.effectiveZoom}
           onZoomIn={reader.zoomIn}
           onZoomOut={reader.zoomOut}

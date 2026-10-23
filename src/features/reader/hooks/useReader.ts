@@ -4,7 +4,6 @@ import type { ScaleMode } from '../types';
 import { useReaderNavigation } from './useReaderNavigation';
 import { useReaderZoom } from './useReaderZoom';
 import { useReaderViewport } from './useReaderViewport';
-import { useReaderKeyboard } from './useReaderKeyboard';
 import { useReadingState } from './useReadingState';
 
 interface UseReaderOptions {
@@ -23,7 +22,6 @@ interface UseReaderOptions {
  *  useReaderNavigation  currentPage, page navigation, document reset
  *  useReaderZoom        zoom level, scaleMode, zoom actions
  *  useReaderViewport    page loading, viewport derivation, resize handling
- *  useReaderKeyboard    global keyboard shortcuts
  *  useReadingState      persistence of reading state to IndexedDB
  *
  * @param pdfDocument  - The loaded PDF document, or null while loading.
@@ -63,14 +61,6 @@ export function useReader(
 
   // Must happen after vp is computed, before any callbacks fire.
   effectiveZoomRef.current = vp.effectiveZoom;
-
-  useReaderKeyboard({
-    previousPage: nav.previousPage,
-    nextPage: nav.nextPage,
-    zoomIn: zoom.zoomIn,
-    zoomOut: zoom.zoomOut,
-    resetZoom: zoom.resetZoom,
-  });
 
   return {
     ...nav,

@@ -65,6 +65,50 @@
   }
 }
 
+/* ─── Page turn track ───────────────────────────────────────────────────────── */
+
+/*
+ * The page and, while turning, its neighbours 16px to either side. usePageTurn
+ * moves this one layer with a transform; nothing inside re-renders or reflows.
+ * The track takes the auto margins that centre the page (see the scroll
+ * container's note on justify-content).
+ */
+.reader-turn {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  margin: auto;
+}
+
+/* Hidden between turns so they add no scrollable overflow */
+.reader-turn__neighbour {
+  display: none;
+  position: absolute;
+  top: 0;
+  background-color: white; /* a plain sheet until the page is drawn */
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.38),
+    0 18px 52px rgba(0, 0, 0, 0.62);
+}
+
+.reader-turn[data-turning] .reader-turn__neighbour:not([hidden]) {
+  display: block;
+}
+
+.reader-turn__neighbour--prev {
+  right: calc(100% + 16px);
+}
+
+.reader-turn__neighbour--next {
+  left: calc(100% + 16px);
+}
+
+/* Just after a turn the canvas already shows the new page; the old text
+   layer (and its highlights) waits until the new page arrives. */
+.reader-turn[data-stale] .textLayer {
+  visibility: hidden;
+}
+
 /* ─── Page stacking context ─────────────────────────────────────────────────── */
 
 /*
@@ -91,8 +135,7 @@
 .reader-viewport-page {
   position: relative;
   display: inline-block;
-  flex-shrink: 0;
-  margin:        auto;
+  vertical-align: top;
   box-shadow:
     0 2px 10px rgba(0, 0, 0, 0.38),
     0 18px 52px rgba(0, 0, 0, 0.62);
