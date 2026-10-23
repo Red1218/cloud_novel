@@ -258,6 +258,10 @@ export function LibraryPage() {
           onEditCollections={() => setEditingId(picked.id)}
           onMove={(shelf) => moveBook(picked.id, shelf)}
           onIntent={(intent) => library.updateCollections(picked.id, { intent })}
+          onRemove={() => {
+            void library.removeBook(picked.id);
+            setPickedId(undefined);
+          }}
           onClose={() => (picked.id === fromHome ? navigate(-1) : setPickedId(undefined))}
         />
       )}

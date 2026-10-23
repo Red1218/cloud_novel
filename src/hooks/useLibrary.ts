@@ -157,6 +157,16 @@ export function useLibrary() {
 
   const clearLastImported = useCallback(() => setLastImportedIds([]), []);
 
+  const removeBook = useCallback(async (id: string) => {
+    try {
+      await BookRepository.remove(id);
+      await fetchBooks(true);
+    } catch (err) {
+      console.error('Failed to remove book:', err);
+      showToast({ type: 'error', title: 'Error', message: 'Could not remove the book.' });
+    }
+  }, [fetchBooks, showToast]);
+
   return {
     books,
     isLoading,
@@ -166,5 +176,6 @@ export function useLibrary() {
     clearLastImported,
     updateCollections,
     applyCollectionUpdates,
+    removeBook,
   };
 }

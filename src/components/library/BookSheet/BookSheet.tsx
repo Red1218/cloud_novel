@@ -16,6 +16,8 @@ export interface BookSheetProps {
   onMove: (shelf: string | null) => void;
   /** Sets the plan for this book; null clears it. */
   onIntent: (intent: BookIntent | null) => void;
+  /** Deletes the book (after the sheet's own confirm). */
+  onRemove: () => void;
   onClose: () => void;
 }
 
@@ -42,10 +44,11 @@ const PLANS: ReadonlyArray<{ id: BookIntent; label: string; hint: string; badge:
  * A tapped book: its progress, Open and Collections, and the shelf it sits on.
  * Choosing a shelf moves the book at once, and so does a plan (Up next or Not now).
  */
-export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove, onIntent, onClose }: BookSheetProps) {
+export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove, onIntent, onRemove, onClose }: BookSheetProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [newShelf, setNewShelf] = useState('');
   const [announced, setAnnounced] = useState('');
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const plan = PLANS.find((p) => p.id === book.intent);
   const progress = Math.round(book.progress);
   const current = book.shelf && shelfNames.includes(book.shelf) ? book.shelf : DEFAULT_SHELF;
@@ -166,6 +169,22 @@ export function BookSheet({ book, shelfNames, onOpen, onEditCollections, onMove,
             <button type="submit" className="pill pill--outline" disabled={!newShelf.trim()}>Add</button>
           </form>
         </fieldset>
+
+        {confirmRemove ? (
+          <div className="book-sheet__remove-confirm" role="group" aria-labelledby="remove-title">
+            <p id="remove-title" className="book-sheet__remove-title">Remove “{book.title}”?</p>
+            <p className="book-sheet__remove-text">Its PDF, reading place and bookmarks are deleted from this phone. You can't undo this.</p>
+            <div className="book-sheet__actions">
+              <button type="button" className="pill book-sheet__remove-yes" onClick={onRemove}>Remove</button>
+              {/* Focus starts on Cancel so a double tap can't delete */}
+              <button type="button" className="pill pill--outline" autoFocus onClick={() => setConfirmRemove(false)}>Cancel</button>
+            </div>
+          </div>
+        ) : (
+          <button type="button" className="pill pill--outline book-sheet__remove" onClick={() => setConfirmRemove(true)}>
+            Remove from library
+          </button>
+        )}
       </div>
     </dialog>
   );

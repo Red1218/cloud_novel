@@ -152,6 +152,18 @@ export const BookRepository = {
     }
   },
 
+  /** Deletes a book, its PDF and its bookmarks from this device. */
+  async remove(id: string): Promise<void> {
+    const db = await getDB();
+    const tx = db.transaction(['books', 'bookmarks'], 'readwrite');
+    const bookmarks = await tx.objectStore('bookmarks').index('by-bookId').getAllKeys(id);
+    await Promise.all([
+      tx.objectStore('books').delete(id),
+      ...bookmarks.map((key) => tx.objectStore('bookmarks').delete(key)),
+      tx.done,
+    ]);
+  },
+
   /**
    * Sets a book's author, series, genres and shelf (the fields collections are
    * built from). Names are trimmed; genres are de-duplicated.

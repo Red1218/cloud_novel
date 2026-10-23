@@ -190,9 +190,16 @@
   border-radius: var(--radius-sm);
 }
 
+/* One line about the chosen page fit */
+.settings__fit-note {
+  margin-top: var(--space-3);
+  font-size: 14px;
+  color: var(--paper-muted);
+}
+
 /* Default zoom, when Page fit is Zoom */
 .settings__zoom {
-  margin-top: var(--space-3);
+  margin-top: var(--space-1);
   border-bottom: none;
 }
 

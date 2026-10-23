@@ -122,7 +122,7 @@ export function SettingsPage() {
 
       <section className="settings__section settings__card" aria-labelledby="fit-heading">
         <h2 id="fit-heading" className="paper-eyebrow">Page fit</h2>
-        <p className="settings__hint">Every book opens this way. Fit screen shows the whole page with nothing cut off; Zoom opens at your zoom, centred. + and − still zoom while you read.</p>
+        <p className="settings__hint">Every book opens this way. + and − still zoom while you read.</p>
         <div className="settings__segmented" role="group" aria-labelledby="fit-heading">
           {FITS.map(([id, name]) => (
             <button
@@ -138,6 +138,11 @@ export function SettingsPage() {
             </button>
           ))}
         </div>
+        {fit !== 'fit-width' && (
+          <p className="settings__fit-note">
+            {fit === 'fit-page' ? 'The whole page, nothing cut off.' : 'Opens at your zoom, centred.'}
+          </p>
+        )}
         {fit === 'custom' && (
           <label className="settings__row settings__zoom">
             <span className="settings__label">Zoom level</span>

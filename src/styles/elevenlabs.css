@@ -419,6 +419,40 @@ body {
   line-height: 1.35;
 }
 
+/* Stacked head: the name gets the width (wrapping, never cut short), the
+   count sits under it in line with the name, the pencil at the top right. */
+div.shelf__head {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--space-3);
+  row-gap: 6px;
+}
+
+div.shelf__head .shelf__dot {
+  margin-top: 8.5px; /* centred on the name's first line (27px) */
+}
+
+div.shelf__head .shelf__name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+div.shelf__head .shelf__count {
+  grid-column: 2;
+  justify-self: start;
+}
+
+div.shelf__head .shelf__edit {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  margin: -8px -10px 0 0;
+}
+
 /* Covers scroll to the card's edges, clipped by its corners */
 .shelf__rail {
   margin-inline: -24px;
