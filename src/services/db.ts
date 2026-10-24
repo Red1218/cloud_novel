@@ -17,10 +17,14 @@ interface CloudNovelDBSchema extends DBSchema {
       'by-bookId': string;
     };
   };
+  tombstones: {
+    key: string; // 'book:<hash>' or 'bookmark:<id>'
+    value: { key: string; deletedAt: number };
+  };
 }
 
 const DB_NAME = 'CloudNovelDB';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 let dbPromise: Promise<IDBPDatabase<CloudNovelDBSchema>> | null = null;
 
@@ -45,6 +49,10 @@ export function getDB(): Promise<IDBPDatabase<CloudNovelDBSchema>> {
         if (oldVersion < 3 && !db.objectStoreNames.contains('bookmarks')) {
           const bookmarkStore = db.createObjectStore('bookmarks', { keyPath: 'id' });
           bookmarkStore.createIndex('by-bookId', 'bookId');
+        }
+
+        if (oldVersion < 4) {
+          db.createObjectStore('tombstones', { keyPath: 'key' });
         }
       },
     });
