@@ -29,9 +29,6 @@ export function calculateScale(
   const availableHeight = Math.max(1, container.clientHeight - paddingV);
 
   switch (scaleMode) {
-    case 'fit-width':
-      return availableWidth / original.width;
-
     case 'fit-page':
       return Math.min(
         availableWidth  / original.width,

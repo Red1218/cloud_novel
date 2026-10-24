@@ -1,9 +1,4 @@
-import type {
-  ReaderEnvironmentSettings,
-  ReaderOpeningMode,
-  ReaderTheme,
-  ScaleMode,
-} from '../../types';
+import type { ReaderEnvironmentSettings, ReaderTheme } from '../../types';
 import './ReadingEnvironmentPanel.css';
 
 interface ReadingPreset {
@@ -12,7 +7,6 @@ interface ReadingPreset {
   description: string;
   theme: ReaderTheme;
   brightness: number;
-  openingMode: ReaderOpeningMode;
   icon: 'moon' | 'book' | 'sun' | 'focus';
 }
 
@@ -24,11 +18,19 @@ interface ThemeOption {
 
 interface ReadingEnvironmentPanelProps {
   settings: ReaderEnvironmentSettings;
-  scaleMode: ScaleMode;
+  /** This book's own zoom; without one it opens with the whole page fitted. */
+  openZoom?: number;
+  /** The page's zoom right now. */
+  zoom: number;
+  /** Zoomed away from the fitted page. */
+  zoomed: boolean;
   onApplyPreset: (preset: ReadingPreset) => void;
   onThemeChange: (theme: ReaderTheme) => void;
   onBrightnessChange: (brightness: number) => void;
-  onOpeningModeChange: (openingMode: ReaderOpeningMode) => void;
+  /** Makes the zoom right now this book's own. */
+  onSaveZoom: () => void;
+  /** Back to fitting the whole page. */
+  onClearZoom: () => void;
   onAutoHideControlsChange: (autoHideControls: boolean) => void;
   onReset: () => void;
   onClose: () => void;
@@ -38,37 +40,33 @@ const READING_PRESETS: ReadingPreset[] = [
   {
     id: 'night',
     label: 'Night',
-    description: 'Night + 15% + Fit Width',
+    description: 'Night + 15%',
     theme: 'dark',
     brightness: 85,
-    openingMode: 'fit-width',
     icon: 'moon',
   },
   {
     id: 'paper',
     label: 'Warm',
-    description: 'Sepia + 10% + Fit Screen',
+    description: 'Sepia + 10%',
     theme: 'sepia',
     brightness: 90,
-    openingMode: 'fit-page',
     icon: 'book',
   },
   {
     id: 'daylight',
     label: 'Daylight',
-    description: 'Paper + 0% + Fit Width',
+    description: 'Paper + 0%',
     theme: 'light',
     brightness: 100,
-    openingMode: 'fit-width',
     icon: 'sun',
   },
   {
     id: 'focus',
     label: 'Focus',
-    description: 'Contrast + 20% + Fit Screen',
+    description: 'Contrast + 20%',
     theme: 'contrast',
     brightness: 80,
-    openingMode: 'fit-page',
     icon: 'focus',
   },
 ];
@@ -153,22 +151,24 @@ function renderIcon(icon: ReadingPreset['icon']) {
   );
 }
 
-function getOpeningMode(scaleMode: ScaleMode): ReaderOpeningMode {
-  return scaleMode === 'fit-page' ? 'fit-page' : 'fit-width';
-}
+const percent = (scale: number) => `${Math.round(scale * 100)}%`;
 
 export function ReadingEnvironmentPanel({
   settings,
-  scaleMode,
+  openZoom,
+  zoom,
+  zoomed,
   onApplyPreset,
   onThemeChange,
   onBrightnessChange,
-  onOpeningModeChange,
+  onSaveZoom,
+  onClearZoom,
   onAutoHideControlsChange,
   onReset,
   onClose,
 }: ReadingEnvironmentPanelProps) {
-  const openingMode = getOpeningMode(scaleMode);
+  // Offer the zoom right now only when it differs from what the book opens at.
+  const canSave = zoomed && percent(zoom) !== (openZoom ? percent(openZoom) : undefined);
 
   return (
     <section className="reading-environment">
@@ -289,26 +289,22 @@ export function ReadingEnvironmentPanel({
       <div className="reading-environment__section">
         <h3 className="reading-environment__section-title">Reading Behavior</h3>
         <div className="reading-environment__setting-row">
-          <span className="reading-environment__setting-label">Opening Mode</span>
-          <div className="reading-environment__segmented" aria-label="Opening mode">
-            <button
-              type="button"
-              className={`reading-environment__segment ${openingMode === 'fit-width' ? 'reading-environment__segment--active' : ''}`}
-              onClick={() => onOpeningModeChange('fit-width')}
-              aria-pressed={openingMode === 'fit-width'}
-            >
-              Fit Width
+          <span className="reading-environment__setting-label">
+            Opens at <strong className="reading-environment__opens-at">{openZoom ? percent(openZoom) : 'Fit screen'}</strong>
+          </span>
+          {canSave ? (
+            <button type="button" className="reading-environment__segment reading-environment__segment--active" onClick={onSaveZoom}>
+              Use {percent(zoom)}
             </button>
-            <button
-              type="button"
-              className={`reading-environment__segment ${openingMode === 'fit-page' ? 'reading-environment__segment--active' : ''}`}
-              onClick={() => onOpeningModeChange('fit-page')}
-              aria-pressed={openingMode === 'fit-page'}
-            >
-              Fit Screen
+          ) : openZoom ? (
+            <button type="button" className="reading-environment__segment" onClick={onClearZoom}>
+              Back to fit screen
             </button>
-          </div>
+          ) : null}
         </div>
+        {!openZoom && !canSave && (
+          <p className="reading-environment__hint">Zoom with + or − until it reads well, then come back here to keep it for this book.</p>
+        )}
 
         <label className="reading-environment__setting-row reading-environment__setting-row--toggle">
           <span className="reading-environment__setting-label">Auto-hide Controls</span>

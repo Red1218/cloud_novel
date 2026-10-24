@@ -7,7 +7,7 @@ import { ZOOM_MIN, ZOOM_MAX, ZOOM_STEP, ZOOM_DEFAULT } from '../constants';
 interface UseReaderZoomOptions {
   /** Initial zoom level from persisted state. Defaults to ZOOM_DEFAULT. */
   initialZoom?: number;
-  /** Initial scale mode from persisted state. Defaults to 'fit-width'. */
+  /** Initial scale mode from persisted state. Defaults to 'fit-page'. */
   initialScaleMode?: ScaleMode;
   /** Receives every zoom and scale mode change (for persistence). */
   persist: (update: ReadingStateUpdate) => void;
@@ -37,7 +37,7 @@ function roundZoom(value: number): number {
  */
 export function useReaderZoom({
   initialZoom = ZOOM_DEFAULT,
-  initialScaleMode = 'fit-width',
+  initialScaleMode = 'fit-page',
   persist,
   effectiveZoomRef,
 }: UseReaderZoomOptions) {
@@ -81,8 +81,7 @@ export function useReaderZoom({
     setZoomTo(() => ZOOM_DEFAULT);
   }, [setMode, setZoomTo]);
 
-  const fitWidth = useCallback(() => setMode('fit-width'), [setMode]);
   const fitPage = useCallback(() => setMode('fit-page'), [setMode]);
 
-  return { zoom, scaleMode, zoomIn, zoomOut, resetZoom, fitWidth, fitPage };
+  return { zoom, scaleMode, zoomIn, zoomOut, resetZoom, fitPage };
 }

@@ -30,9 +30,9 @@ import { usePageTurn } from '@/features/reader/hooks/usePageTurn';
 import { useNeighbourPages } from '@/features/reader/hooks/useNeighbourPages';
 import { useReaderKeyboard } from '@/features/reader/hooks/useReaderKeyboard';
 import { useReaderBookmarks } from '@/features/reader/bookmarks/hooks/useReaderBookmarks';
-import { getDefaultFit, getDefaultZoom, useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
+import { useReaderEnvironment } from '@/features/reader/hooks/useReaderEnvironment';
 import { useReaderSearch } from '@/features/reader/search/hooks/useReaderSearch';
-import type { ReaderOpeningMode } from '@/features/reader/types';
+import { BookRepository } from '@/repositories/BookRepository';
 import { type TextLayerHighlight } from '@/features/reader/search/types';
 import './ReaderPage.css';
 
@@ -130,13 +130,14 @@ export function ReaderPage() {
   const readerBookmarks = useReaderBookmarks(bookId ?? '');
   const { showToast } = useToast();
 
-  const [defaultFit] = useState(getDefaultFit);
-  const [defaultZoom] = useState(() => getDefaultZoom() / 100);
+  // The book's own zoom as changed in Aa this visit: null once cleared.
+  const [changedZoom, setChangedZoom] = useState<number | null>();
+  const openZoom = changedZoom === undefined ? book?.openZoom : changedZoom ?? undefined;
   const reader = useReader(pdfDocument, containerRef, bookId, {
     initialPage: startPage ?? book?.currentPage ?? 1,
-    // Every book opens with the page fit chosen in Settings; zoom is for the session.
-    initialScaleMode: defaultFit,
-    initialZoom: defaultFit === 'custom' ? defaultZoom : undefined,
+    // A book opens at its own zoom, or with the whole page fitted; + and − are for the visit.
+    initialScaleMode: book?.openZoom ? 'custom' : 'fit-page',
+    initialZoom: book?.openZoom,
   });
   const { touchLastOpened } = reader;
   const { turnNext, turnPrevious } = usePageTurn({
@@ -150,9 +151,9 @@ export function ReaderPage() {
     page: reader.page,
     nextPage: reader.nextPage,
     previousPage: reader.previousPage,
-    // At the default zoom the page rests centred: it opens and lands there,
+    // At the book's own zoom the page rests centred: it opens and lands there,
     // and a swipe from there turns the page.
-    centred: reader.scaleMode === 'custom' && Math.abs(reader.zoom - defaultZoom) < 0.005,
+    centred: openZoom !== undefined && reader.scaleMode === 'custom' && Math.abs(reader.zoom - openZoom) < 0.005,
   });
   useNeighbourPages(pdfDocument, reader.currentPage, reader.viewport?.scale, prevPageRef, nextPageRef);
   useReaderKeyboard({
@@ -394,9 +395,11 @@ export function ReaderPage() {
       .map(match => ({ ranges: match.ranges, selected: match.index === currentMatch?.index }));
   }, [currentMatch, currentPage, isSearchOpen, searchResults]);
 
-  const applyOpeningMode = (openingMode: ReaderOpeningMode): void => {
-    if (openingMode === 'fit-page') reader.fitPage();
-    else reader.fitWidth();
+  const saveOpenZoom = (zoom: number | null): void => {
+    if (!bookId) return;
+    setChangedZoom(zoom);
+    void BookRepository.updateReadingState(bookId, { openZoom: zoom });
+    if (zoom === null) reader.fitPage();
   };
 
   const handleAutoHideControlsChange = (autoHideControls: boolean): void => {
@@ -578,14 +581,14 @@ export function ReaderPage() {
         >
           <ReadingEnvironmentPanel
             settings={readerEnvironment.settings}
-            scaleMode={reader.scaleMode}
-            onApplyPreset={(preset) => {
-              readerEnvironment.updateSettings({ theme: preset.theme, brightness: preset.brightness });
-              applyOpeningMode(preset.openingMode);
-            }}
+            openZoom={openZoom}
+            zoom={reader.effectiveZoom}
+            zoomed={reader.scaleMode === 'custom'}
+            onApplyPreset={(preset) => readerEnvironment.updateSettings({ theme: preset.theme, brightness: preset.brightness })}
             onThemeChange={(theme) => readerEnvironment.updateSettings({ theme })}
             onBrightnessChange={(brightness) => readerEnvironment.updateSettings({ brightness })}
-            onOpeningModeChange={applyOpeningMode}
+            onSaveZoom={() => saveOpenZoom(reader.zoom)}
+            onClearZoom={() => saveOpenZoom(null)}
             onAutoHideControlsChange={handleAutoHideControlsChange}
             onReset={readerEnvironment.resetSettings}
             onClose={closePanel}

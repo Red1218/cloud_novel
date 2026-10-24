@@ -2,12 +2,7 @@ import { useState } from 'react';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { PALETTES, getPalette, setPalette, type PaletteId } from '@/features/appearance/palette';
 import {
-  getDefaultFit,
-  getDefaultZoom,
   getReaderDefaults,
-  setDefaultFit,
-  setDefaultZoom,
-  type DefaultFit,
   setReaderDefaults,
 } from '@/features/reader/hooks/useReaderEnvironment';
 import type { ReaderTheme } from '@/features/reader/types';
@@ -26,12 +21,6 @@ const THEMES: ReadonlyArray<[ReaderTheme, string]> = [
   ['light', 'Paper'],
   ['sepia', 'Sepia'],
   ['contrast', 'Contrast'],
-];
-
-const FITS: ReadonlyArray<[DefaultFit, string]> = [
-  ['fit-width', 'Fit width'],
-  ['fit-page', 'Fit screen'],
-  ['custom', 'Zoom'],
 ];
 
 function Swatches({ palette }: { palette: PaletteId }) {
@@ -67,7 +56,7 @@ function Segmented<T extends string>({ label, options, value, onChange }: {
 }
 
 /**
- * Settings: how books look. The page fit every book opens with, the theme
+ * Settings: how books look. The theme
  * and controls new books open with (each keeps its own Aa changes after
  * that), and keyboard shortcuts.
  */
@@ -76,8 +65,6 @@ export function SettingsPage() {
 
   const [palette, choosePalette] = useState<PaletteId>(getPalette);
   const [defaults, setDefaults] = useState(getReaderDefaults);
-  const [fit, setFit] = useState(getDefaultFit);
-  const [zoom, setZoom] = useState(getDefaultZoom);
   const updateDefaults = (update: Partial<typeof defaults>) => {
     setReaderDefaults(update);
     setDefaults((current) => ({ ...current, ...update }));
@@ -119,51 +106,6 @@ export function SettingsPage() {
         </fieldset>
       </details>
       )}
-
-      <section className="settings__section settings__card" aria-labelledby="fit-heading">
-        <h2 id="fit-heading" className="paper-eyebrow">Page fit</h2>
-        <p className="settings__hint">Every book opens this way. + and − still zoom while you read.</p>
-        <div className="settings__segmented" role="group" aria-labelledby="fit-heading">
-          {FITS.map(([id, name]) => (
-            <button
-              key={id}
-              type="button"
-              aria-pressed={fit === id}
-              onClick={() => {
-                setDefaultFit(id);
-                setFit(id);
-              }}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-        {fit !== 'fit-width' && (
-          <p className="settings__fit-note">
-            {fit === 'fit-page' ? 'The whole page, nothing cut off.' : 'Opens at your zoom, centred.'}
-          </p>
-        )}
-        {fit === 'custom' && (
-          <label className="settings__row settings__zoom">
-            <span className="settings__label">Zoom level</span>
-            <span className="settings__zoom-input">
-              <input
-                type="number"
-                inputMode="numeric"
-                min={25}
-                max={500}
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                onBlur={() => {
-                  setDefaultZoom(zoom);
-                  setZoom(getDefaultZoom());
-                }}
-              />
-              %
-            </span>
-          </label>
-        )}
-      </section>
 
       <section className="settings__section settings__card" aria-labelledby="defaults-heading">
         <h2 id="defaults-heading" className="paper-eyebrow">New books open with</h2>

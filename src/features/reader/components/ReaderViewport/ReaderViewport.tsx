@@ -24,7 +24,7 @@ interface ReaderViewportProps {
   /** Drawn on by the canvas rendering hook (usePdfRenderer). */
   canvasRef:    RefObject<HTMLCanvasElement | null>;
   /** Attached to the scroll container so useReaderViewport can measure
-   *  available dimensions for fit-width / fit-page calculations. */
+   *  available dimensions for fit-page calculations. */
   containerRef: RefObject<HTMLDivElement | null>;
   /** Fit screen: the whole page shows, and the bars float over it instead of
    *  taking room, so showing them never resizes or scrolls the page. */

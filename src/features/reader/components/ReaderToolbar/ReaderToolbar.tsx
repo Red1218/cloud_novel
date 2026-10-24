@@ -153,8 +153,8 @@ export function ReaderToolbar({
           <button
             type="button"
             className="reader-toolbar__button reader-toolbar__aa"
-            aria-label="Themes, brightness and fit"
-            title="Themes, brightness and fit"
+            aria-label="Themes, brightness and zoom"
+            title="Themes, brightness and zoom"
             onClick={onOpenReadingEnvironment}
           >
             Aa

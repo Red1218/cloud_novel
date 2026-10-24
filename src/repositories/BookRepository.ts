@@ -10,6 +10,8 @@ export interface ReadingStateUpdate {
   currentPage?: number;
   zoom?: number;
   scaleMode?: ScaleMode;
+  /** The book's own zoom; null clears it so the book fits the whole page. */
+  openZoom?: number | null;
   lastOpened?: number;
 }
 
@@ -135,6 +137,11 @@ export const BookRepository = {
 
     if (update.scaleMode !== undefined && book.scaleMode !== update.scaleMode) {
       book.scaleMode = update.scaleMode;
+      changed = true;
+    }
+
+    if (update.openZoom !== undefined && book.openZoom !== (update.openZoom ?? undefined)) {
+      book.openZoom = update.openZoom ?? undefined;
       changed = true;
     }
 

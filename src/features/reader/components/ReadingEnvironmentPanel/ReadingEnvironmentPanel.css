@@ -279,6 +279,22 @@
   background: var(--reader-panel-active-bg);
 }
 
+/* A lone segment (Use 140%, Back to fit screen) on the control's track */
+.reading-environment__setting-row > .reading-environment__segment:not(.reading-environment__segment--active) {
+  background: var(--reader-panel-control-bg);
+}
+
+.reading-environment__opens-at {
+  margin-left: var(--space-1);
+  font-weight: var(--font-weight-bold);
+}
+
+.reading-environment__hint {
+  margin-top: calc(-1 * var(--space-1));
+  font-size: var(--font-size-xs);
+  color: var(--reader-panel-muted);
+}
+
 .reading-environment__setting-row--toggle {
   cursor: pointer;
 }

@@ -39,6 +39,8 @@ export interface Book {
   zoom?: number;
   /** Last scale mode used (for persistence) */
   scaleMode?: ScaleMode;
+  /** This book's own zoom (1 = 100%): it opens there, centred, instead of fitting the whole page. */
+  openZoom?: number;
   /** The series this book belongs to (at most one), with its place in it */
   series?: BookSeries;
   /** Genres the reader filed this book under (any number) */

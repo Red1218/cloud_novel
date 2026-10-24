@@ -72,7 +72,7 @@ export function useReaderViewport(
   // ── Resize handling ──────────────────────────────────────────────────────
 
   // Custom zoom is deliberately preserved across resize events.
-  // Only fit-width and fit-page modes need to recalculate on resize.
+  // Only fit-page needs to recalculate on resize.
   //
   // A ResizeObserver on the container (rather than a window listener) also
   // catches sidebar-width and orientation changes. It only fires when the
@@ -113,7 +113,7 @@ export function useReaderViewport(
     const scale = calculateScale(page, containerRef.current, zoom, scaleMode);
 
     // Return the same PageViewport object when the page AND scale are both
-    // unchanged (e.g. a height-only resize in fit-width mode). This prevents
+    // unchanged (e.g. a resize that leaves the fitted scale the same). This prevents
     // usePdfRenderer from redrawing the canvas for an identical result.
     const last = lastRef.current;
     if (last?.page === page && Math.abs(scale - last.viewport.scale) < 1e-6) {
