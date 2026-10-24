@@ -40,7 +40,7 @@ const isKind = (v: string | null): v is CollectionKind => v === 'series' || v ==
 
 /**
  * Library page: a one-row header, then one scrolling row of chips. The
- * reading-state chips show books face-out on glass shelves the reader names
+ * reading-state chips show books spine-out in a white bookcase, on shelves the reader names
  * and fills (all on one shelf to start); a tapped book opens its sheet. The
  * Series, Authors and Genres chips list collections (?view=series etc., so
  * Back returns to it).

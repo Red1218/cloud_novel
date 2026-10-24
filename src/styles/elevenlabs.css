@@ -163,9 +163,7 @@ body {
 
 .home__hero,
 .home__bookmarks li,
-.shelf,
 .collections-view__row,
-.collection__shelf,
 .profile__card,
 .profile__storage,
 .profile__intro,
@@ -391,97 +389,9 @@ body {
   border-style: solid;
 }
 
-.shelves {
-  gap: var(--space-4);
-}
-
-.shelf {
-  padding: 24px;
-  overflow: hidden;
-}
-
-.shelf__head {
-  gap: var(--space-3);
-  min-height: 40px;
-  margin-bottom: var(--space-4);
-}
-
-.shelf__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  box-shadow: none;
-}
-
-.shelf__name {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-/* Stacked head: the name gets the width (wrapping, never cut short), the
-   count sits under it in line with the name, the pencil at the top right. */
-div.shelf__head {
-  display: grid;
-  grid-template-columns: 10px minmax(0, 1fr) auto;
-  align-items: start;
-  column-gap: var(--space-3);
-  row-gap: 6px;
-}
-
-div.shelf__head .shelf__dot {
-  margin-top: 8.5px; /* centred on the name's first line (27px) */
-}
-
-div.shelf__head .shelf__name {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  text-overflow: clip;
-}
-
-div.shelf__head .shelf__count {
-  grid-column: 2;
-  justify-self: start;
-}
-
-div.shelf__head .shelf__edit {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  margin: -8px -10px 0 0;
-}
-
-/* Covers scroll to the card's edges, clipped by its corners */
-.shelf__rail {
-  margin-inline: -24px;
-}
-
-.shelf__row {
-  min-height: 0;
-  padding: 0 24px;
-  scroll-padding-inline: 24px;
-}
-
 /* No glass bands: the cards hold the covers */
 .glass-shelf {
   display: none;
-}
-
-.shelf__book,
-.shelf__book .book-cover {
-  border-radius: 8px;
-  box-shadow: none;
-}
-
-.shelf__arrow {
-  top: calc(50% - 22px);
-  border-color: var(--paper-line);
-  background: var(--paper-raised);
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
 }
 
 /* Collections rows and pages */
@@ -511,15 +421,6 @@ div.shelf__head .shelf__edit {
   border: 1px solid var(--paper-line);
   border-radius: 16px;
   background: var(--paper-raised);
-}
-
-.collection__shelf {
-  padding: 24px 0;
-  overflow: hidden;
-}
-
-.collection__shelf .shelf__rail {
-  margin-inline: 0;
 }
 
 .collection__order .paper-eyebrow {
