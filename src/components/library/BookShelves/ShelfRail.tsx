@@ -1,99 +1,60 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { Book } from '@/types/book';
-import { SPINE_FALLBACK, jitter, useSpineColors, type SpineColor } from '@/components/library/BookSpines/useSpineColors';
-import { packPlanks, spineWidth } from '@/features/library/utils/planks';
+import { BookCover } from '@/components/library/BookCover/BookCover';
 import './BookShelves.css';
 
 export interface ShelfRailProps {
   books: readonly Book[];
   onPick: (bookId: string) => void;
-  /** The pill centred on the shelf's first plank. */
+  /** Names the shelf for the scroll arrows' labels. */
+  name: string;
+  /** The pill centred on the plank. */
   label?: ReactNode;
-  /** Shown in an empty bay when there are no books. */
+  /** Shown in the bay when there are no books. */
   empty?: ReactNode;
 }
 
-/** Bay padding, 6px a side. */
-const BAY_PAD = 12;
-
-const lastName = (author?: string) => author?.trim().split(/\s+/).pop() ?? '';
-const spineLabel = (book: Book) => [book.title, book.author, book.intent === 'next' && 'up next'].filter(Boolean).join(', ');
-const paint = (c: SpineColor | undefined) => ({ backgroundColor: (c ?? SPINE_FALLBACK).bg, color: (c ?? SPINE_FALLBACK).fg });
-
 /**
- * One shelf of a white bookcase: books stand spine-out on planks and wrap
- * onto the next plank when one is full. A full plank's last book leans, the
- * last plank ends with a bookend, and a roomy last plank lays its last two
- * books flat. Goes inside a `.bookcase`. Used by the Library and collection
- * pages.
+ * One shelf of a white bookcase: covers stand on a fixed plank and scroll
+ * sideways above it (arrows only for mouse and trackpad). Goes inside a
+ * `.bookcase`. Used by the Library and collection pages.
  */
-export function ShelfRail({ books, onPick, label, empty }: ShelfRailProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [room, setRoom] = useState(330 - BAY_PAD);
-  const colors = useSpineColors(books);
-
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const measure = () => setRoom(el.clientWidth - BAY_PAD);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const { planks, stack } = packPlanks(books.map((b) => spineWidth(b.pageCount)), room);
-  const lastPlank = planks.length - 1;
-
+export function ShelfRail({ books, onPick, name, label, empty }: ShelfRailProps) {
   return (
-    <div ref={ref} className="case-shelf">
-      {planks.map((plank, p) => (
-        <div key={p} className="case-plank">
-          <div className="case-bay">
-            {books.length === 0 && <p className="case-bay__empty">{empty}</p>}
-            {plank.books.map((i, n) => {
-              const book = books[i];
-              return (
-                <button
-                  key={book.id}
-                  type="button"
-                  className="case-spine"
-                  data-next={book.intent === 'next' || undefined}
-                  data-lean={(plank.lean && n === plank.books.length - 1) || undefined}
-                  aria-label={spineLabel(book)}
-                  style={{ ...paint(colors[book.id]), width: spineWidth(book.pageCount), height: Math.round(134 + jitter(book.id) * 32) }}
-                  onClick={() => onPick(book.id)}
-                >
-                  <span className="case-spine__title">{book.title}</span>
-                  <span className="case-spine__author">{lastName(book.author)}</span>
-                </button>
-              );
-            })}
-            {p === lastPlank && stack.length > 0 && (
-              <div className="case-stack">
-                {[...stack].reverse().map((i, n) => {
-                  const book = books[i];
-                  return (
-                    <button
-                      key={book.id}
-                      type="button"
-                      className="case-flat"
-                      data-next={book.intent === 'next' || undefined}
-                      aria-label={spineLabel(book)}
-                      style={{ ...paint(colors[book.id]), width: n === 0 ? 110 : 116, height: Math.round(20 + jitter(book.id) * 6), marginLeft: n === 0 ? 6 : 0 }}
-                      onClick={() => onPick(book.id)}
-                    >
-                      {book.title}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-            {p === lastPlank && books.length > 0 && <span className="case-bookend" aria-hidden="true" />}
-          </div>
-          <div className="case-board">{p === 0 && label}</div>
-        </div>
-      ))}
+    <div className="case-shelf">
+      <div className="case-bay">
+        {books.map((book) => (
+          <button
+            key={book.id}
+            type="button"
+            className="case-cover"
+            aria-label={[book.title, book.author, book.intent === 'next' && 'up next'].filter(Boolean).join(', ')}
+            onClick={() => onPick(book.id)}
+          >
+            <BookCover src={book.thumbnail} title={book.title} />
+            {book.intent === 'next' && <span className="case-cover__tag">Up next</span>}
+          </button>
+        ))}
+        {books.length === 0 && <p className="case-bay__empty">{empty}</p>}
+      </div>
+      <div className="case-board">{label}</div>
+      {books.length > 1 &&
+        ([-1, 1] as const).map((dir) => (
+          <button
+            key={dir}
+            type="button"
+            className={`case-arrow case-arrow--${dir < 0 ? 'prev' : 'next'}`}
+            aria-label={dir < 0 ? `Scroll ${name} back` : `Scroll ${name} on`}
+            onClick={(e) => {
+              const bay = e.currentTarget.parentElement?.querySelector('.case-bay');
+              bay?.scrollBy({ left: dir * bay.clientWidth * 0.8, behavior: 'smooth' });
+            }}
+          >
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d={dir < 0 ? 'm15 6-6 6 6 6' : 'm9 6 6 6-6 6'} />
+            </svg>
+          </button>
+        ))}
     </div>
   );
 }

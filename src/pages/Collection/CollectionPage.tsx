@@ -85,7 +85,7 @@ export function CollectionPage() {
       <p className="paper-meta">{meta}</p>
 
       <div className="collection__shelf bookcase">
-        <ShelfRail books={ordered} onPick={open} />
+        <ShelfRail books={ordered} name={title} onPick={open} />
       </div>
 
       {isSeries && (

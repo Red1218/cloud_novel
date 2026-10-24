@@ -12,8 +12,8 @@ export interface BookShelvesProps {
 }
 
 /**
- * Every shelf in one white bookcase, each a run of planks. A shelf's label
- * pill sits on its first plank; on the reader's own shelves it opens rename
+ * Every shelf in one white bookcase, one plank each. A shelf's label
+ * pill sits on its plank; on the reader's own shelves it opens rename
  * and delete above that shelf.
  */
 export function BookShelves({ shelves, editing, onEdit, onRename, onDelete, onPick }: BookShelvesProps) {
@@ -48,6 +48,7 @@ export function BookShelves({ shelves, editing, onEdit, onRename, onDelete, onPi
             )}
             <ShelfRail
               books={shelf.books}
+              name={shelf.name}
               onPick={onPick}
               empty="Empty. Tap a book and move it here."
               label={

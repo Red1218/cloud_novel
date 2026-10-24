@@ -1,12 +1,18 @@
-/* A white bookcase: books stand spine-out on planks, one run of planks per
-   shelf. Painted wood, so the colours are fixed rather than themed. */
+/* A white bookcase: covers stand on one plank per shelf and scroll
+   sideways. Painted wood, so the colours are fixed rather than themed. */
 
 .bookcase {
-  padding: 12px 10px 0;
+  padding: 12px 4px 0; /* a thin frame, so three covers and a peek fit a phone */
   border: 1px solid #e7e5e4;
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 10px 24px rgba(12, 10, 9, 0.08);
+}
+
+@media (min-width: 768px) {
+  .bookcase {
+    padding-inline: 10px;
+  }
 }
 
 /* Rename form above a shelf */
@@ -41,19 +47,32 @@
   height: 40px;
 }
 
-/* ---- Bay and plank ---- */
+/* ---- Bay and plank: the covers scroll, the plank stays ---- */
+
+.case-shelf {
+  position: relative;
+}
 
 .case-bay {
   display: flex;
   align-items: flex-end;
-  gap: 3px;
-  height: 176px;
-  padding: 0 6px;
+  gap: 12px;
+  height: 166px;
+  padding: 0 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 10px;
+  scrollbar-width: none;
   background: #f1eee9;
   box-shadow:
     inset 0 14px 14px -10px rgba(12, 10, 9, 0.18),
     inset 6px 0 8px -6px rgba(12, 10, 9, 0.12),
     inset -6px 0 8px -6px rgba(12, 10, 9, 0.12);
+}
+
+.case-bay::-webkit-scrollbar {
+  display: none;
 }
 
 .case-bay__empty {
@@ -104,115 +123,93 @@ button.case-label::before {
   inset: -15px 0;
 }
 
-/* ---- Spines ---- */
+/* ---- Covers ---- */
 
-.case-spine,
-.case-flat {
+.case-cover {
   position: relative;
   flex-shrink: 0;
+  width: 92px;
+  height: 136px;
   padding: 0;
-  overflow: hidden;
-  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0) 22%, rgba(0, 0, 0, 0) 68%, rgba(0, 0, 0, 0.24) 100%);
-  font-weight: 600;
-  box-shadow: 1px 0 1px rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+  scroll-snap-align: start;
+  box-shadow: 0 1px 2px rgba(12, 10, 9, 0.18), 0 8px 14px -6px rgba(12, 10, 9, 0.35);
 }
 
-.case-spine {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 24px 0 22px;
-  border-radius: 3px 3px 1px 1px;
+.case-cover .book-cover {
+  height: 100%;
+  border-radius: 4px;
+  box-shadow: none;
 }
 
-/* Two thin bands near the head and the foot, each a pair of lines */
-.case-spine::before,
-.case-spine::after {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  height: 2px;
-  background: currentColor;
-  box-shadow: 0 4px 0 currentColor;
-  opacity: 0.55;
-}
-
-.case-spine::before {
-  top: 8px;
-}
-
-.case-spine::after {
-  bottom: 12px;
-}
-
-.case-spine__title,
-.case-spine__author {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-
-.case-spine__title {
-  max-height: 104px;
-  font-size: 11px;
-  line-height: 1.2;
-}
-
-/* The title gives way first; the author's name keeps its length */
-.case-spine__author {
-  flex-shrink: 0;
-  max-height: 48px;
-  font-size: 8px;
-  line-height: 1.2;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-}
-
-.case-spine[data-lean] {
-  transform: rotate(9deg);
-  transform-origin: bottom left;
-}
-
-.case-spine[data-next],
-.case-flat[data-next] {
-  outline: 2px solid #ffffff;
-  outline-offset: -4px;
-}
-
-.case-spine:focus-visible,
-.case-flat:focus-visible {
+.case-cover:focus-visible {
   outline: 2px solid var(--paper-accent);
   outline-offset: 2px;
 }
 
-/* ---- Lying flat, and the bookend ---- */
-
-.case-stack {
-  display: flex;
-  flex-direction: column;
-  margin-left: 5px;
-}
-
-.case-flat {
-  display: block;
-  padding: 0 8px;
-  border-radius: 1px 3px 3px 1px;
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0) 22%, rgba(0, 0, 0, 0) 68%, rgba(0, 0, 0, 0.24) 100%);
+/* "UP NEXT" on a cover in the reader's queue */
+.case-cover__tag {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+  color: #0c0a09;
   font-size: 9px;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
-.case-bookend {
-  flex-shrink: 0;
-  width: 6px;
-  height: 96px;
-  margin-left: 5px; /* 8px after the last book, with the 3px gap */
-  border-radius: 2px 2px 0 0;
-  background: #292524;
+/* ---- Mouse and trackpad: the wheel scrolls the page, so give the bay
+   arrows and a thin scrollbar. Touch keeps plain swiping. ---- */
+
+.case-arrow {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .case-bay {
+    scrollbar-width: thin;
+    scrollbar-color: #d6d3d1 transparent;
+  }
+
+  .case-bay::-webkit-scrollbar {
+    display: block;
+    height: 6px;
+  }
+
+  .case-arrow {
+    position: absolute;
+    top: 61px; /* centred on the covers */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #e7e5e4;
+    border-radius: var(--radius-full);
+    background: #ffffff;
+    color: #0c0a09;
+    box-shadow: 0 4px 12px rgba(12, 10, 9, 0.15);
+  }
+
+  .case-arrow--prev {
+    left: 4px;
+  }
+
+  .case-arrow--next {
+    right: 4px;
+  }
+
+  .case-arrow:hover {
+    border-color: var(--paper-accent);
+  }
+
+  .case-arrow:focus-visible {
+    outline-color: var(--paper-accent);
+  }
 }

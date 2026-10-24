@@ -40,7 +40,7 @@ const isKind = (v: string | null): v is CollectionKind => v === 'series' || v ==
 
 /**
  * Library page: a one-row header, then one scrolling row of chips. The
- * reading-state chips show books spine-out in a white bookcase, on shelves the reader names
+ * reading-state chips show books face-out in a white bookcase, on shelves the reader names
  * and fills (all on one shelf to start); a tapped book opens its sheet. The
  * Series, Authors and Genres chips list collections (?view=series etc., so
  * Back returns to it).
@@ -102,7 +102,9 @@ export function LibraryPage() {
 
   const addShelf = () => {
     const name = freeShelfName(customNames);
-    saveOrder([...customNames, name]);
+    // From the saved order, not customNames: right after a rename the books
+    // still carry the old shelf name, which would bring it back.
+    saveOrder([...loadShelfOrder(), name]);
     setEditingShelf(name);
   };
 
