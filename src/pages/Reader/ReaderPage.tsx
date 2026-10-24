@@ -486,8 +486,9 @@ export function ReaderPage() {
   }, [reader.effectiveZoom, reader.viewport]);
 
   return (
+    // ponytail: themes are off for now, every book reads in Night; use readerEnvironment.settings.theme to bring them back
     <div
-      className={`reader-page reader-page--theme-${readerEnvironment.settings.theme} ${isChromeVisible ? 'reader-page--chrome-visible' : ''}`}
+      className={`reader-page reader-page--theme-dark ${isChromeVisible ? 'reader-page--chrome-visible' : ''}`}
       style={readerEnvironmentStyle}
       onPointerDown={handleReaderPointerDown}
       onPointerMove={handlePointerMove}
@@ -584,8 +585,7 @@ export function ReaderPage() {
             openZoom={openZoom}
             zoom={reader.effectiveZoom}
             zoomed={reader.scaleMode === 'custom'}
-            onApplyPreset={(preset) => readerEnvironment.updateSettings({ theme: preset.theme, brightness: preset.brightness })}
-            onThemeChange={(theme) => readerEnvironment.updateSettings({ theme })}
+            onZoomChange={reader.setZoomLevel}
             onBrightnessChange={(brightness) => readerEnvironment.updateSettings({ brightness })}
             onSaveZoom={() => saveOpenZoom(reader.zoom)}
             onClearZoom={() => saveOpenZoom(null)}

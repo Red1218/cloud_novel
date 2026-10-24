@@ -83,5 +83,11 @@ export function useReaderZoom({
 
   const fitPage = useCallback(() => setMode('fit-page'), [setMode]);
 
-  return { zoom, scaleMode, zoomIn, zoomOut, resetZoom, fitPage };
+  /** Jumps to an exact zoom (the Aa zoom bar). */
+  const setZoomLevel = useCallback((value: number) => {
+    setMode('custom');
+    setZoomTo(() => clamp(roundZoom(value)));
+  }, [setMode, setZoomTo]);
+
+  return { zoom, scaleMode, zoomIn, zoomOut, resetZoom, fitPage, setZoomLevel };
 }

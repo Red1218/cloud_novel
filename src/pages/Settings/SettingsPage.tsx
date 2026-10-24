@@ -5,7 +5,6 @@ import {
   getReaderDefaults,
   setReaderDefaults,
 } from '@/features/reader/hooks/useReaderEnvironment';
-import type { ReaderTheme } from '@/features/reader/types';
 import './SettingsPage.css';
 
 const SHORTCUTS: ReadonlyArray<[keys: string, action: string]> = [
@@ -14,13 +13,6 @@ const SHORTCUTS: ReadonlyArray<[keys: string, action: string]> = [
   ['Ctrl + = / Ctrl + −', 'Zoom in / out'],
   ['Ctrl + 0', 'Reset zoom'],
   ['Esc', 'Close the open panel'],
-];
-
-const THEMES: ReadonlyArray<[ReaderTheme, string]> = [
-  ['dark', 'Night'],
-  ['light', 'Paper'],
-  ['sepia', 'Sepia'],
-  ['contrast', 'Contrast'],
 ];
 
 function Swatches({ palette }: { palette: PaletteId }) {
@@ -32,26 +24,6 @@ function Swatches({ palette }: { palette: PaletteId }) {
       <span style={{ background: 'var(--shelf-2)' }} />
       <span style={{ background: 'var(--shelf-3)' }} />
     </span>
-  );
-}
-
-function Segmented<T extends string>({ label, options, value, onChange }: {
-  label: string;
-  options: ReadonlyArray<[T, string]>;
-  value: T;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div className="settings__field">
-      <span className="settings__label" id={`seg-${label}`}>{label}</span>
-      <div className="settings__segmented" role="group" aria-labelledby={`seg-${label}`}>
-        {options.map(([id, name]) => (
-          <button key={id} type="button" aria-pressed={value === id} onClick={() => onChange(id)}>
-            {name}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -110,7 +82,6 @@ export function SettingsPage() {
       <section className="settings__section settings__card" aria-labelledby="defaults-heading">
         <h2 id="defaults-heading" className="paper-eyebrow">New books open with</h2>
         <p className="settings__hint">Each book remembers its own Aa changes after that.</p>
-        <Segmented label="Theme" options={THEMES} value={defaults.theme} onChange={(theme) => updateDefaults({ theme })} />
         <label className="settings__row settings__switch-row">
           <span className="settings__label">Hide controls while reading</span>
           <input
