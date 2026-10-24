@@ -3,7 +3,7 @@ import { ROUTES } from '@/constants/routes';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
 import { useToast } from '@/hooks/useToast';
-import { compareWithDrive, syncService, useSync } from '@/features/sync/sync';
+import { compareWithDrive, driveErrorToast, syncService, useSync } from '@/features/sync/sync';
 import { formatBytes } from '@/utils/formatBytes';
 import { DriveCover, PageBar } from './ProfilePage';
 import { plural, useBack } from './profileUtils';
@@ -64,7 +64,7 @@ export function RestorePage() {
               syncService
                 .download(chosen.map((b) => b.hash))
                 .then(back)
-                .catch((err: Error) => showToast({ type: 'error', title: 'Google Drive', message: err.message }))
+                .catch((err: Error) => showToast(driveErrorToast(err, "Couldn't download from Google Drive")))
             }
           >
             {chosen.length === 0 ? 'Pick books to download' : `Download ${plural(chosen.length, 'book')}, ${size}`}

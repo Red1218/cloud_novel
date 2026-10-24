@@ -1,6 +1,6 @@
 import { createContext, useState, useCallback, type ReactNode } from 'react';
 import type { ToastMessage } from '@/types/toast';
-import { ToastContainer } from '@/components/common/Toast/ToastContainer';
+import { Toast } from '@/components/common/Toast/Toast';
 
 interface ToastContextValue {
   addToast: (toast: Omit<ToastMessage, 'id'>) => void;
@@ -12,21 +12,24 @@ interface ToastProviderProps {
   children: ReactNode;
 }
 
+/** One bar at a time: a new toast replaces the one showing. */
 export function ToastProvider({ children }: ToastProviderProps) {
-  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
 
-  const addToast = useCallback((toast: Omit<ToastMessage, 'id'>) => {
-    setToasts((prev) => [...prev, { ...toast, id: crypto.randomUUID() }]);
+  const addToast = useCallback((next: Omit<ToastMessage, 'id'>) => {
+    setToast({ ...next, id: crypto.randomUUID() });
   }, []);
 
   const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    setToast((current) => (current?.id === id ? null : current));
   }, []);
 
   return (
     <ToastContext.Provider value={{ addToast }}>
       {children}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      <div className="toast-container">
+        {toast && <Toast key={toast.id} toast={toast} onClose={removeToast} />}
+      </div>
     </ToastContext.Provider>
   );
 }

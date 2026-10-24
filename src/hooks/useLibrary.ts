@@ -1,10 +1,15 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Book, StoredBook } from '@/types/book';
 import { BookRepository, type CollectionsUpdate } from '@/repositories/BookRepository';
 import { extractPdfData } from '@/services/pdfService';
 import { computeSHA256 } from '@/utils/hash';
 import { selectPdfFiles } from '@/utils/filePicker';
 import { useToast } from '@/hooks/useToast';
+import { ROUTES } from '@/constants/routes';
+import { DEFAULT_SHELF } from '@/features/library/utils/shelves';
+
+const NOT_PDF = "It isn't a PDF file.";
 
 type ImportResult =
   | { status: 'added'; title: string; id: string }
@@ -16,7 +21,7 @@ type ImportResult =
  */
 async function importFile(file: File): Promise<ImportResult> {
   if (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) {
-    throw new Error('Not a PDF file.');
+    throw new Error(NOT_PDF);
   }
 
   const arrayBuffer = await file.arrayBuffer();
@@ -45,6 +50,8 @@ async function importFile(file: File): Promise<ImportResult> {
   return { status: 'added', title: newBook.title, id: newBook.id };
 }
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
 export function useLibrary() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +60,7 @@ export function useLibrary() {
   const [lastImportedIds, setLastImportedIds] = useState<string[]>([]);
 
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const fetchBooks = useCallback(async (quiet = false) => {
     try {
@@ -63,7 +71,7 @@ export function useLibrary() {
       setBooks(allBooks);
     } catch (err) {
       console.error('Failed to fetch books from library:', err);
-      showToast({ type: 'error', title: 'Error', message: 'Failed to load library.' });
+      showToast({ type: 'error', title: "Couldn't load your library", message: 'Close the app and open it again.' });
     } finally {
       setIsLoading(false);
     }
@@ -74,18 +82,11 @@ export function useLibrary() {
     fetchBooks();
   }, [fetchBooks]);
 
-  const importBooks = useCallback(async () => {
-    let files: File[];
-    try {
-      files = await selectPdfFiles();
-    } catch {
-      return; // Picker cancelled
-    }
-
+  const importFiles = useCallback(async (files: File[]) => {
     setIsImporting(true);
     const added: { title: string; id: string }[] = [];
     const duplicates: string[] = [];
-    const failed: { name: string; reason: string }[] = [];
+    const failed: { file: File; reason: string }[] = [];
 
     // One at a time: each PDF is parsed and rendered for its thumbnail.
     for (const file of files) {
@@ -96,10 +97,8 @@ export function useLibrary() {
       } catch (err) {
         console.error(`Import failed for ${file.name}:`, err);
         failed.push({
-          name: file.name,
-          reason: err instanceof Error && err.message
-            ? err.message
-            : 'The PDF might be corrupted or unsupported.',
+          file,
+          reason: err instanceof Error && err.message === NOT_PDF ? NOT_PDF : 'The PDF might be damaged or unsupported.',
         });
       }
     }
@@ -108,34 +107,50 @@ export function useLibrary() {
     setIsImporting(false);
     setLastImportedIds(added.map((a) => a.id));
 
-    if (added.length > 0) {
+    // One bar at a time, so the most important outcome speaks for the rest.
+    const others = [
+      added.length > 0 && `${plural(added.length, 'other book')} added.`,
+      duplicates.length > 0 && `${plural(duplicates.length, 'book')} already in your library.`,
+    ].filter(Boolean).join(' ');
+    if (failed.length > 0) {
+      // Only a damaged-looking PDF is worth trying again; another file type never imports.
+      const retry = failed.filter((f) => f.reason !== NOT_PDF).map((f) => f.file);
+      showToast({
+        type: 'error',
+        title: failed.length === 1 ? `Couldn't import “${failed[0].file.name}”` : `Couldn't import ${failed.length} files`,
+        message: [failed.length === 1 ? failed[0].reason : failed.map((f) => f.file.name).join(', '), others].filter(Boolean).join(' '),
+        action: retry.length > 0 ? { label: 'Retry', onPress: () => void importFiles(retry) } : undefined,
+      });
+    } else if (added.length > 0) {
       showToast({
         type: 'success',
-        title: 'Import Successful',
-        message: added.length === 1
-          ? `Added "${added[0].title}" to your library.`
-          : `Added ${added.length} books to your library.`,
+        title: `Added ${plural(added.length, 'book')}`,
+        message: [
+          `${added.length === 1 ? "It's" : "They're"} on ${DEFAULT_SHELF}.`,
+          duplicates.length > 0 && `${plural(duplicates.length, 'book')} ${duplicates.length === 1 ? 'was' : 'were'} already in your library.`,
+        ].filter(Boolean).join(' '),
+        action: { label: 'View', onPress: () => navigate(ROUTES.LIBRARY) },
       });
-    }
-    if (duplicates.length > 0) {
+    } else if (duplicates.length > 0) {
       showToast({
         type: 'warning',
-        title: duplicates.length === 1 ? 'Duplicate Book' : 'Duplicate Books',
+        title: 'Already in your library',
         message: duplicates.length === 1
-          ? `The book "${duplicates[0]}" is already in your library.`
+          ? `“${duplicates[0]}” wasn't added again.`
           : `${duplicates.length} books were already in your library.`,
       });
     }
-    if (failed.length > 0) {
-      showToast({
-        type: 'error',
-        title: 'Import Error',
-        message: failed.length === 1
-          ? `Couldn't import "${failed[0].name}": ${failed[0].reason}`
-          : `Couldn't import ${failed.length} files: ${failed.map((f) => f.name).join(', ')}.`,
-      });
+  }, [fetchBooks, navigate, showToast]);
+
+  const importBooks = useCallback(async () => {
+    let files: File[];
+    try {
+      files = await selectPdfFiles();
+    } catch {
+      return; // Picker cancelled
     }
-  }, [fetchBooks, showToast]);
+    await importFiles(files);
+  }, [importFiles]);
 
   /** Saves books' author, series and genres, then refreshes the list once. */
   const applyCollectionUpdates = useCallback(async (updates: { id: string; update: CollectionsUpdate }[]) => {
@@ -146,7 +161,7 @@ export function useLibrary() {
       await fetchBooks(true);
     } catch (err) {
       console.error('Failed to update collections:', err);
-      showToast({ type: 'error', title: 'Error', message: 'Could not save the collections.' });
+      showToast({ type: 'error', title: "Couldn't save the changes", message: 'Try again.' });
     }
   }, [fetchBooks, showToast]);
 
@@ -163,7 +178,7 @@ export function useLibrary() {
       await fetchBooks(true);
     } catch (err) {
       console.error('Failed to remove book:', err);
-      showToast({ type: 'error', title: 'Error', message: 'Could not remove the book.' });
+      showToast({ type: 'error', title: "Couldn't remove the book", message: 'Try again.' });
     }
   }, [fetchBooks, showToast]);
 

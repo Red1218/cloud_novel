@@ -7,7 +7,7 @@ import { useLibrary } from '@/hooks/useLibrary';
 import { useToast } from '@/hooks/useToast';
 import { BookCover } from '@/components/library/BookCover/BookCover';
 import { Avatar } from '@/components/layout/ProfileButton/ProfileButton';
-import { compareWithDrive, syncService, useSync, type DriveBook, type SyncState } from '@/features/sync/sync';
+import { compareWithDrive, driveErrorToast, syncService, useSync, type DriveBook, type SyncState } from '@/features/sync/sync';
 import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime';
 import { formatBytes } from '@/utils/formatBytes';
 import '@/components/library/BookCollectionsSheet/BookCollectionsSheet.css';
@@ -58,12 +58,12 @@ export function ProfilePage() {
   const [dialog, setDialog] = useState<'sign-out' | 'delete' | 'first-sync' | null>(null);
   const { backedUp, notBackedUp, missingHere } = compareWithDrive(books, sync.driveBooks);
 
-  const run = (task: Promise<void>) =>
-    task.catch((err: Error) => showToast({ type: 'error', title: 'Google Drive', message: err.message }));
+  const run = (task: Promise<void>, failed: string) =>
+    task.catch((err: Error) => showToast(driveErrorToast(err, failed)));
   const signIn = () =>
     run(syncService.signIn().then(() => {
       if (books.length > 0) setDialog('first-sync');
-    }));
+    }), "Couldn't sign in to Google");
 
   return (
     <div className="profile paper-page">
@@ -129,7 +129,7 @@ export function ProfilePage() {
             ))}
           </div>
           <div className="profile__actions">
-            <button type="button" className="pill pill--filled" onClick={() => run(syncService.download(missingHere.map((b) => b.hash)))}>
+            <button type="button" className="pill pill--filled" onClick={() => run(syncService.download(missingHere.map((b) => b.hash)), "Couldn't download from Google Drive")}>
               Download all
             </button>
             <Link to={ROUTES.PROFILE_RESTORE} className="pill pill--outline">Choose books</Link>
@@ -164,7 +164,7 @@ export function ProfilePage() {
         <ConfirmDialog
           title="Sign out of Google?"
           confirmLabel="Sign out"
-          onConfirm={() => run(syncService.signOut())}
+          onConfirm={() => run(syncService.signOut(), "Couldn't sign out of Google")}
           onClose={() => setDialog(null)}
         >
           Your books stay on this device. Syncing stops until you sign in again.
@@ -175,7 +175,7 @@ export function ProfilePage() {
           title="Delete your Drive backup?"
           confirmLabel="Delete backup"
           danger
-          onConfirm={() => run(syncService.deleteBackup())}
+          onConfirm={() => run(syncService.deleteBackup(), "Couldn't delete the Drive backup")}
           onClose={() => setDialog(null)}
         >
           This removes {plural(sync.driveBooks.length, 'book')} ({totalSize(sync.driveBooks)}) from your Google Drive. Books on this phone stay. You can't undo this.
@@ -186,7 +186,7 @@ export function ProfilePage() {
           email={sync.account.email}
           books={notBackedUp}
           wifiOnly={sync.wifiOnly}
-          onBackUp={(picked) => run(syncService.backUp(picked))}
+          onBackUp={(picked) => run(syncService.backUp(picked), "Couldn't back up to Google Drive")}
           onClose={() => setDialog(null)}
         />
       )}

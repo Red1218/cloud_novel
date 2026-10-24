@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import type { Book } from '@/types/book';
 import { createFakeDrive } from './fakeDrive';
+import type { ToastMessage } from '@/types/toast';
 
 export interface DriveAccount {
   name: string;
@@ -53,7 +54,18 @@ const SIGNED_OUT: SyncState = {
   wifiOnly: true,
 };
 
-const notSetUp = () => Promise.reject(new Error("Google sign-in isn't set up for this app yet."));
+const NOT_SET_UP = "Google sign-in isn't set up for this app yet.";
+const notSetUp = () => Promise.reject(new Error(NOT_SET_UP));
+
+/**
+ * The toast for a failed Drive task: `failed` names what failed, the error
+ * says how to fix it. "Not set up yet" is news, not a failure.
+ */
+export function driveErrorToast(err: Error, failed: string): Omit<ToastMessage, 'id'> {
+  return err.message === NOT_SET_UP
+    ? { type: 'info', title: "Google sign-in isn't set up yet" }
+    : { type: 'error', title: failed, message: err.message || 'Check your connection and try again.' };
+}
 
 /** Stands in until the Google Drive client exists: always signed out. */
 const unavailable: SyncService = {

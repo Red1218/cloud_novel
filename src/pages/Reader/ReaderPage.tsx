@@ -356,12 +356,39 @@ export function ReaderPage() {
 
   const reportBookmarkError = useCallback((err: unknown): void => {
     console.error('Bookmark update failed:', err);
-    showToast({ type: 'error', title: 'Bookmark Error', message: 'Could not update bookmarks.' });
+    showToast({ type: 'error', title: "Couldn't save the bookmark", message: 'Try again.' });
   }, [showToast]);
 
   const handleToggleBookmark = useCallback((): void => {
-    toggleBookmark(currentPage).catch(reportBookmarkError);
-  }, [currentPage, reportBookmarkError, toggleBookmark]);
+    toggleBookmark(currentPage)
+      .then((added) => {
+        if (!added) return;
+        showToast({
+          type: 'info',
+          icon: 'bookmark',
+          title: 'Bookmark added',
+          // Page first, so a long title never hides the number
+          message: book?.title ? `Page ${added.page}, ${book.title}` : `Page ${added.page}`,
+          action: { label: 'Undo', onPress: () => void removeBookmark(added.id).catch(reportBookmarkError) },
+        });
+      })
+      .catch(reportBookmarkError);
+  }, [book?.title, currentPage, removeBookmark, reportBookmarkError, showToast, toggleBookmark]);
+
+  // The toast sits 16px above the bottom bar, or 24px from the edge while the bars are hidden.
+  useEffect(() => {
+    const root = document.documentElement.style;
+    const bar = document.querySelector<HTMLElement>('.reader-page__bottom-chrome');
+    const place = () => root.setProperty('--toast-bottom', isChromeVisible && bar ? `${bar.offsetHeight + 16}px` : '24px');
+    place();
+    // The bar grows once the book loads (page count, scrubber), so follow its size.
+    const observer = bar ? new ResizeObserver(place) : undefined;
+    if (bar) observer?.observe(bar);
+    return () => {
+      observer?.disconnect();
+      root.removeProperty('--toast-bottom');
+    };
+  }, [isChromeVisible]);
 
   const handleRemoveBookmark = useCallback((bookmarkId: string): void => {
     removeBookmark(bookmarkId).catch(reportBookmarkError);

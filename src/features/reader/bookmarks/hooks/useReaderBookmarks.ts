@@ -36,9 +36,10 @@ export function useReaderBookmarks(bookId: string) {
   );
 
   const addBookmark = useCallback(
-    async (page: number): Promise<void> => {
-      await bookmarkService.addBookmark({ bookId, page });
+    async (page: number): Promise<Bookmark> => {
+      const bookmark = await bookmarkService.addBookmark({ bookId, page });
       await refreshBookmarks();
+      return bookmark;
     },
     [bookId, refreshBookmarks],
   );
@@ -55,13 +56,14 @@ export function useReaderBookmarks(bookId: string) {
   }, []);
 
   const toggleBookmark = useCallback(
-    async (page: number): Promise<void> => {
+    /** Resolves to the new bookmark, or undefined when one was removed. */
+    async (page: number): Promise<Bookmark | undefined> => {
       const existing = bookmarks.find(bookmark => bookmark.page === page);
       if (existing) {
         await removeBookmark(existing.id);
-      } else {
-        await addBookmark(page);
+        return undefined;
       }
+      return addBookmark(page);
     },
     [bookmarks, addBookmark, removeBookmark],
   );
