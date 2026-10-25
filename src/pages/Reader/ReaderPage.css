@@ -149,10 +149,11 @@
   align-items: center;
 }
 
+/* Brightness: a black veil over the page (below the bars); taps pass through */
 .reader-page__environment-dim {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: var(--z-raised);
   background: #000000;
   opacity: var(--reader-environment-dim-opacity);
   pointer-events: none;
