@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Themed icon (Android 13+): the "Shelf" foreground in one colour; the launcher tints it.
+     Same 100-unit canvas as resources/icon-foreground.svg: the art sits in the central 66%
+     (the adaptive icon's safe zone), so no inset is needed. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <group android:translateX="17" android:translateY="17" android:scaleX="0.66" android:scaleY="0.66">
+        <path android:fillColor="#FF000000" android:pathData="M23.5,30h8a1.5,1.5 0 0 1 1.5,1.5v39a1.5,1.5 0 0 1 -1.5,1.5h-8a1.5,1.5 0 0 1 -1.5,-1.5v-39a1.5,1.5 0 0 1 1.5,-1.5z" />
+        <path android:fillColor="#FF000000" android:pathData="M36.5,36h6a1.5,1.5 0 0 1 1.5,1.5v33a1.5,1.5 0 0 1 -1.5,1.5h-6a1.5,1.5 0 0 1 -1.5,-1.5v-33a1.5,1.5 0 0 1 1.5,-1.5z" />
+        <path android:fillColor="#FF000000" android:pathData="M47.5,27h9a1.5,1.5 0 0 1 1.5,1.5v42a1.5,1.5 0 0 1 -1.5,1.5h-9a1.5,1.5 0 0 1 -1.5,-1.5v-42a1.5,1.5 0 0 1 1.5,-1.5z" />
+        <path android:fillColor="#FF000000" android:pathData="M61.5,34h6a1.5,1.5 0 0 1 1.5,1.5v35a1.5,1.5 0 0 1 -1.5,1.5h-6a1.5,1.5 0 0 1 -1.5,-1.5v-35a1.5,1.5 0 0 1 1.5,-1.5z" />
+        <path android:fillColor="#FF000000" android:pathData="M15,72h70a1,1 0 0 1 1,1v3a1,1 0 0 1 -1,1h-70a1,1 0 0 1 -1,-1v-3a1,1 0 0 1 1,-1z" />
+        <group android:rotation="14" android:pivotX="71" android:pivotY="74">
+            <path android:fillColor="#FF000000" android:pathData="M72.5,38h6a1.5,1.5 0 0 1 1.5,1.5v33a1.5,1.5 0 0 1 -1.5,1.5h-6a1.5,1.5 0 0 1 -1.5,-1.5v-33a1.5,1.5 0 0 1 1.5,-1.5z" />
+        </group>
+    </group>
+</vector>
