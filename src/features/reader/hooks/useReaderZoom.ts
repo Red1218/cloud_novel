@@ -1,16 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import type { ScaleMode } from '../types';
-import type { ReadingStateUpdate } from '@/repositories/BookRepository';
 import { ZOOM_MIN, ZOOM_MAX, ZOOM_STEP, ZOOM_DEFAULT } from '../constants';
 
 interface UseReaderZoomOptions {
-  /** Initial zoom level from persisted state. Defaults to ZOOM_DEFAULT. */
+  /** The zoom a book opens at. Defaults to ZOOM_DEFAULT. */
   initialZoom?: number;
-  /** Initial scale mode from persisted state. Defaults to 'fit-page'. */
+  /** How a book opens. Defaults to 'fit-page'. */
   initialScaleMode?: ScaleMode;
-  /** Receives every zoom and scale mode change (for persistence). */
-  persist: (update: ReadingStateUpdate) => void;
   /**
    * The effective (rendered) zoom scale, updated each render by the caller.
    *
@@ -32,13 +29,11 @@ function roundZoom(value: number): number {
 
 /**
  * Manages zoom level and scale mode for the Reader.
- *
- * Accepts initial values from persisted state and reports changes to `persist`.
+ * Zoom is for the visit; a book's own opening zoom is saved separately (openZoom).
  */
 export function useReaderZoom({
   initialZoom = ZOOM_DEFAULT,
   initialScaleMode = 'fit-page',
-  persist,
   effectiveZoomRef,
 }: UseReaderZoomOptions) {
   const [zoom, setZoom] = useState(initialZoom);
@@ -53,41 +48,28 @@ export function useReaderZoom({
   const scaleModeRef = useRef<ScaleMode>(initialScaleMode);
   scaleModeRef.current = scaleMode;
 
-  const setMode = useCallback((mode: ScaleMode) => {
-    if (scaleModeRef.current !== mode) persist({ scaleMode: mode });
-    setScaleMode(mode);
-  }, [persist]);
-
-  const setZoomTo = useCallback((pick: (prev: number) => number) => {
-    setZoom(prev => {
-      const next = pick(prev);
-      if (next !== prev) persist({ zoom: next });
-      return next;
-    });
-  }, [persist]);
-
   /** Steps the zoom; leaving a fit mode starts from the rendered scale. */
   const stepZoom = useCallback((delta: number) => {
     const wasCustom = scaleModeRef.current === 'custom';
-    setMode('custom');
-    setZoomTo(prev => clamp(roundZoom((wasCustom ? prev : effectiveZoomRef.current) + delta)));
-  }, [effectiveZoomRef, setMode, setZoomTo]);
+    setScaleMode('custom');
+    setZoom(prev => clamp(roundZoom((wasCustom ? prev : effectiveZoomRef.current) + delta)));
+  }, [effectiveZoomRef]);
 
   const zoomIn = useCallback(() => stepZoom(ZOOM_STEP), [stepZoom]);
   const zoomOut = useCallback(() => stepZoom(-ZOOM_STEP), [stepZoom]);
 
   const resetZoom = useCallback(() => {
-    setMode('custom');
-    setZoomTo(() => ZOOM_DEFAULT);
-  }, [setMode, setZoomTo]);
+    setScaleMode('custom');
+    setZoom(ZOOM_DEFAULT);
+  }, []);
 
-  const fitPage = useCallback(() => setMode('fit-page'), [setMode]);
+  const fitPage = useCallback(() => setScaleMode('fit-page'), []);
 
   /** Jumps to an exact zoom (the Aa zoom bar). */
   const setZoomLevel = useCallback((value: number) => {
-    setMode('custom');
-    setZoomTo(() => clamp(roundZoom(value)));
-  }, [setMode, setZoomTo]);
+    setScaleMode('custom');
+    setZoom(clamp(roundZoom(value)));
+  }, []);
 
   return { zoom, scaleMode, zoomIn, zoomOut, resetZoom, fitPage, setZoomLevel };
 }

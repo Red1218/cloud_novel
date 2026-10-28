@@ -1,5 +1,5 @@
 /* ==============================================================
-   LIBRARY — glass shelves (shared pieces live in globals.css)
+   LIBRARY (shared pieces live in globals.css)
    ============================================================== */
 
 /* ---- Filters ---- */
@@ -174,12 +174,6 @@
 
 .collections-view__cover .book-cover__placeholder-text {
   font-size: 6px;
-}
-
-.collections-view__shelf .glass-shelf {
-  bottom: 0;
-  height: 18px;
-  border-radius: 3px;
 }
 
 .collections-view__text {

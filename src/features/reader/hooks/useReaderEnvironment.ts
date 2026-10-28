@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type {
-  ReaderEnvironmentSettings,
-  ReaderTheme,
-} from '../types';
+import type { ReaderEnvironmentSettings } from '../types';
 
 const STORAGE_KEY_PREFIX = 'cloud-novel:reader-environment';
 /** Settings' "New books open with": books with no saved settings start from these. */
@@ -11,13 +8,11 @@ const BRIGHTNESS_MIN = 0;
 const BRIGHTNESS_MAX = 100;
 
 export const DEFAULT_READER_ENVIRONMENT: ReaderEnvironmentSettings = {
-  theme: 'dark',
   brightness: 100,
   autoHideControls: true,
 };
 
 export interface ReaderEnvironmentUpdate {
-  theme?: ReaderTheme;
   brightness?: number;
   autoHideControls?: boolean;
 }
@@ -33,13 +28,6 @@ function clampBrightness(value: number): number {
   return Math.min(BRIGHTNESS_MAX, Math.max(BRIGHTNESS_MIN, Math.round(value)));
 }
 
-function isReaderTheme(value: unknown): value is ReaderTheme {
-  return value === 'dark'
-    || value === 'light'
-    || value === 'sepia'
-    || value === 'contrast';
-}
-
 function getStorageKey(bookId: string | undefined): string {
   return `${STORAGE_KEY_PREFIX}:${bookId ?? 'global'}`;
 }
@@ -53,9 +41,6 @@ function readSettings(storageKey: string): ReaderEnvironmentSettings {
   try {
     const parsed = JSON.parse(raw) as Partial<ReaderEnvironmentSettings>;
     return {
-      theme: isReaderTheme(parsed.theme)
-        ? parsed.theme
-        : DEFAULT_READER_ENVIRONMENT.theme,
       brightness: typeof parsed.brightness === 'number'
         ? clampBrightness(parsed.brightness)
         : DEFAULT_READER_ENVIRONMENT.brightness,

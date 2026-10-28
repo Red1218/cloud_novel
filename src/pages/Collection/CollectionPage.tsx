@@ -15,7 +15,7 @@ const isKind = (k: string | undefined): k is CollectionKind => k === 'series' ||
 type Order = 'number' | 'added';
 
 /**
- * One series, author or genre: its books face-out on a glass shelf and in a
+ * One series, author or genre: its books face-out in the white bookcase and in a
  * list; tapping either opens the book. A series
  * reads in book-number order (switchable to date added) and offers to
  * continue with the next unfinished book.

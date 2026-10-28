@@ -6,7 +6,7 @@
 @import './tokens.css';
 @import './reset.css';
 
-/* The shell is paper (light); the reader sets its own colours per theme. */
+/* The shell is paper (light); the reader sets its own colours. */
 html {
   color-scheme: light;
 }
@@ -244,22 +244,4 @@ body {
   font-family: var(--font-family-display);
   font-size: var(--font-size-xl);
   color: var(--paper-ink);
-}
-
-/* The glass band a row of covers stands on, in --shelf-color (set by the
-   parent; defaults to the first shelf colour). Library, Collections and Home. */
-.glass-shelf {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 4px;
-  height: 56px;
-  border-block: 1px solid color-mix(in srgb, var(--shelf-color, var(--shelf-1)) 75%, transparent);
-  background: color-mix(in srgb, var(--shelf-color, var(--shelf-1)) 22%, transparent);
-  box-shadow:
-    0 0 calc(36px * var(--glow)) color-mix(in srgb, var(--shelf-color, var(--shelf-1)) 50%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  pointer-events: none; /* taps and swipes reach the covers */
 }

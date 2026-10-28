@@ -9,7 +9,7 @@ const DEBOUNCE_MS = 500;
  * Hook to manage persisted reading state for a book.
  *
  * Responsibilities:
- * - Queue debounced updates for currentPage, zoom, scaleMode (500ms)
+ * - Queue debounced updates for currentPage (500ms)
  * - Immediately persist lastOpened when requested
  * - Flush pending updates on visibilitychange and beforeunload
  *

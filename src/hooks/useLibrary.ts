@@ -6,6 +6,7 @@ import { extractPdfData } from '@/services/pdfService';
 import { computeSHA256 } from '@/utils/hash';
 import { selectPdfFiles } from '@/utils/filePicker';
 import { useToast } from '@/hooks/useToast';
+import { plural } from '@/utils/plural';
 import { ROUTES } from '@/constants/routes';
 import { DEFAULT_SHELF } from '@/features/library/utils/shelves';
 
@@ -49,8 +50,6 @@ async function importFile(file: File): Promise<ImportResult> {
   await BookRepository.save(newBook);
   return { status: 'added', title: newBook.title, id: newBook.id };
 }
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 export function useLibrary() {
   const [books, setBooks] = useState<Book[]>([]);

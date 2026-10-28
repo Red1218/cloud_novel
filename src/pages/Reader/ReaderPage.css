@@ -1,7 +1,7 @@
 .reader-page {
   --reader-environment-bg: var(--reader-bg-dark);
   --reader-environment-dim-opacity: 0;
-  /* Night (the default): warm dark chrome and panels */
+  /* Night: warm dark chrome and panels */
   --reader-chrome-bg: rgba(36, 34, 31, 0.95);
   --reader-chrome-border: rgba(239, 233, 223, 0.12);
   --reader-chrome-blur: blur(18px);
@@ -25,16 +25,8 @@
   --reader-panel-active-text: #1f1d1a;
   --reader-panel-selected-border: #d4a85a;
   --reader-panel-slider-accent: #d4a85a;
-  --reader-panel-check-bg: #d4a85a;
-  --reader-panel-check-text: #1f1d1a;
   --reader-panel-handle-bg: #4a453e;
   --reader-panel-shadow: 0 -10px 40px rgba(0, 0, 0, 0.45);
-  --reader-theme-preview-dark: #1a1917;
-  --reader-theme-preview-light: #fffdf8;
-  --reader-theme-preview-sepia: #f4e6cb;
-  --reader-theme-preview-contrast: #000000;
-  --reader-theme-preview-line-dark: #d9d2c5;
-  --reader-theme-preview-line-light: #1f1b16;
 
   /*
    * Chrome insets — how much vertical space to reserve inside the scroll
@@ -63,75 +55,6 @@
   height: 100dvh;
   background: var(--reader-environment-bg);
   overflow: hidden;
-}
-
-.reader-page--theme-light,
-.reader-page--theme-sepia {
-  --reader-chrome-bg: rgba(250, 247, 240, 0.95);
-  --reader-chrome-border: var(--paper-line);
-  --reader-chrome-hover-bg: rgba(31, 27, 22, 0.07);
-  --reader-chrome-divider: var(--paper-line);
-  --reader-chrome-track: var(--paper-line);
-  --reader-chrome-text: var(--reader-chrome-text-light);
-  --reader-chrome-text-muted: var(--reader-chrome-muted-light);
-  --reader-chrome-text-disabled: var(--reader-chrome-disabled-light);
-  --reader-panel-bg: var(--paper-bg);
-  --reader-panel-border: var(--paper-line);
-  --reader-panel-border-strong: var(--paper-edge);
-  --reader-panel-text: var(--paper-ink);
-  --reader-panel-muted: var(--paper-muted);
-  --reader-panel-accent: var(--reader-panel-accent-light);
-  --reader-panel-tile-bg: rgba(31, 27, 22, 0.04);
-  --reader-panel-tile-hover-bg: rgba(31, 27, 22, 0.08);
-  --reader-panel-control-bg: rgba(31, 27, 22, 0.05);
-  --reader-panel-control-hover-bg: rgba(31, 27, 22, 0.1);
-  --reader-panel-active-bg: var(--paper-ink);
-  --reader-panel-active-text: var(--paper-bg);
-  --reader-panel-selected-border: var(--paper-ink);
-  --reader-panel-slider-accent: var(--paper-accent);
-  --reader-panel-check-bg: var(--paper-ink);
-  --reader-panel-check-text: var(--paper-bg);
-  --reader-panel-handle-bg: var(--paper-edge);
-  --reader-panel-shadow: 0 -10px 40px rgba(31, 27, 22, 0.2);
-}
-
-.reader-page--theme-light {
-  --reader-environment-bg: var(--reader-bg-light);
-}
-
-/* Sepia: the same paper chrome, warmed to sit on the tan page */
-.reader-page--theme-sepia {
-  --reader-environment-bg: var(--reader-bg-sepia);
-  --reader-chrome-bg: rgba(246, 236, 214, 0.95);
-  --reader-chrome-border: #d8c5a2;
-  --reader-chrome-track: #d8c5a2;
-  --reader-chrome-divider: #d8c5a2;
-  --reader-chrome-text: #3b2a18;
-  --reader-chrome-text-muted: #6e5a3e;
-  --reader-panel-bg: #f6ecd6;
-  --reader-panel-border: #d8c5a2;
-  --reader-panel-text: #3b2a18;
-  --reader-panel-muted: #6e5a3e;
-  --reader-panel-accent: #7a4b1e;
-}
-
-.reader-page--theme-contrast {
-  --reader-environment-bg: var(--reader-bg-contrast);
-  --reader-chrome-bg: rgba(0, 0, 0, 0.92);
-  --reader-chrome-border: rgba(255, 255, 255, 0.3);
-  --reader-chrome-hover-bg: rgba(255, 255, 255, 0.16);
-  --reader-chrome-text: #ffffff;
-  --reader-chrome-text-muted: #d6d6d6;
-  --reader-panel-bg: #000000;
-  --reader-panel-border: rgba(255, 255, 255, 0.3);
-  --reader-panel-border-strong: rgba(255, 255, 255, 0.55);
-  --reader-panel-text: #ffffff;
-  --reader-panel-muted: #d6d6d6;
-  --reader-panel-accent: #ffd60a;
-  --reader-panel-slider-accent: #ffd60a;
-  --reader-panel-selected-border: #ffd60a;
-  --reader-panel-check-bg: #ffd60a;
-  --reader-panel-check-text: #000000;
 }
 
 .reader-page--chrome-visible {

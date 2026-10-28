@@ -44,17 +44,10 @@
 
   /* Reader environment */
   --reader-bg-dark:          #0f0e0d;
-  --reader-bg-light:         #e4ddcf;
-  --reader-bg-sepia:         #cdb894;
-  --reader-bg-contrast:      #000000;
   --reader-chrome-text-dark: #efe9df;
   --reader-chrome-muted-dark: #a59d90;
   --reader-chrome-disabled-dark: rgba(239, 233, 223, 0.34);
-  --reader-chrome-text-light: #1f1b16;
-  --reader-chrome-muted-light: #5f574b;
-  --reader-chrome-disabled-light: rgba(31, 27, 22, 0.32);
   --reader-panel-accent-dark: #d4a85a;
-  --reader-panel-accent-light: #23395b;
 
   /* ----------------------------------------------------------
      SPACING SCALE (4px base unit)
@@ -145,8 +138,7 @@
    PALETTE: ElevenLabs is the app's one look (light only).
    The reader keeps paper colours for its light themes (ADR-002).
    ------------------------------------------------------------ */
-:root,
-[data-palette='elevenlabs'] {
+:root {
   --paper-bg:      #f5f5f5;
   --paper-ink:     #0c0a09;
   --paper-muted:   #4e4e4e;   /* body grey; #777169 only for text 24px+ */

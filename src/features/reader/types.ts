@@ -10,12 +10,8 @@ import type { PDFPageProxy } from 'pdfjs-dist';
  */
 export type ScaleMode = 'fit-page' | 'custom';
 
-/** Visual environment around the published PDF page. */
-export type ReaderTheme = 'dark' | 'light' | 'sepia' | 'contrast';
-
 /** Reader environment settings persisted per book. */
 export interface ReaderEnvironmentSettings {
-  theme: ReaderTheme;
   brightness: number;
   autoHideControls: boolean;
 }

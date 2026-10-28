@@ -5,9 +5,9 @@ import './index.css';
 import { App } from './app/App';
 // After App, so the look's rules come after every component's own styles.
 import './styles/elevenlabs.css';
-import { applyPalette, getPalette } from './features/appearance/palette';
+import { syncStatusBar } from './features/appearance/palette';
 
-applyPalette(getPalette()); // before the first paint, so there is no flash of the wrong colours
+syncStatusBar();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

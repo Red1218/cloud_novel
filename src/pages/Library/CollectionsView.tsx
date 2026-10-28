@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Book } from '@/types/book';
 import { collectionPath } from '@/constants/routes';
@@ -27,7 +27,7 @@ export interface CollectionsViewProps {
 
 /**
  * The Library's Series, Authors or Genres list: each collection as a few of
- * its covers on a small glass band, opening the collection's own page.
+ * its first covers, opening the collection's own page.
  */
 export function CollectionsView({ books, collections, kind }: CollectionsViewProps) {
   const withoutAuthor = useMemo(() => books.filter((b) => !b.author).length, [books]);
@@ -47,20 +47,15 @@ export function CollectionsView({ books, collections, kind }: CollectionsViewPro
         <p className="spines-page__none">{EMPTY[kind]}</p>
       ) : (
         <ul className="collections-view__list" role="list">
-          {collections.map((collection, i) => (
+          {collections.map((collection) => (
             <li key={collection.name}>
               <Link to={collectionPath(collection.kind, collection.name)} className="collections-view__row">
-                <span
-                  className="collections-view__shelf"
-                  aria-hidden="true"
-                  style={{ '--shelf-color': `var(--shelf-${(i % 3) + 1})` } as CSSProperties}
-                >
+                <span className="collections-view__shelf" aria-hidden="true">
                   {collection.books.slice(0, 3).map((book) => (
                     <span key={book.id} className="collections-view__cover">
                       <BookCover src={book.thumbnail} title={book.title} />
                     </span>
                   ))}
-                  <span className="glass-shelf" />
                 </span>
                 <span className="collections-view__text">
                   <span className="collections-view__name">{collection.name}</span>

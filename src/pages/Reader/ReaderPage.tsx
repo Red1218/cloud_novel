@@ -513,9 +513,8 @@ export function ReaderPage() {
   }, [reader.effectiveZoom, reader.viewport]);
 
   return (
-    // ponytail: themes are off for now, every book reads in Night; use readerEnvironment.settings.theme to bring them back
     <div
-      className={`reader-page reader-page--theme-dark ${isChromeVisible ? 'reader-page--chrome-visible' : ''}`}
+      className={`reader-page ${isChromeVisible ? 'reader-page--chrome-visible' : ''}`}
       style={readerEnvironmentStyle}
       onPointerDown={handleReaderPointerDown}
       onPointerMove={handlePointerMove}

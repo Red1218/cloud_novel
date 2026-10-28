@@ -12,7 +12,8 @@ import { formatRelativeTime } from '@/features/library/utils/formatRelativeTime'
 import { formatBytes } from '@/utils/formatBytes';
 import '@/components/library/BookCollectionsSheet/BookCollectionsSheet.css';
 import '@/pages/Settings/SettingsPage.css';
-import { plural, useBack } from './profileUtils';
+import { useBack } from './profileUtils';
+import { plural } from '@/utils/plural';
 import './ProfilePage.css';
 
 const RESTORE_COVERS_MAX = 5;

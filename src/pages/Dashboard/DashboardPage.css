@@ -27,11 +27,6 @@
   color: var(--paper-muted);
 }
 
-.home__progress {
-  margin-top: auto;
-  padding-top: var(--space-3);
-}
-
 .home__continue {
   margin-top: var(--space-3);
 }

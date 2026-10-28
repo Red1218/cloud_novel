@@ -1,4 +1,3 @@
-import type { ScaleMode } from '@/features/reader/types';
 
 /**
  * Represents a book in the Cloud Novel library (Domain Model).
@@ -35,10 +34,6 @@ export interface Book {
   progress: number;
   /** Current page number (1-based) */
   currentPage?: number;
-  /** Last zoom level used (for persistence) */
-  zoom?: number;
-  /** Last scale mode used (for persistence) */
-  scaleMode?: ScaleMode;
   /** This book's own zoom (1 = 100%): it opens there, centred, instead of fitting the whole page. */
   openZoom?: number;
   /** The series this book belongs to (at most one), with its place in it */

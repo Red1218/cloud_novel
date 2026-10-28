@@ -1,6 +1,5 @@
 import { getDB } from '@/services/db';
 import type { Book, BookIntent, BookSeries, StoredBook } from '@/types/book';
-import type { ScaleMode } from '@/features/reader/types';
 
 /**
  * Update payload for reading state persistence.
@@ -8,8 +7,6 @@ import type { ScaleMode } from '@/features/reader/types';
  */
 export interface ReadingStateUpdate {
   currentPage?: number;
-  zoom?: number;
-  scaleMode?: ScaleMode;
   /** The book's own zoom; null clears it so the book fits the whole page. */
   openZoom?: number | null;
   lastOpened?: number;
@@ -128,16 +125,6 @@ export const BookRepository = {
           book.intentAt = undefined;
         }
       }
-    }
-
-    if (update.zoom !== undefined && book.zoom !== update.zoom) {
-      book.zoom = update.zoom;
-      changed = true;
-    }
-
-    if (update.scaleMode !== undefined && book.scaleMode !== update.scaleMode) {
-      book.scaleMode = update.scaleMode;
-      changed = true;
     }
 
     if (update.openZoom !== undefined && book.openZoom !== (update.openZoom ?? undefined)) {

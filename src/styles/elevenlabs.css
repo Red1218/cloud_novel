@@ -123,14 +123,12 @@ body {
 }
 
 /* Two-way switches become pill groups: a quiet well, the choice in white */
-.settings__segmented,
 .collection__order-switch {
   padding: 4px;
   border-radius: var(--radius-full);
   background: var(--paper-tint);
 }
 
-.settings__segmented button,
 .collection__order-switch button {
   height: 36px;
   border: 1px solid transparent;
@@ -140,7 +138,6 @@ body {
   font-weight: 500;
 }
 
-.settings__segmented button[aria-pressed='true'],
 .collection__order-switch button[aria-pressed='true'] {
   border-color: var(--paper-line);
   background: var(--paper-raised);
@@ -387,11 +384,6 @@ body {
 
 .library-hero__new-shelf {
   border-style: solid;
-}
-
-/* No glass bands: the cards hold the covers */
-.glass-shelf {
-  display: none;
 }
 
 /* Collections rows and pages */

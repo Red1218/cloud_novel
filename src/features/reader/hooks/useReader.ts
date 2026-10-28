@@ -47,7 +47,6 @@ export function useReader(
   const zoom = useReaderZoom({
     initialZoom,
     initialScaleMode,
-    persist: queueUpdate,
     effectiveZoomRef,
   });
 

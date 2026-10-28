@@ -6,7 +6,8 @@ import { useToast } from '@/hooks/useToast';
 import { compareWithDrive, driveErrorToast, syncService, useSync } from '@/features/sync/sync';
 import { formatBytes } from '@/utils/formatBytes';
 import { DriveCover, PageBar } from './ProfilePage';
-import { plural, useBack } from './profileUtils';
+import { useBack } from './profileUtils';
+import { plural } from '@/utils/plural';
 import './ProfilePage.css';
 
 /** "Choose books" from the profile: tick the Drive books to bring onto this device. */
