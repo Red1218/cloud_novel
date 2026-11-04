@@ -96,9 +96,12 @@ export const BookRepository = {
    */
   async updateReadingState(id: string, update: ReadingStateUpdate): Promise<void> {
     const db = await getDB();
+    // Read and write in one transaction, so a save landing at the same moment
+    // (e.g. the page-progress save and "Use 140%") waits instead of overwriting.
+    const tx = db.transaction('books', 'readwrite');
 
     // Get the existing book
-    const book = await db.get('books', id);
+    const book = await tx.store.get(id);
     if (!book) {
       // Book no longer exists — not an exceptional condition for persistence
       return;
@@ -146,8 +149,9 @@ export const BookRepository = {
 
     // Only write to IndexedDB if something actually changed
     if (changed) {
-      await db.put('books', book);
+      await tx.store.put(book);
     }
+    await tx.done;
   },
 
   /** Deletes a book, its PDF and its bookmarks from this device. */
@@ -168,7 +172,8 @@ export const BookRepository = {
    */
   async updateCollections(id: string, update: CollectionsUpdate): Promise<void> {
     const db = await getDB();
-    const book = await db.get('books', id);
+    const tx = db.transaction('books', 'readwrite'); // one step: see updateReadingState
+    const book = await tx.store.get(id);
     if (!book) return;
 
     const title = update.title?.trim().slice(0, 200);
@@ -200,6 +205,7 @@ export const BookRepository = {
       book.intentAt = update.intent ? Date.now() : undefined;
     }
 
-    await db.put('books', book);
+    await tx.store.put(book);
+    await tx.done;
   },
 };

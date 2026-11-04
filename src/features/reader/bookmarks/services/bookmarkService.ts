@@ -39,7 +39,10 @@ export const bookmarkService = {
    */
   async addBookmark(input: CreateBookmarkInput): Promise<Bookmark> {
     const db = await getDB();
-    const bookmarks = await db.getAllFromIndex('bookmarks', 'by-bookId', input.bookId);
+    // Check and add in one transaction: two quick taps would otherwise both
+    // see "no bookmark yet" and save the page twice.
+    const tx = db.transaction('bookmarks', 'readwrite');
+    const bookmarks = await tx.store.index('by-bookId').getAll(input.bookId);
     const existing = bookmarks.find(bookmark => bookmark.page === input.page);
     if (existing) {
       return existing;
@@ -51,7 +54,8 @@ export const bookmarkService = {
       createdAt: Date.now(),
     };
 
-    await db.put('bookmarks', bookmark);
+    await tx.store.put(bookmark);
+    await tx.done;
     return bookmark;
   },
 
@@ -62,7 +66,8 @@ export const bookmarkService = {
    */
   async updateBookmarkLabel(bookmarkId: string, label: string): Promise<Bookmark | undefined> {
     const db = await getDB();
-    const bookmark = await db.get('bookmarks', bookmarkId);
+    const tx = db.transaction('bookmarks', 'readwrite');
+    const bookmark = await tx.store.get(bookmarkId);
     if (!bookmark) return undefined;
 
     const trimmed = label.trim();
@@ -70,7 +75,8 @@ export const bookmarkService = {
     if (trimmed) updated.label = trimmed;
     else delete updated.label;
 
-    await db.put('bookmarks', updated);
+    await tx.store.put(updated);
+    await tx.done;
     return updated;
   },
 

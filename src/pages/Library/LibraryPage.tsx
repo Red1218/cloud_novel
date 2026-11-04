@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
+import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/constants/routes';
 import { BookShelves } from '@/components/library/BookShelves/BookShelves';
 import { ShelfSheet } from '@/components/library/ShelfSheet/ShelfSheet';
@@ -55,6 +56,7 @@ export function LibraryPage() {
   // ?view=collections is the old link to the collections tab
   const kind: CollectionKind | undefined = viewParam === 'collections' ? 'series' : isKind(viewParam) ? viewParam : undefined;
   const library = useLibrary();
+  const { showToast } = useToast();
   const { books, isLoading, isImporting, importBooks } = library;
   const [chosenFilter, setFilter] = useState<Filter>('all');
   // Home's Details opens a book's sheet here (?book=id); closing it goes back.
@@ -127,6 +129,9 @@ export function LibraryPage() {
     const name = to.trim();
     const taken = [DEFAULT_SHELF, ...customNames.filter((n) => n !== shelf.name)].some((n) => n.toLowerCase() === name.toLowerCase());
     const rename = shelf.custom && name && name !== shelf.name && !taken ? name : undefined;
+    if (shelf.custom && taken && name !== shelf.name) {
+      showToast({ type: 'warning', title: `There's already a shelf called “${name}”`, message: order ? 'Pick another name. The new book order was saved.' : 'Pick another name.' });
+    }
     if (rename) saveOrder(customNames.map((n) => (n === shelf.name ? rename : n)));
     const updates = shelf.books
       .map((b) => ({
