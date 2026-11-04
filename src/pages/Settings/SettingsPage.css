@@ -17,12 +17,6 @@
   border-bottom: 1px solid var(--paper-line);
 }
 
-.settings__hint {
-  margin-bottom: var(--space-2);
-  font-size: 14px;
-  color: var(--paper-muted);
-}
-
 .settings__switch-row {
   cursor: pointer;
 }
@@ -37,6 +31,27 @@
   color: var(--paper-muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+/* A label and value over a full-width bar (opening zoom, brightness) */
+.settings__slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.settings__slider-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.settings__slider input {
+  width: 100%;
+  min-height: 32px; /* a comfortable thumb target */
+  accent-color: var(--paper-accent);
 }
 
 .settings__kbd {

@@ -7,8 +7,12 @@ const BAR_MAX = 3;
 
 interface ReadingEnvironmentPanelProps {
   settings: ReaderEnvironmentSettings;
-  /** This book's own zoom; without one it opens with the whole page fitted. */
-  openZoom?: number;
+  /** The settings this book changed itself; the rest follow the app settings. */
+  own: Partial<ReaderEnvironmentSettings>;
+  /** This book's own opening zoom, if it has one. */
+  bookZoom?: number;
+  /** The app's opening zoom; without one books fit the whole page. */
+  appZoom?: number;
   /** The page's zoom right now. */
   zoom: number;
   /** Zoomed away from the fitted page. */
@@ -18,12 +22,16 @@ interface ReadingEnvironmentPanelProps {
   onBrightnessChange: (brightness: number) => void;
   /** Makes the zoom right now this book's own. */
   onSaveZoom: () => void;
-  /** Back to fitting the whole page. */
+  /** Back to the app's opening zoom. */
   onClearZoom: () => void;
   onAutoHideControlsChange: (autoHideControls: boolean) => void;
+  /** Forget this book's changes so it follows the app settings. */
   onReset: () => void;
   onClose: () => void;
 }
+
+/** Marks a setting this book changed itself. */
+const ThisBook = () => <span className="reading-environment__own">This book</span>;
 
 function renderIcon(icon: 'moon' | 'sun') {
   return icon === 'moon' ? (
@@ -53,7 +61,9 @@ const percent = (scale: number) => `${Math.round(scale * 100)}%`;
 
 export function ReadingEnvironmentPanel({
   settings,
-  openZoom,
+  own,
+  bookZoom,
+  appZoom,
   zoom,
   zoomed,
   onZoomChange,
@@ -64,8 +74,10 @@ export function ReadingEnvironmentPanel({
   onReset,
   onClose,
 }: ReadingEnvironmentPanelProps) {
+  const openZoom = bookZoom ?? appZoom;
   // Offer the zoom right now only when it differs from what the book opens at.
   const canSave = zoomed && percent(zoom) !== (openZoom ? percent(openZoom) : undefined);
+  const hasOwn = bookZoom !== undefined || Object.keys(own).length > 0;
 
   return (
     <section className="reading-environment">
@@ -110,25 +122,28 @@ export function ReadingEnvironmentPanel({
         <div className="reading-environment__setting-row">
           <span className="reading-environment__setting-label">
             Opens at <strong className="reading-environment__opens-at">{openZoom ? percent(openZoom) : 'Fit screen'}</strong>
+            {bookZoom !== undefined && <ThisBook />}
           </span>
           {canSave ? (
             <button type="button" className="reading-environment__segment reading-environment__segment--active" onClick={onSaveZoom}>
               Use {percent(zoom)}
             </button>
-          ) : openZoom ? (
+          ) : bookZoom !== undefined ? (
             <button type="button" className="reading-environment__segment" onClick={onClearZoom}>
-              Back to fit screen
+              App setting
             </button>
           ) : null}
         </div>
-        {!openZoom && !canSave && (
+        {bookZoom === undefined && !canSave && (
           <p className="reading-environment__hint">Drag the bar until the page reads well, then keep that zoom for this book.</p>
         )}
       </div>
 
       <div className="reading-environment__section">
         <div className="reading-environment__section-row">
-          <h3 className="reading-environment__section-title">Brightness</h3>
+          <h3 className="reading-environment__section-title">
+            Brightness {own.brightness !== undefined && <ThisBook />}
+          </h3>
           <span className="reading-environment__value">
             {settings.brightness}%
           </span>
@@ -155,7 +170,9 @@ export function ReadingEnvironmentPanel({
 
       <div className="reading-environment__section">
         <label className="reading-environment__setting-row reading-environment__setting-row--toggle">
-          <span className="reading-environment__setting-label">Auto-hide Controls</span>
+          <span className="reading-environment__setting-label">
+            Auto-hide Controls {own.autoHideControls !== undefined && <ThisBook />}
+          </span>
           <input
             className="reading-environment__toggle"
             type="checkbox"
@@ -165,13 +182,11 @@ export function ReadingEnvironmentPanel({
         </label>
       </div>
 
-      <button
-        type="button"
-        className="reading-environment__reset"
-        onClick={onReset}
-      >
-        Reset to Default Settings
-      </button>
+      {hasOwn && (
+        <button type="button" className="reading-environment__reset" onClick={onReset}>
+          Use app settings
+        </button>
+      )}
     </section>
   );
 }

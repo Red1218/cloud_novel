@@ -132,12 +132,15 @@ export function ReaderPage() {
 
   // The book's own zoom as changed in Aa this visit: null once cleared.
   const [changedZoom, setChangedZoom] = useState<number | null>();
-  const openZoom = changedZoom === undefined ? book?.openZoom : changedZoom ?? undefined;
+  const bookZoom = changedZoom === undefined ? book?.openZoom : changedZoom ?? undefined;
+  // The book's own zoom wins, then the app setting; neither fits the whole page.
+  const openZoom = bookZoom ?? readerEnvironment.appOpenZoom;
+  const startZoom = book?.openZoom ?? readerEnvironment.appOpenZoom;
   const reader = useReader(pdfDocument, containerRef, bookId, {
     initialPage: startPage ?? book?.currentPage ?? 1,
-    // A book opens at its own zoom, or with the whole page fitted; + and − are for the visit.
-    initialScaleMode: book?.openZoom ? 'custom' : 'fit-page',
-    initialZoom: book?.openZoom,
+    // + and − are for the visit; the next visit opens at openZoom again.
+    initialScaleMode: startZoom ? 'custom' : 'fit-page',
+    initialZoom: startZoom,
   });
   const { touchLastOpened } = reader;
   const { turnNext, turnPrevious } = usePageTurn({
@@ -426,7 +429,10 @@ export function ReaderPage() {
     if (!bookId) return;
     setChangedZoom(zoom);
     void BookRepository.updateReadingState(bookId, { openZoom: zoom });
-    if (zoom === null) reader.fitPage();
+    if (zoom !== null) return;
+    // Back to the app's opening zoom.
+    if (readerEnvironment.appOpenZoom) reader.setZoomLevel(readerEnvironment.appOpenZoom);
+    else reader.fitPage();
   };
 
   const handleAutoHideControlsChange = (autoHideControls: boolean): void => {
@@ -608,7 +614,9 @@ export function ReaderPage() {
         >
           <ReadingEnvironmentPanel
             settings={readerEnvironment.settings}
-            openZoom={openZoom}
+            own={readerEnvironment.own}
+            bookZoom={bookZoom}
+            appZoom={readerEnvironment.appOpenZoom}
             zoom={reader.effectiveZoom}
             zoomed={reader.scaleMode === 'custom'}
             onZoomChange={reader.setZoomLevel}
@@ -616,7 +624,10 @@ export function ReaderPage() {
             onSaveZoom={() => saveOpenZoom(reader.zoom)}
             onClearZoom={() => saveOpenZoom(null)}
             onAutoHideControlsChange={handleAutoHideControlsChange}
-            onReset={readerEnvironment.resetSettings}
+            onReset={() => {
+              readerEnvironment.resetSettings();
+              if (bookZoom !== undefined) saveOpenZoom(null);
+            }}
             onClose={closePanel}
           />
         </ReaderSheet>

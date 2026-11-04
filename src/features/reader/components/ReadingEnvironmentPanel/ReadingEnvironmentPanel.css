@@ -195,3 +195,17 @@
     transition: none;
   }
 }
+
+/* "This book": a setting the book changed itself, over the app settings */
+.reading-environment__own {
+  margin-left: var(--space-2);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--reader-panel-control-bg);
+  color: var(--reader-panel-accent);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+  text-transform: none;
+  vertical-align: middle;
+}
