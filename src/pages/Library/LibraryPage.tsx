@@ -4,6 +4,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useLibrary } from '@/hooks/useLibrary';
 import { ROUTES } from '@/constants/routes';
 import { BookShelves } from '@/components/library/BookShelves/BookShelves';
+import { ShelfSheet } from '@/components/library/ShelfSheet/ShelfSheet';
 import { BookSheet } from '@/components/library/BookSheet/BookSheet';
 import { BookCollectionsSheet } from '@/components/library/BookCollectionsSheet/BookCollectionsSheet';
 import { ProfileButton } from '@/components/layout/ProfileButton/ProfileButton';
@@ -12,7 +13,7 @@ import { sortBooks } from '@/features/library/utils/sortBooks';
 import { readState, statusText, upNext, type ReadState } from '@/features/library/utils/readingStatus';
 import { BookCover } from '@/components/library/BookCover/BookCover';
 import type { Book } from '@/types/book';
-import { DEFAULT_SHELF, deriveShelves, freeShelfName, loadShelfOrder, saveShelfOrder } from '@/features/library/utils/shelves';
+import { DEFAULT_SHELF, deriveShelves, freeShelfName, loadShelfOrder, saveShelfOrder, type Shelf } from '@/features/library/utils/shelves';
 import { deriveCollections, type CollectionKind } from '@/features/library/utils/collections';
 import { CollectionsView } from './CollectionsView';
 
@@ -81,6 +82,8 @@ export function LibraryPage() {
   const allShelves = useMemo(() => deriveShelves(books, shelfOrder), [books, shelfOrder]);
   const customNames = allShelves.filter((s) => s.custom).map((s) => s.name);
   const shelves = deriveShelves(visible, shelfOrder).filter((s) => filter === 'all' || s.books.length > 0);
+  // The sheet orders every book on the shelf, not only those the chip shows.
+  const sheetShelf = allShelves.find((s) => s.name === editingShelf);
   const picked = books.find((b) => b.id === pickedId);
   const editing = books.find((b) => b.id === editingId);
   const collections = useMemo(() => deriveCollections(books), [books]);
@@ -114,25 +117,34 @@ export function LibraryPage() {
       saveOrder([...customNames, shelf]);
     }
     const existing = customNames.find((n) => n.toLowerCase() === shelf?.toLowerCase()) ?? shelf;
-    void library.updateCollections(id, { shelf: existing });
+    // A new shelf: the book goes after the ones ranked there.
+    void library.updateCollections(id, { shelf: existing, shelfRank: null });
   };
 
-  const renameShelf = (from: string, to: string) => {
-    const name = to.trim();
+  /** Done in the shelf sheet: a new name (ignored if empty or taken) and the book order, if dragged. */
+  const saveShelf = (shelf: Shelf, to: string, order: Book[] | undefined) => {
     setEditingShelf(undefined);
-    const taken = [DEFAULT_SHELF, ...customNames.filter((n) => n !== from)].some((n) => n.toLowerCase() === name.toLowerCase());
-    if (!name || name === from || taken) return;
-    saveOrder(customNames.map((n) => (n === from ? name : n)));
-    void library.applyCollectionUpdates(
-      books.filter((b) => b.shelf === from).map((b) => ({ id: b.id, update: { shelf: name } }))
-    );
+    const name = to.trim();
+    const taken = [DEFAULT_SHELF, ...customNames.filter((n) => n !== shelf.name)].some((n) => n.toLowerCase() === name.toLowerCase());
+    const rename = shelf.custom && name && name !== shelf.name && !taken ? name : undefined;
+    if (rename) saveOrder(customNames.map((n) => (n === shelf.name ? rename : n)));
+    const updates = shelf.books
+      .map((b) => ({
+        id: b.id,
+        update: {
+          ...(rename && { shelf: rename }),
+          ...(order && { shelfRank: order.findIndex((o) => o.id === b.id) + 1 }),
+        },
+      }))
+      .filter((u) => Object.keys(u.update).length > 0);
+    if (updates.length > 0) void library.applyCollectionUpdates(updates);
   };
 
   const deleteShelf = (name: string) => {
     setEditingShelf(undefined);
     saveOrder(customNames.filter((n) => n !== name));
     void library.applyCollectionUpdates(
-      books.filter((b) => b.shelf === name).map((b) => ({ id: b.id, update: { shelf: null } }))
+      books.filter((b) => b.shelf === name).map((b) => ({ id: b.id, update: { shelf: null, shelfRank: null } }))
     );
   };
 
@@ -225,10 +237,7 @@ export function LibraryPage() {
               ) : (
                 <BookShelves
                   shelves={shelves}
-                  editing={editingShelf}
                   onEdit={setEditingShelf}
-                  onRename={renameShelf}
-                  onDelete={deleteShelf}
                   onPick={setPickedId}
                 />
               )}
@@ -249,6 +258,16 @@ export function LibraryPage() {
             </>
           )}
         </>
+      )}
+
+      {sheetShelf && (
+        <ShelfSheet
+          key={sheetShelf.name}
+          shelf={sheetShelf}
+          onSave={(name, order) => saveShelf(sheetShelf, name, order)}
+          onDelete={() => deleteShelf(sheetShelf.name)}
+          onClose={() => setEditingShelf(undefined)}
+        />
       )}
 
       {picked && !editing && (

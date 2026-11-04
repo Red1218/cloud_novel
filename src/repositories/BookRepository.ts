@@ -24,6 +24,8 @@ export interface CollectionsUpdate {
   series?: BookSeries | null;
   genres?: string[];
   shelf?: string | null;
+  /** Place on the shelf; null drops it (the book goes after the ranked ones). */
+  shelfRank?: number | null;
   /** Up next or Not now; null clears the plan. */
   intent?: BookIntent | null;
 }
@@ -189,6 +191,9 @@ export const BookRepository = {
     }
     if (update.shelf !== undefined) {
       book.shelf = update.shelf?.trim() || undefined;
+    }
+    if (update.shelfRank !== undefined) {
+      book.shelfRank = update.shelfRank ?? undefined;
     }
     if (update.intent !== undefined && update.intent !== (book.intent ?? null)) {
       book.intent = update.intent ?? undefined;

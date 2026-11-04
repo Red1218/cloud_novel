@@ -18,6 +18,13 @@ assert.deepEqual(
 );
 assert.deepEqual(names(['Gothic'], [book('b', 'Gothic')]), ['Gothic:b'], 'default shelf hides once empty');
 
+const rankedBook = (id: string, shelfRank?: number) => ({ id, title: id, shelf: 'ToG', shelfRank }) as Book;
+assert.deepEqual(
+  names(['ToG'], [rankedBook('x'), rankedBook('c', 3), rankedBook('a', 1), rankedBook('y'), rankedBook('b', 2)]),
+  ['ToG:abcxy'],
+  'ranked books first in rank order, unranked after in the order they came'
+);
+
 assert.equal(freeShelfName([]), 'New shelf');
 assert.equal(freeShelfName(['new shelf', 'New shelf 2']), 'New shelf 3');
 assert.equal(freeShelfName([], DEFAULT_SHELF), `${DEFAULT_SHELF} 2`);

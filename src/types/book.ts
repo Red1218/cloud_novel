@@ -42,6 +42,8 @@ export interface Book {
   genres?: string[];
   /** The reader's own shelf in the Library; none = the default shelf */
   shelf?: string;
+  /** Its place on that shelf (1 first), set by dragging in the shelf sheet; unranked books follow. */
+  shelfRank?: number;
   /** The reader's plan: read it soon ('next') or set it aside ('later') */
   intent?: BookIntent;
   /** When the plan was set; Up next is read oldest first */

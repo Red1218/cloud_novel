@@ -33,16 +33,21 @@ export function saveShelfOrder(names: readonly string[]): void {
 /**
  * The Library's shelves: the default shelf first (while it holds books or
  * is the only one), then the reader's shelves in their order, then any shelf
- * a book names that the order lost. Books keep the order they come in.
+ * a book names that the order lost. Books the reader ranked come first, in
+ * rank order; the rest follow in the order they come in.
  */
 export function deriveShelves(books: readonly Book[], order: readonly string[]): Shelf[] {
   const names = [...new Set([...order, ...books.flatMap((b) => (b.shelf ? [b.shelf] : []))])];
   const unshelved = books.filter((b) => !b.shelf || !names.includes(b.shelf));
-  const custom = names.map((name) => ({ name, custom: true, books: books.filter((b) => b.shelf === name) }));
+  const custom = names.map((name) => ({ name, custom: true, books: ranked(books.filter((b) => b.shelf === name)) }));
   return unshelved.length > 0 || custom.length === 0
-    ? [{ name: DEFAULT_SHELF, custom: false, books: unshelved }, ...custom]
+    ? [{ name: DEFAULT_SHELF, custom: false, books: ranked(unshelved) }, ...custom]
     : custom;
 }
+
+/** Ranked books by rank, then the unranked ones as they came (sort is stable). */
+const ranked = (books: Book[]) =>
+  [...books].sort((a, b) => (a.shelfRank ?? Infinity) - (b.shelfRank ?? Infinity));
 
 /** A shelf name not yet taken: "New shelf", "New shelf 2", … */
 export function freeShelfName(taken: readonly string[], base = 'New shelf'): string {

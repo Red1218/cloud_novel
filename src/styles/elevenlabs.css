@@ -146,8 +146,7 @@ body {
 
 /* ---- Inputs ---- */
 
-.collections-sheet__input,
-.shelf__input {
+.collections-sheet__input {
   height: 44px;
   padding: 0 16px;
   border: 1px solid var(--paper-edge);

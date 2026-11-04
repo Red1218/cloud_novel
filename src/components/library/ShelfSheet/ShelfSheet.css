@@ -1,0 +1,85 @@
+/* The shelf sheet's book list; the sheet itself is .collections-sheet */
+
+.shelf-sheet__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  user-select: none; /* a drag moves books, never highlights titles */
+  -webkit-user-select: none;
+}
+
+.shelf-sheet__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+/* The book being dragged lifts off the list */
+.shelf-sheet__row[data-dragging] {
+  position: relative;
+  z-index: 1;
+  border-radius: 10px;
+  background: var(--paper-raised);
+  box-shadow: 0 6px 18px rgba(12, 10, 9, 0.16);
+}
+
+.shelf-sheet__number {
+  flex-shrink: 0;
+  width: 20px;
+  color: var(--paper-muted);
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.shelf-sheet__cover {
+  flex-shrink: 0;
+  width: 34px;
+}
+
+.shelf-sheet__title {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shelf-sheet__handle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  color: var(--paper-muted);
+  cursor: grab;
+  touch-action: none; /* the drag, not the page, gets the finger */
+}
+
+.shelf-sheet__handle:active {
+  cursor: grabbing;
+}
+
+.shelf-sheet__handle:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: -2px;
+}
+
+.shelf-sheet__delete {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  color: var(--paper-danger);
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+}
